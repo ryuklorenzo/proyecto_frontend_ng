@@ -14,7 +14,7 @@ import { LucideGraduationCap, LucideLoader2, LucideDynamicIcon } from '@lucide/a
   imports: [CommonModule, ReactiveFormsModule, LucideDynamicIcon], 
   templateUrl: './home.html' 
 })
-export class HomeComponent {
+export class Home {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);

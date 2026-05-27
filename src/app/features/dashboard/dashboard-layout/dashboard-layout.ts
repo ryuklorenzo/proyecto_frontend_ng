@@ -33,7 +33,7 @@ import { LucideLoader2, LucideDynamicIcon } from '@lucide/angular';
     }
   `
 })
-export class DashboardLayoutComponent {
+export class DashboardLayout {
   authService = inject(AuthService);
   sidebarCollapsed = false;
   

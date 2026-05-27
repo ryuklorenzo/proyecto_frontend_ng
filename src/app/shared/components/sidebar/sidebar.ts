@@ -22,7 +22,7 @@ interface NavItem {
   imports: [CommonModule, RouterModule, LucideDynamicIcon],  
   templateUrl: './sidebar.html'
 })
-export class SidebarComponent {
+export class Sidebar {
   @Input() collapsed = false;
   @Output() toggle = new EventEmitter<void>();
 
