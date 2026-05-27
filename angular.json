@@ -59,7 +59,8 @@
               "buildTarget": "proyecto_frontend_ng:build:production"
             },
             "development": {
-              "buildTarget": "proyecto_frontend_ng:build:development"
+              "buildTarget": "proyecto_frontend_ng:build:development",
+              "proxyConfig": "proxy.conf.json"
             }
           },
           "defaultConfiguration": "development"
