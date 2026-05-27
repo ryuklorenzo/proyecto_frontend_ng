@@ -1,15 +1,14 @@
-// src/app/features/dashboard/dashboard-layout/dashboard-layout.component.ts
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { SidebarComponent } from '../../../shared/components/sidebar/sidebar';
+import { Sidebar } from '../../../shared/components/sidebar/sidebar';
 import { AuthService } from '../../../core/auth/auth';
 import { LucideLoader2, LucideDynamicIcon } from '@lucide/angular';
 
 @Component({
   selector: 'app-dashboard-layout',
   standalone: true,
-  imports: [CommonModule, RouterModule, SidebarComponent, LucideDynamicIcon],
+  imports: [CommonModule, RouterModule, Sidebar, LucideDynamicIcon],
   template: `
     @if (authService.isLoading()) {
       <div class="min-h-screen flex items-center justify-center bg-background">
