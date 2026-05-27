@@ -37,12 +37,14 @@ export class Sidebar {
     LogOut: LucideLogOut
   };
 
+  //TODO verificar permisos de cada campo
   private navItems: NavItem[] = [
     { href: '/dashboard', label: 'Inicio', icon: LucideHome, roles: ['admin', 'directivo', 'profesor', 'alumno'] },
-    { href: '/dashboard/usuarios', label: 'Usuarios', icon: LucideUsers, roles: ['admin'] },
-    { href: '/dashboard/alumnos', label: 'Alumnos', icon: LucideGraduationCap, roles: ['admin', 'directivo'] },
-    { href: '/dashboard/cursos', label: 'Cursos', icon: LucideBookOpen, roles: ['admin', 'directivo'] },
-    { href: '/dashboard/horarios', label: 'Horarios', icon: LucideCalendar, roles: ['admin', 'directivo'] },
+    { href: '/dashboard/students', label: 'Alumnos', icon: LucideGraduationCap, roles: ['admin', 'directivo'] },
+    { href: '/dashboard/teachers', label: 'Profesores', icon: LucideGraduationCap, roles: ['admin', 'directivo'] },
+    { href: '/dashboard/executives', label: 'Directivos', icon: LucideGraduationCap, roles: ['admin', 'directivo', 'profesor', 'alumno'] }, // solo admin y directivo, pongo mas para testear.
+    { href: '/dashboard/cursos', label: 'Cursos', icon: LucideBookOpen, roles: ['admin'] },
+    { href: '/dashboard/horarios', label: 'Horarios', icon: LucideCalendar, roles: ['admin'] },
     { href: '/dashboard/expedientes', label: 'Expedientes', icon: LucideFileText, roles: ['admin', 'directivo'] },
     { href: '/dashboard/tareas', label: 'Tareas', icon: LucideClipboardList, roles: ['admin', 'directivo', 'profesor', 'alumno'] },
     { href: '/dashboard/amonestaciones', label: 'Amonestaciones', icon: LucideTriangleAlert, roles: ['admin', 'directivo', 'profesor'] },
