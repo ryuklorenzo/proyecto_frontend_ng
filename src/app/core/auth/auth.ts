@@ -32,7 +32,7 @@ export class AuthService {
   // Signal computada para saber si está autenticado
   isAuthenticated = computed(() => !!this.token());
 
-  private readonly API_URL = 'http://localhost:8081';
+  private readonly API_URL = 'http://localhost:8082';
 
   constructor() {
     this.checkSession();
