@@ -31,7 +31,7 @@ import { LucideLoader2, LucideDynamicIcon } from '@lucide/angular';
       </div>
     }
   `
-})
+}) //el template de arriba, comprueba que haya loggeado !muestra algo
 export class DashboardLayout {
   authService = inject(AuthService);
   sidebarCollapsed = false;
