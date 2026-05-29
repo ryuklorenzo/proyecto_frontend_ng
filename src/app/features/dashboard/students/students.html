@@ -2,30 +2,41 @@
     <div class="mb-8">
         <h2 class="text-3xl font-bold text-foreground">Gestión de Alumnos</h2>
         <p class="text-muted-foreground mt-2">
-            Mostrando acciones disponibles para tu rol: 
+            Mostrando acciones disponibles para tu rol:
             <span class="font-bold uppercase">{{ user()?.role }}</span>
         </p>
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        
+
         @for (btn of filteredButtons(); track btn.label) {
-            
-            <button 
-                class="flex flex-col items-center justify-center gap-3 p-6 bg-card border border-border rounded-xl shadow-sm hover:shadow-md hover:bg-primary/10 hover:border-primary transition-all duration-200"
-            >
-                <svg [lucideIcon]="btn.icon" class="w-10 h-10 text-primary"></svg>
-                <span class="font-semibold text-card-foreground text-lg">{{ btn.label }}</span>
-            </button>
-            
+
+        <button (click)="btn.label === 'Crear alumno' && toggleCrearAlumno()"
+            class="flex flex-col items-center justify-center gap-3 p-6 bg-card border border-border rounded-xl shadow-sm hover:shadow-md hover:bg-primary/10 hover:border-primary transition-all duration-200">
+            <svg [lucideIcon]="btn.icon" class="w-10 h-10 text-primary"></svg>
+            <span class="font-semibold text-card-foreground text-lg">{{ btn.label }}</span>
+        </button>
+
         } @empty {
-            
-            <div class="col-span-full p-8 text-center bg-destructive/10 rounded-xl border border-destructive/20">
-                <p class="text-destructive font-medium">
-                    No tienes permisos para realizar acciones en este módulo.
-                </p>
-            </div>
-            
+
+        <div class="col-span-full p-8 text-center bg-destructive/10 rounded-xl border border-destructive/20">
+            <p class="text-destructive font-medium">
+                No tienes permisos para realizar acciones en este módulo.
+            </p>
+        </div>
+
         }
     </div>
+    @if (mostrarFormulario) {
+        <div class="mt-8 p-6 bg-card bord border border-border rounded-xl">
+            <h3 class="text-2xl font-bold mb-4">Crear Alumno</h3>
+            <div class="grid gap-4">
+                <input [(ngModel)]="student.nombre" placeholder="Nombre" class="border rounded p-2">
+                <input [(ngModel)]="student.apellidos" placeholder="Apellidos" class="border rounded p-2">
+                <input [(ngModel)]="student.password" placeholder="Contraseña" class="border rounded p-2">
+                <input [(ngModel)]="idCurso" type="number" placeholder="ID Curso" class="border rounded p-2">
+                <button (click)="createStudent()" class="bg-blue-600 text-white rounded p-2">Crear Alumno</button>
+            </div>
+        </div>
+    }
 </div>
