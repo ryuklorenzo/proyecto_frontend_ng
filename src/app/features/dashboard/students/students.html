@@ -11,7 +11,8 @@
 
         @for (btn of filteredButtons(); track btn.label) {
 
-        <button (click)="btn.label === 'Crear alumno' && toggleCrearAlumno()"
+        <button
+            (click)="btn.label === 'Crear alumno' ? toggleCrearAlumno() : btn.label === 'Ver alumnos' ? loadStudents(): null"
             class="flex flex-col items-center justify-center gap-3 p-6 bg-card border border-border rounded-xl shadow-sm hover:shadow-md hover:bg-primary/10 hover:border-primary transition-all duration-200">
             <svg [lucideIcon]="btn.icon" class="w-10 h-10 text-primary"></svg>
             <span class="font-semibold text-card-foreground text-lg">{{ btn.label }}</span>
@@ -28,15 +29,56 @@
         }
     </div>
     @if (mostrarFormulario) {
-        <div class="mt-8 p-6 bg-card bord border border-border rounded-xl">
-            <h3 class="text-2xl font-bold mb-4">Crear Alumno</h3>
-            <div class="grid gap-4">
-                <input [(ngModel)]="student.nombre" placeholder="Nombre" class="border rounded p-2">
-                <input [(ngModel)]="student.apellidos" placeholder="Apellidos" class="border rounded p-2">
-                <input [(ngModel)]="student.password" placeholder="Contraseña" class="border rounded p-2">
-                <input [(ngModel)]="idCurso" type="number" placeholder="ID Curso" class="border rounded p-2">
-                <button (click)="createStudent()" class="bg-blue-600 text-white rounded p-2">Crear Alumno</button>
-            </div>
+    <div class="mt-8 p-6 bg-card bord border border-border rounded-xl">
+        <h3 class="text-2xl font-bold mb-4">Crear Alumno</h3>
+        <div class="grid gap-4">
+            <input [(ngModel)]="student.nombre" placeholder="Nombre" class="border rounded p-2">
+            <input [(ngModel)]="student.apellidos" placeholder="Apellidos" class="border rounded p-2">
+            <input [(ngModel)]="student.password" placeholder="Contraseña" class="border rounded p-2">
+            <input [(ngModel)]="idCurso" type="number" placeholder="ID Curso" class="border rounded p-2">
+            <button (click)="createStudent()" class="bg-blue-600 text-white rounded p-2">Crear Alumno</button>
         </div>
+    </div>
+    }
+    @if (mostrarTabla) {
+    <div class="mt-8">
+        <div class="bg-card border border-border rounded-xl shadow-md overflow-hidden">
+            <div class="p-4 border-b border-border">
+                <h3 class="text-xl font-bold">Listado de alumnos</h3>
+            </div>
+            <p-table [value]="students" [paginator]="true" [rows]="5" styleClass="p-datatable-striped">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th class="px-4 py-4">ID</th>
+                        <th class="px-4 py-4">Nombre</th>
+                        <th class="px-4 py-4">Apellidos</th>
+                        <th class="px-4 py-4">Curso</th>
+                        <th class="px-4 py-4">Módulo</th>
+                        <th class="px-4 py-4">Estado</th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-student>
+                    <tr class="h-16">
+                        <td>{{ student.id }}</td>
+                        <td>{{ student.nombre }}</td>
+                        <td>{{ student.apellidos }}</td>
+                        <td>{{ student.curso }}</td>
+                        <td>{{ student.modulo }}</td>
+                        <td>
+                            @if(student.activo){
+                            <span class="px-3 py-1 rounded-full bg-green-100 text-green-700 text-sm font-medium">
+                                Activo
+                            </span>
+                            } @else {
+                            <span class="px-3 py-1 rounded-full bg-red-100 text-red-700 text-sm font-medium">
+                                Baja
+                            </span>
+                            }
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </div>
     }
 </div>

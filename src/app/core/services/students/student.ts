@@ -24,4 +24,12 @@ export class StudentService {
       }
     );
   }
+
+  getStudents() {
+    return this.http.get('/api/students/', {
+      headers: {
+        Authorization: `Bearer ${this.authService.token()}`
+      }
+    });
+  }
 }

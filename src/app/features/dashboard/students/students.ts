@@ -15,6 +15,8 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { StudentService } from '../../../core/services/students/student';
+import { OnInit } from '@angular/core';
+import { TableModule } from 'primeng/table';
 
 interface Buttons {
   label: string;
@@ -24,11 +26,16 @@ interface Buttons {
 
 @Component({
   selector: 'app-students',
-  imports: [LucideDynamicIcon, CommonModule, FormsModule],
+  imports: [
+    LucideDynamicIcon,
+    CommonModule,
+    FormsModule,
+    TableModule
+  ],
   templateUrl: './students.html',
   styleUrl: './students.css',
 })
-export class Students {
+export class Students implements OnInit {
   authService = inject(AuthService);
   private studentService = inject(StudentService);
   user = this.authService.user;
@@ -54,6 +61,9 @@ export class Students {
   });
 
   mostrarFormulario = false;
+  mostrarTabla = false;
+
+  students: any[] = [];
 
   student = {
     nombre: '',
@@ -63,9 +73,26 @@ export class Students {
   };
 
   idCurso = 1;
+  ngOnInit() {
+  }
 
   toggleCrearAlumno() {
-    this.mostrarFormulario = !this.mostrarFormulario;
+    this.mostrarTabla = false;
+    this.mostrarFormulario = true;
+  }
+
+  loadStudents() {
+    this.studentService.getStudents().subscribe({
+      next: (data: any) => {
+        this.students = data;
+        this.mostrarFormulario = false;
+        this.mostrarTabla = true;
+      },
+      error: (error) => {
+        console.error(error);
+        alert('Error cargando alumnos');
+      }
+    });
   }
 
   createStudent() {
