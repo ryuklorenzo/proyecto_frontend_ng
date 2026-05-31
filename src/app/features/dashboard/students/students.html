@@ -56,9 +56,7 @@
 
         }
     </div>
-    @if (mostrarFormulario) {
-
-    <div class="mt-10 bg-card border border-border rounded-3xl shadow-md p-8">
+    <div class="mt-10 bg-card border border-border rounded-3xl shadow-md p-8" [hidden]="!mostrarFormulario">
 
         <h3 class="text-4xl font-bold mb-8">
             Crear Alumno
@@ -108,10 +106,7 @@
 
         </div>
     </div>
-    }
-    @if (mostrarTabla) {
-
-    <div class="mt-10">
+    <div class="mt-10" [hidden]="!mostrarTabla">
 
         <div class="bg-card border border-border rounded-3xl shadow-md overflow-hidden">
 
@@ -197,5 +192,68 @@
             </p-table>
         </div>
     </div>
-    }
+    <div *ngIf="mostrarDetalle && selectedStudent"
+        class="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center z-50 p-6">
+        ```
+        <div class="w-full max-w-4xl bg-gradient-to-b from-white to-blue-50 rounded-[32px] shadow-2xl border border-blue-100 overflow-hidden">
+            <div class="flex items-center justify-between px-10 py-8 border-b border-blue-100">
+                <div>
+                    <h3 class="text-4xl font-bold text-blue-950">
+                        Alumno #{{ selectedStudent.id }}
+                    </h3>
+                    <p class="text-blue-600/70 text-lg mt-2">
+                        Información detallada del alumno
+                    </p>
+                </div>
+                <button (click)="closeModal()" class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl text-blue-500 hover:bg-blue-100 hover:text-blue-700 transition-all duration-300">
+                    ✕
+                </button>
+            </div>
+            <div class="p-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white border border-blue-100 rounded-3xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
+                        <p class="text-blue-500 font-medium text-base mb-2">
+                            Nombre
+                        </p>
+                        <p class="text-2xl font-bold text-blue-950">
+                            {{ selectedStudent.nombre }}
+                        </p>
+                    </div>
+                    <div class="bg-white border border-blue-100 rounded-3xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
+                        <p class="text-blue-500 font-medium text-base mb-2">
+                            Apellidos
+                        </p>
+                        <p class="text-2xl font-bold text-blue-950">
+                            {{ selectedStudent.apellidos }}
+                        </p>
+                    </div>
+                    <div class="bg-white border border-blue-100 rounded-3xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
+                        <p class="text-blue-500 font-medium text-base mb-2">
+                            Curso
+                        </p>
+                        <p class="text-2xl font-bold text-blue-950">
+                            {{ selectedStudent.curso }}
+                        </p>
+                    </div>
+                    <div class="bg-white border border-blue-100 rounded-3xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
+                        <p class="text-blue-500 font-medium text-base mb-2">
+                            Módulo
+                        </p>
+                        <p class="text-2xl font-bold text-blue-950">
+                            {{ selectedStudent.modulo }}
+                        </p>
+                    </div>
+                    <div class="md:col-span-2 bg-white border border-blue-100 rounded-3xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
+                        <p class="text-blue-500 font-medium text-base mb-2">
+                            ID
+                        </p>
+                        <p class="text-2xl font-bold text-blue-950">
+                            {{ selectedStudent.id }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        ```
+    </div>
 </div>

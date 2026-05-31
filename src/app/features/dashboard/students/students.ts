@@ -62,6 +62,8 @@ export class Students implements OnInit {
   mostrarTabla = false;
 
   students: any[] = [];
+  selectedStudent: any = null;
+  mostrarDetalle = false;
 
   searchTerm = '';
 
@@ -82,11 +84,12 @@ export class Students implements OnInit {
   }
 
   loadStudents() {
+    this.mostrarFormulario = false;
+    this.mostrarTabla = true;
+
     this.studentService.getStudents().subscribe({
       next: (data: any) => {
-        this.students = data;
-        this.mostrarFormulario = false;
-        this.mostrarTabla = true;
+        this.students = [...data];
       },
       error: (error) => {
         console.error(error);
@@ -104,6 +107,14 @@ export class Students implements OnInit {
   }
 
   createStudent() {
+    if (
+      !this.student.nombre.trim() ||
+      !this.student.apellidos.trim() ||
+      !this.student.password.trim()
+    ) {
+      alert('Todos los campos son obligatorios');
+      return;
+    }
     this.studentService.createStudent(this.student, this.idCurso).subscribe({
       next: (response) => {
         console.log(response);
@@ -128,8 +139,8 @@ export class Students implements OnInit {
   viewStudent(student: any) {
     this.studentService.getStudentById(student.id).subscribe({
       next: (data) => {
-        console.log(data);
-        alert(JSON.stringify(data, null, 2));
+        this.selectedStudent = data;
+        this.mostrarDetalle = true;
       },
       error: (error) => {
         console.error(error);
@@ -153,5 +164,10 @@ export class Students implements OnInit {
         alert('Error dando de baja al alumno');
       }
     });
+  }
+
+  closeModal() {
+    this.mostrarDetalle = false;
+    this.selectedStudent = null;
   }
 }
