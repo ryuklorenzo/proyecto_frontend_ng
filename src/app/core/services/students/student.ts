@@ -32,4 +32,20 @@ export class StudentService {
       }
     });
   }
+
+  getStudentById(id: number) {
+    return this.http.get(`/api/students/${id}/`, {
+      headers: {
+        Authorization: `Bearer ${this.authService.token()}`
+      }
+    });
+  }
+
+  deleteStudent(id: number) {
+    return this.http.delete(`/api/students/${id}/baja/`, {
+      headers: {
+        Authorization: `Bearer ${this.authService.token()}`
+      }
+    });
+  }
 }

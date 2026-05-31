@@ -7,7 +7,7 @@
         </p>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
         @for (btn of filteredButtons(); track btn.label) {
 
@@ -46,7 +46,11 @@
             <div class="p-4 border-b border-border">
                 <h3 class="text-xl font-bold">Listado de alumnos</h3>
             </div>
-            <p-table [value]="students" [paginator]="true" [rows]="5" styleClass="p-datatable-striped">
+            <div class="p-4 border-b border-border">
+                <input [(ngModel)]="searchTerm" placeholder="Buscar por ID, nombre o apellidos..."
+                    class="w-full border rounded-lg p-3">
+            </div>
+            <p-table [value]="filteredStudents" [paginator]="true" [rows]="5" styleClass="p-datatable-striped">
                 <ng-template pTemplate="header">
                     <tr>
                         <th class="px-4 py-4">ID</th>
@@ -55,6 +59,7 @@
                         <th class="px-4 py-4">Curso</th>
                         <th class="px-4 py-4">Módulo</th>
                         <th class="px-4 py-4">Estado</th>
+                        <th class="px-4 py-4">Acciones</th>
                     </tr>
                 </ng-template>
                 <ng-template pTemplate="body" let-student>
@@ -74,6 +79,20 @@
                                 Baja
                             </span>
                             }
+                        </td>
+                        <td>
+                            <div class="flex gap-2">
+                                <button (click)="viewStudent(student)"
+                                    class="px-3 py-1 bg-blue-600 text-white rounded-lg">
+                                    👁
+                                </button>
+                                @if(student.activo){
+                                <button (click)="deleteStudent(student)"
+                                    class="px-3 py-1 bg-red-600 text-white rounded-lg">
+                                    🚫
+                                </button>
+                                }
+                            </div>
                         </td>
                     </tr>
                 </ng-template>

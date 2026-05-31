@@ -50,8 +50,6 @@ export class Students implements OnInit {
   private butonItems: Buttons[] = [
     { label: 'Crear alumno', icon: LucideGraduationCap, roles: ['admin'] },
     { label: 'Ver alumnos', icon: LucideUsers, roles: ['admin', 'directivo', 'profesor'] },
-    { label: 'Ver alumno por ID', icon: LucideUserSearch, roles: ['admin', 'directivo', 'profesor'] },
-    { label: 'Dar baja alumno', icon: LucideUserX, roles: ['admin', 'directivo'] },
   ];
 
   filteredButtons = computed(() => {
@@ -64,6 +62,8 @@ export class Students implements OnInit {
   mostrarTabla = false;
 
   students: any[] = [];
+
+  searchTerm = '';
 
   student = {
     nombre: '',
@@ -95,6 +95,14 @@ export class Students implements OnInit {
     });
   }
 
+  get filteredStudents() {
+    return this.students.filter(student =>
+      student.nombre.toLowerCase().includes(this.searchTerm.toLocaleLowerCase()) ||
+      student.apellidos.toLowerCase().includes(this.searchTerm.toLocaleLowerCase()) ||
+      student.id.toString().includes(this.searchTerm)
+    );
+  }
+
   createStudent() {
     this.studentService.createStudent(this.student, this.idCurso).subscribe({
       next: (response) => {
@@ -113,6 +121,36 @@ export class Students implements OnInit {
       error: (error) => {
         console.error(error);
         alert('Error creando alumno');
+      }
+    });
+  }
+
+  viewStudent(student: any) {
+    this.studentService.getStudentById(student.id).subscribe({
+      next: (data) => {
+        console.log(data);
+        alert(JSON.stringify(data, null, 2));
+      },
+      error: (error) => {
+        console.error(error);
+        alert('Error obteniendo alumno');
+      }
+    });
+  }
+
+  deleteStudent(student: any) {
+    const confirmar = confirm(
+      `¿Dar de baja a ${student.nombre} ${student.apellidos}?`
+    );
+    if (!confirmar) return;
+    this.studentService.deleteStudent(student.id).subscribe({
+      next: () => {
+        alert('Alumno dado de baja correctamente');
+        this.loadStudents();
+      },
+      error: (error) => {
+        console.error(error);
+        alert('Error dando de baja al alumno');
       }
     });
   }
