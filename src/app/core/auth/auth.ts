@@ -15,6 +15,7 @@ export interface User {
 
 export interface AuthResponse {
   access_token: string;
+  role: string;
 }
 
 @Injectable({
@@ -49,19 +50,19 @@ export class AuthService {
     this.isLoading.set(false);
   }
 
-  private detectUserRole(username: string): UserRole {
+  private detectUserRole(role: string): UserRole {
     //TODO cambiar esto de alguna manera saber que es, pero asi no
-    const lowerName = username.toLowerCase();
-    if (lowerName.includes('alumno') || lowerName.includes('estudiante')) {
-      return 'alumno';
+    const role_lowercase = role.toLowerCase();
+    if (role_lowercase.includes('admin')){
+      return 'admin';
     }
-    if (lowerName.includes('profesor') || lowerName.includes('teacher')) {
-      return 'profesor';
-    }
-    if (lowerName.includes('directivo') || lowerName.includes('director')) {
+    if (role_lowercase.includes('directivo')) {
       return 'directivo';
     }
-    return 'admin';
+    if (role_lowercase.includes('profesor')) {
+      return 'profesor';
+    }
+    return 'alumno';
   }
 
   async login(username: string, password: string): Promise<boolean> {
@@ -82,25 +83,25 @@ export class AuthService {
         return false;
       }
 
-      const userRole = this.detectUserRole(username);
+      const userRole = this.detectUserRole(response.role);
 
-      const user = this.detectUserRole("alumno");
-      const profe = this.detectUserRole("profesor");
-      const directivo = this.detectUserRole("directivo");
-      const admin = this.detectUserRole("admin");
+      // const alumno = this.detectUserRole("alumno");
+      // const profe = this.detectUserRole("profesor");
+      // const directivo = this.detectUserRole("directivo");
+      // const admin = this.detectUserRole("admin");
 
       const userData: User = {
         id: 1,
         nombre: username,
         apellidos: '',
         activo: true,
-        // role: userRole, asi tendrá que ser
+        role: userRole, //asi tendrá que ser
 
         //TESTEO
-        // role: user,
+        // role: alumno,
         // role: profe,
         // role: directivo,
-        role: admin,
+        // role: admin,
       };
 
       this.token.set(response.access_token);
@@ -110,6 +111,8 @@ export class AuthService {
       localStorage.setItem('user', JSON.stringify(userData));
 
       console.log('Login exitoso');
+      console.log(response.access_token);
+      console.log(response.role);
       return true;
     } catch (error) {
       console.error('Login error:', error);
