@@ -64,8 +64,15 @@ export class Students implements OnInit {
   students: any[] = [];
   selectedStudent: any = null;
   mostrarDetalle = false;
+  filteredStudents: any[] = [];
 
   searchTerm = '';
+  nombreError = false;
+  apellidosError = false;
+  passwordError = false;
+  nombreTouched = false;
+  apellidosTouched = false;
+  passwordTouched = false;
 
   student = {
     nombre: '',
@@ -76,6 +83,7 @@ export class Students implements OnInit {
 
   idCurso = 1;
   ngOnInit() {
+    this.filteredStudents = [];
   }
 
   toggleCrearAlumno() {
@@ -89,7 +97,8 @@ export class Students implements OnInit {
 
     this.studentService.getStudents().subscribe({
       next: (data: any) => {
-        this.students = [...data];
+        this.students = data;
+        this.filterStudents();
       },
       error: (error) => {
         console.error(error);
@@ -98,27 +107,26 @@ export class Students implements OnInit {
     });
   }
 
-  get filteredStudents() {
-    return this.students.filter(student =>
-      student.nombre.toLowerCase().includes(this.searchTerm.toLocaleLowerCase()) ||
-      student.apellidos.toLowerCase().includes(this.searchTerm.toLocaleLowerCase()) ||
+  filterStudents() {
+    this.filteredStudents = this.students.filter(student =>
+      student.nombre.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+      student.apellidos.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
       student.id.toString().includes(this.searchTerm)
     );
   }
 
   createStudent() {
+    this.validateForm();
     if (
-      !this.student.nombre.trim() ||
-      !this.student.apellidos.trim() ||
-      !this.student.password.trim()
+      this.nombreError ||
+      this.apellidosError ||
+      this.passwordError
     ) {
-      alert('Todos los campos son obligatorios');
       return;
     }
     this.studentService.createStudent(this.student, this.idCurso).subscribe({
       next: (response) => {
         console.log(response);
-        alert('Alumno creado correctamente');
 
         this.student = {
           nombre: '',
@@ -128,6 +136,10 @@ export class Students implements OnInit {
         };
 
         this.idCurso = 1;
+        this.nombreError = false;
+        this.apellidosError = false;
+        this.passwordError = false;
+        alert('Alumno creado correctamente');
       },
       error: (error) => {
         console.error(error);
@@ -141,10 +153,6 @@ export class Students implements OnInit {
       next: (data) => {
         this.selectedStudent = data;
         this.mostrarDetalle = true;
-      },
-      error: (error) => {
-        console.error(error);
-        alert('Error obteniendo alumno');
       }
     });
   }
@@ -169,5 +177,23 @@ export class Students implements OnInit {
   closeModal() {
     this.mostrarDetalle = false;
     this.selectedStudent = null;
+  }
+
+  validateForm() {
+    this.nombreError = !this.student.nombre.trim();
+    this.apellidosError = !this.student.apellidos.trim();
+    this.passwordError = !this.student.password.trim();
+  }
+
+  onNombreBlur() {
+    this.nombreTouched = true;
+  }
+
+  onApellidosBlur() {
+    this.apellidosTouched = true;
+  }
+
+  onPasswordBlur() {
+    this.passwordTouched = true;
   }
 }

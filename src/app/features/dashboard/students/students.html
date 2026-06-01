@@ -69,8 +69,14 @@
                     Nombre
                 </label>
 
-                <input [(ngModel)]="student.nombre" placeholder="Ingresa el nombre"
-                    class="w-full border border-slate-300 rounded-xl p-4">
+                <input [(ngModel)]="student.nombre" (blur)="onNombreBlur()" placeholder="Ingresa el nombre"
+                    class="w-full border rounded-xl p-4">
+
+                @if(nombreTouched && !student.nombre.trim()){
+                <p class="text-red-500 text-sm mt-2">
+                    El nombre es obligatorio.
+                </p>
+                }
             </div>
 
             <div>
@@ -78,17 +84,27 @@
                     Apellidos
                 </label>
 
-                <input [(ngModel)]="student.apellidos" placeholder="Ingresa los apellidos"
-                    class="w-full border border-slate-300 rounded-xl p-4">
+                <input [(ngModel)]="student.apellidos" (blur)="onApellidosBlur()" placeholder="Ingresa los apellidos"
+                    class="w-full border rounded-xl p-4">
+
+                @if(apellidosTouched && !student.apellidos.trim()){
+                <p class="text-red-500 text-sm mt-2">
+                    Los apellidos son obligatorios.
+                </p>
+                }
             </div>
 
             <div>
                 <label class="block mb-2 font-semibold">
                     Contraseña
                 </label>
-
-                <input [(ngModel)]="student.password" placeholder="Ingresa la contraseña"
-                    class="w-full border border-slate-300 rounded-xl p-4">
+                <input [(ngModel)]="student.password" (blur)="onPasswordBlur()" placeholder="Ingresa la contraseña"
+                    class="w-full border rounded-xl p-4">
+                @if(passwordTouched && !student.password.trim()){
+                <p class="text-red-500 text-sm mt-2">
+                    La contraseña es obligatoria.
+                </p>
+                }
             </div>
             <div>
                 <label class="block mb-2 font-semibold">
@@ -98,10 +114,9 @@
             </div>
 
             <button (click)="createStudent()"
-                class="w-full py-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg transition-colors">
-
+                [disabled]="!student.nombre.trim() || !student.apellidos.trim() || !student.password.trim()"
+                class="w-full py-4 rounded-xl text-white font-bold text-lg transition-colors disabled:bg-slate-400 disabled:cursor-not-allowed bg-blue-600 hover:bg-blue-700">
                 Crear Alumno
-
             </button>
 
         </div>
@@ -118,8 +133,8 @@
 
             <div class="p-8 border-b border-border">
 
-                <input [(ngModel)]="searchTerm" placeholder="Buscar por ID, nombre o apellidos..."
-                    class="w-full border border-slate-300 rounded-xl p-4">
+                <input [(ngModel)]="searchTerm" (input)="filterStudents()"
+                    placeholder="Buscar por ID, nombre o apellidos..." class="w-full border rounded-lg p-3">
 
             </div>
             <p-table [value]="filteredStudents" [paginator]="true" [rows]="5" styleClass="p-datatable-striped">
@@ -194,8 +209,8 @@
     </div>
     <div *ngIf="mostrarDetalle && selectedStudent"
         class="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center z-50 p-6">
-        ```
-        <div class="w-full max-w-4xl bg-gradient-to-b from-white to-blue-50 rounded-[32px] shadow-2xl border border-blue-100 overflow-hidden">
+        <div
+            class="w-full max-w-4xl bg-gradient-to-b from-white to-blue-50 rounded-[32px] shadow-2xl border border-blue-100 overflow-hidden">
             <div class="flex items-center justify-between px-10 py-8 border-b border-blue-100">
                 <div>
                     <h3 class="text-4xl font-bold text-blue-950">
@@ -205,13 +220,15 @@
                         Información detallada del alumno
                     </p>
                 </div>
-                <button (click)="closeModal()" class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl text-blue-500 hover:bg-blue-100 hover:text-blue-700 transition-all duration-300">
+                <button (click)="closeModal()"
+                    class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl text-blue-500 hover:bg-blue-100 hover:text-blue-700 transition-all duration-300">
                     ✕
                 </button>
             </div>
             <div class="p-8">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-white border border-blue-100 rounded-3xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
+                    <div
+                        class="bg-white border border-blue-100 rounded-3xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
                         <p class="text-blue-500 font-medium text-base mb-2">
                             Nombre
                         </p>
@@ -219,7 +236,8 @@
                             {{ selectedStudent.nombre }}
                         </p>
                     </div>
-                    <div class="bg-white border border-blue-100 rounded-3xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
+                    <div
+                        class="bg-white border border-blue-100 rounded-3xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
                         <p class="text-blue-500 font-medium text-base mb-2">
                             Apellidos
                         </p>
@@ -227,7 +245,8 @@
                             {{ selectedStudent.apellidos }}
                         </p>
                     </div>
-                    <div class="bg-white border border-blue-100 rounded-3xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
+                    <div
+                        class="bg-white border border-blue-100 rounded-3xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
                         <p class="text-blue-500 font-medium text-base mb-2">
                             Curso
                         </p>
@@ -235,7 +254,8 @@
                             {{ selectedStudent.curso }}
                         </p>
                     </div>
-                    <div class="bg-white border border-blue-100 rounded-3xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
+                    <div
+                        class="bg-white border border-blue-100 rounded-3xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
                         <p class="text-blue-500 font-medium text-base mb-2">
                             Módulo
                         </p>
@@ -243,7 +263,8 @@
                             {{ selectedStudent.modulo }}
                         </p>
                     </div>
-                    <div class="md:col-span-2 bg-white border border-blue-100 rounded-3xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
+                    <div
+                        class="md:col-span-2 bg-white border border-blue-100 rounded-3xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
                         <p class="text-blue-500 font-medium text-base mb-2">
                             ID
                         </p>
@@ -254,6 +275,5 @@
                 </div>
             </div>
         </div>
-        ```
     </div>
 </div>

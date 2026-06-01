@@ -1,31 +1,279 @@
-<div class="p-6">
-    <div class="mb-8">
-        <h2 class="text-3xl font-bold text-foreground">Gestión de Profesores</h2>
-        <p class="text-muted-foreground mt-2">
-            Mostrando acciones disponibles para tu rol: 
-            <span class="font-bold uppercase">{{ user()?.role }}</span>
+<div class="p-8">
+    <div class="mb-10">
+        <h2 class="text-5xl font-bold text-foreground mb-4">
+            Gestión de Profesores
+        </h2>
+
+        <p class="text-lg text-muted-foreground flex items-center gap-3">
+            Mostrando acciones disponibles para tu rol:
+            <span class="px-4 py-1 rounded-xl bg-blue-100 text-blue-700 font-bold text-sm uppercase">
+                {{ user()?.role }}
+            </span>
         </p>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+
         @for (btn of filteredButtons(); track btn.label) {
-            
-            <button 
-                class="flex flex-col items-center justify-center gap-3 p-6 bg-card border border-border rounded-xl shadow-sm hover:shadow-md hover:bg-primary/10 hover:border-primary transition-all duration-200"
-            >
-                <svg [lucideIcon]="btn.icon" class="w-10 h-10 text-primary"></svg>
-                <span class="font-semibold text-card-foreground text-lg">{{ btn.label }}</span>
-            </button>
-            
-        } @empty {
-            
-            <div class="col-span-full p-8 text-center bg-destructive/10 rounded-xl border border-destructive/20">
-                <p class="text-destructive font-medium">
-                    No tienes permisos para realizar acciones en este módulo.
-                </p>
+
+        <button
+            (click)="btn.label === 'Crear profesor' ? toggleCrearProfesor() : btn.label === 'Ver profesores' ? loadTeachers() : null"
+            class="flex items-center justify-between p-8 bg-card border border-border rounded-3xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+
+            <div class="flex items-center gap-6">
+
+                <div class="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center">
+                    <svg [lucideIcon]="btn.icon" class="w-10 h-10 text-blue-600"></svg>
+                </div>
+
+                <div class="text-left">
+                    <h3 class="text-2xl font-bold text-card-foreground">
+                        {{ btn.label }}
+                    </h3>
+
+                    <p class="text-muted-foreground mt-1">
+                        {{ btn.label === 'Crear profesor'
+                        ? 'Registra un nuevo profesor en el sistema'
+                        : 'Visualiza y gestiona la lista de todos los profesores'
+                        }}
+                    </p>
+                </div>
+
             </div>
-            
+
+            <svg [lucideIcon]="icons.ChevronRight" class="w-8 h-8 text-blue-600">
+            </svg>
+
+        </button>
+
+        } @empty {
+
+        <div class="col-span-full p-8 text-center bg-destructive/10 rounded-xl border border-destructive/20">
+            <p class="text-destructive font-medium">
+                No tienes permisos para realizar acciones en este módulo.
+            </p>
+        </div>
+
         }
+    </div>
+    <div class="mt-10 bg-card border border-border rounded-3xl shadow-md p-8" [hidden]="!mostrarFormulario">
+
+        <h3 class="text-4xl font-bold mb-8">
+            Crear Profesor
+        </h3>
+
+        <div class="grid gap-6">
+
+            <div>
+                <label class="block mb-2 font-semibold">
+                    Nombre
+                </label>
+
+                <input [(ngModel)]="teacher.nombre" (blur)="onNombreBlur()" placeholder="Ingresa el nombre"
+                    class="w-full border rounded-xl p-4">
+
+                @if(nombreTouched && !teacher.nombre.trim()){
+                <p class="text-red-500 text-sm mt-2">
+                    El nombre es obligatorio.
+                </p>
+                }
+            </div>
+
+            <div>
+                <label class="block mb-2 font-semibold">
+                    Apellidos
+                </label>
+
+                <input [(ngModel)]="teacher.apellidos" (blur)="onApellidosBlur()" placeholder="Ingresa los apellidos"
+                    class="w-full border rounded-xl p-4">
+
+                @if(apellidosTouched && !teacher.apellidos.trim()){
+                <p class="text-red-500 text-sm mt-2">
+                    Los apellidos son obligatorios.
+                </p>
+                }
+            </div>
+
+            <div>
+                <label class="block mb-2 font-semibold">
+                    Contraseña
+                </label>
+                <input [(ngModel)]="teacher.password" (blur)="onPasswordBlur()" placeholder="Ingresa la contraseña"
+                    class="w-full border rounded-xl p-4">
+                @if(passwordTouched && !teacher.password.trim()){
+                <p class="text-red-500 text-sm mt-2">
+                    La contraseña es obligatoria.
+                </p>
+                }
+            </div>
+            <div>
+                <label class="block mb-2 font-semibold">
+                    Curso
+                </label>
+                <input [(ngModel)]="idCurso" type="number" class="w-full border border-slate-300 rounded-xl p-4">
+            </div>
+
+            <button (click)="createTeacher()"
+                [disabled]="!teacher.nombre.trim() || !teacher.apellidos.trim() || !teacher.password.trim()"
+                class="w-full py-4 rounded-xl text-white font-bold text-lg transition-colors disabled:bg-slate-400 disabled:cursor-not-allowed bg-blue-600 hover:bg-blue-700">
+                Crear Profesor
+            </button>
+
+        </div>
+    </div>
+    <div class="mt-10" [hidden]="!mostrarTabla">
+
+        <div class="bg-card border border-border rounded-3xl shadow-md overflow-hidden">
+
+            <div class="p-8 border-b border-border">
+                <h3 class="text-4xl font-bold">
+                    Listado de profesores
+                </h3>
+            </div>
+
+            <div class="p-8 border-b border-border">
+
+                <input [(ngModel)]="searchTerm" (input)="filterTeachers()"
+                    placeholder="Buscar por ID, nombre o apellidos..." class="w-full border rounded-lg p-3">
+
+            </div>
+            <p-table [value]="filteredTeachers" [paginator]="true" [rows]="5" styleClass="p-datatable-striped">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th class="py-6">ID</th>
+                        <th class="py-6">Nombre</th>
+                        <th class="py-6">Apellidos</th>
+                        <th class="py-6">Curso</th>
+                        <th class="py-6">Módulo</th>
+                        <th class="py-6">Estado</th>
+                        <th class="py-6">Acciones</th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-teacher>
+
+                    <tr class="h-24">
+
+                        <td class="font-bold">
+                            {{ teacher.id }}
+                        </td>
+
+                        <td class="font-semibold">
+                            {{ teacher.nombre }}
+                        </td>
+
+                        <td>
+                            {{ teacher.apellidos }}
+                        </td>
+
+                        <td>
+                            {{ teacher.curso }}
+                        </td>
+
+                        <td>
+                            {{ teacher.modulo }}
+                        </td>
+
+                        <td>
+                            @if(teacher.activo){
+
+                            <span class="px-4 py-2 rounded-xl bg-green-100 text-green-700 font-semibold">
+                                ● Activo
+                            </span>
+                            } @else {
+
+                            <span class="px-4 py-2 rounded-xl bg-red-100 text-red-700 font-semibold">
+                                ● Baja
+                            </span>
+                            }
+                        </td>
+                        <td>
+
+                            <div class="flex gap-3">
+
+                                <button (click)="viewTeacher(teacher)"
+                                    class="w-12 h-12 rounded-xl bg-blue-600 text-white flex items-center justify-center hover:bg-blue-700 transition-colors">
+                                    👁
+                                </button>
+                                @if(teacher.activo){
+                                <button (click)="deleteTeacher(teacher)"
+                                    class="w-12 h-12 rounded-xl bg-red-600 text-white flex items-center justify-center hover:bg-red-700 transition-colors">
+                                    🚫
+                                </button>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </div>
+    <div *ngIf="mostrarDetalle && selectedTeacher"
+        class="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center z-50 p-6">
+        <div
+            class="w-full max-w-4xl bg-gradient-to-b from-white to-blue-50 rounded-[32px] shadow-2xl border border-blue-100 overflow-hidden">
+            <div class="flex items-center justify-between px-10 py-8 border-b border-blue-100">
+                <div>
+                    <h3 class="text-4xl font-bold text-blue-950">
+                        Profesor #{{ selectedTeacher.id }}
+                    </h3>
+                    <p class="text-blue-600/70 text-lg mt-2">
+                        Información detallada del profesor
+                    </p>
+                </div>
+                <button (click)="closeModal()"
+                    class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl text-blue-500 hover:bg-blue-100 hover:text-blue-700 transition-all duration-300">
+                    ✕
+                </button>
+            </div>
+            <div class="p-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div
+                        class="bg-white border border-blue-100 rounded-3xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
+                        <p class="text-blue-500 font-medium text-base mb-2">
+                            Profesor
+                        </p>
+                        <p class="text-2xl font-bold text-blue-950">
+                            {{ selectedTeacher.nombre }}
+                        </p>
+                    </div>
+                    <div
+                        class="bg-white border border-blue-100 rounded-3xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
+                        <p class="text-blue-500 font-medium text-base mb-2">
+                            Apellidos
+                        </p>
+                        <p class="text-2xl font-bold text-blue-950">
+                            {{ selectedTeacher.apellidos }}
+                        </p>
+                    </div>
+                    <div
+                        class="bg-white border border-blue-100 rounded-3xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
+                        <p class="text-blue-500 font-medium text-base mb-2">
+                            Curso
+                        </p>
+                        <p class="text-2xl font-bold text-blue-950">
+                            {{ selectedTeacher.curso }}
+                        </p>
+                    </div>
+                    <div
+                        class="bg-white border border-blue-100 rounded-3xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
+                        <p class="text-blue-500 font-medium text-base mb-2">
+                            Módulo
+                        </p>
+                        <p class="text-2xl font-bold text-blue-950">
+                            {{ selectedTeacher.modulo }}
+                        </p>
+                    </div>
+                    <div
+                        class="md:col-span-2 bg-white border border-blue-100 rounded-3xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
+                        <p class="text-blue-500 font-medium text-base mb-2">
+                            ID
+                        </p>
+                        <p class="text-2xl font-bold text-blue-950">
+                            {{ selectedTeacher.id }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
