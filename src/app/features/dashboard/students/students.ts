@@ -1,22 +1,18 @@
-import { Component, inject, computed } from '@angular/core';
+import { Component, inject, computed, signal, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { TableModule } from 'primeng/table';
 import { AuthService, UserRole } from '../../../core/auth/auth';
+import { StudentService } from '../../../core/services/students/student';
 import {
   LucideGraduationCap,
   LucideUsers,
-  LucideUserSearch,
-  LucideUserX,
-  LucideLogOut,
   LucideChevronLeft,
   LucideChevronRight,
   LucideUserCircle,
+  LucideLogOut,
   LucideDynamicIcon,
 } from '@lucide/angular';
-
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { StudentService } from '../../../core/services/students/student';
-import { OnInit } from '@angular/core';
-import { TableModule } from 'primeng/table';
 
 interface Buttons {
   label: string;
@@ -26,10 +22,11 @@ interface Buttons {
 
 @Component({
   selector: 'app-students',
+  standalone: true,
   imports: [
     LucideDynamicIcon,
     CommonModule,
-    FormsModule,
+    ReactiveFormsModule,
     TableModule
   ],
   templateUrl: './students.html',
@@ -38,6 +35,8 @@ interface Buttons {
 export class Students implements OnInit {
   authService = inject(AuthService);
   private studentService = inject(StudentService);
+  private fb = inject(FormBuilder);
+
   user = this.authService.user;
 
   icons = {
@@ -58,47 +57,50 @@ export class Students implements OnInit {
     return this.butonItems.filter((btn) => btn.roles.includes(currentUser.role));
   });
 
-  mostrarFormulario = false;
-  mostrarTabla = false;
+  mostrarFormulario = signal(false);
+  mostrarTabla = signal(false);
+  mostrarDetalle = signal(false);
 
-  students: any[] = [];
-  selectedStudent: any = null;
-  mostrarDetalle = false;
-  filteredStudents: any[] = [];
+  students = signal<any[]>([]);
+  selectedStudent = signal<any>(null);
+  searchTerm = signal(''); //barra de busqueda.
 
-  searchTerm = '';
-  nombreError = false;
-  apellidosError = false;
-  passwordError = false;
-  nombreTouched = false;
-  apellidosTouched = false;
-  passwordTouched = false;
+  //se actualiza con la barra de busqueda automaticamente.
+  filteredStudents = computed(() => {
+    const term = this.searchTerm().toLowerCase();
+    const allStudents = this.students();
+    
+    if (!term) return allStudents;
+    
+    return allStudents.filter(student =>
+      student.nombre.toLowerCase().includes(term) ||
+      student.apellidos.toLowerCase().includes(term) ||
+      student.id.toString().includes(term)
+    );
+  });
 
-  student = {
-    nombre: '',
-    apellidos: '',
-    password: '',
-    activo: true
-  };
+  //form
+  studentForm: FormGroup = this.fb.group({
+    nombre: ['', Validators.required],
+    apellidos: ['', Validators.required],
+    password: ['', Validators.required],
+    idCurso: [1, [Validators.required, Validators.min(1)]]
+  });
 
-  idCurso = 1;
-  ngOnInit() {
-    this.filteredStudents = [];
-  }
+  ngOnInit() { }
 
   toggleCrearAlumno() {
-    this.mostrarTabla = false;
-    this.mostrarFormulario = true;
+    this.mostrarTabla.set(false);
+    this.mostrarFormulario.set(true);
   }
 
   loadStudents() {
-    this.mostrarFormulario = false;
-    this.mostrarTabla = true;
-
+    // Pedimos los datos y, cuando lleguen, mostramos la tabla
     this.studentService.getStudents().subscribe({
       next: (data: any) => {
-        this.students = data;
-        this.filterStudents();
+        this.students.set(data);
+        this.mostrarFormulario.set(false);
+        this.mostrarTabla.set(true);
       },
       error: (error) => {
         console.error(error);
@@ -107,38 +109,31 @@ export class Students implements OnInit {
     });
   }
 
-  filterStudents() {
-    this.filteredStudents = this.students.filter(student =>
-      student.nombre.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-      student.apellidos.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-      student.id.toString().includes(this.searchTerm)
-    );
+  //actualiza el Signal del buscador
+  updateSearchTerm(event: Event) {
+    const input = event.target as HTMLInputElement;
+    this.searchTerm.set(input.value);
   }
 
   createStudent() {
-    this.validateForm();
-    if (
-      this.nombreError ||
-      this.apellidosError ||
-      this.passwordError
-    ) {
+    if (this.studentForm.invalid) {
+      this.studentForm.markAllAsTouched();
       return;
     }
-    this.studentService.createStudent(this.student, this.idCurso).subscribe({
+
+    const formValue = this.studentForm.value;
+    const studentData = {
+      nombre: formValue.nombre,
+      apellidos: formValue.apellidos,
+      password: formValue.password,
+      activo: true
+    };
+
+    this.studentService.createStudent(studentData, formValue.idCurso).subscribe({
       next: (response) => {
         console.log(response);
-
-        this.student = {
-          nombre: '',
-          apellidos: '',
-          password: '',
-          activo: true
-        };
-
-        this.idCurso = 1;
-        this.nombreError = false;
-        this.apellidosError = false;
-        this.passwordError = false;
+        //reseteamos el estado
+        this.studentForm.reset({ idCurso: 1 });
         alert('Alumno creado correctamente');
       },
       error: (error) => {
@@ -151,17 +146,16 @@ export class Students implements OnInit {
   viewStudent(student: any) {
     this.studentService.getStudentById(student.id).subscribe({
       next: (data) => {
-        this.selectedStudent = data;
-        this.mostrarDetalle = true;
+        this.selectedStudent.set(data);
+        this.mostrarDetalle.set(true);
       }
     });
   }
 
   deleteStudent(student: any) {
-    const confirmar = confirm(
-      `¿Dar de baja a ${student.nombre} ${student.apellidos}?`
-    );
+    const confirmar = confirm(`¿Dar de baja a ${student.nombre} ${student.apellidos}?`);
     if (!confirmar) return;
+    
     this.studentService.deleteStudent(student.id).subscribe({
       next: () => {
         alert('Alumno dado de baja correctamente');
@@ -175,25 +169,13 @@ export class Students implements OnInit {
   }
 
   closeModal() {
-    this.mostrarDetalle = false;
-    this.selectedStudent = null;
+    this.mostrarDetalle.set(false);
+    this.selectedStudent.set(null);
   }
 
-  validateForm() {
-    this.nombreError = !this.student.nombre.trim();
-    this.apellidosError = !this.student.apellidos.trim();
-    this.passwordError = !this.student.password.trim();
-  }
-
-  onNombreBlur() {
-    this.nombreTouched = true;
-  }
-
-  onApellidosBlur() {
-    this.apellidosTouched = true;
-  }
-
-  onPasswordBlur() {
-    this.passwordTouched = true;
+  // Método auxiliar para la vista HTML para comprobar si un campo tiene error
+  hasError(controlName: string, errorName: string = 'required') {
+    const control = this.studentForm.get(controlName);
+    return control?.hasError(errorName) && control?.touched;
   }
 }
