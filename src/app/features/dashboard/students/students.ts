@@ -32,7 +32,7 @@ interface Buttons {
   templateUrl: './students.html',
   styleUrl: './students.css',
 })
-export class Students implements OnInit {
+export class Students {
   authService = inject(AuthService);
   private studentService = inject(StudentService);
   private fb = inject(FormBuilder);
@@ -86,8 +86,6 @@ export class Students implements OnInit {
     password: ['', Validators.required],
     idCurso: [1, [Validators.required, Validators.min(1)]]
   });
-
-  ngOnInit() { }
 
   toggleCrearAlumno() {
     this.mostrarTabla.set(false);
