@@ -1,5 +1,10 @@
-import { Component, inject, computed } from '@angular/core';
+import { Component, inject, computed, signal, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { TableModule } from 'primeng/table';
+
 import { AuthService, UserRole } from '../../../core/auth/auth';
+import { TeacherService } from '../../../core/services/teachers/teacher';
 import {
   LucideGraduationCap,
   LucideUsers,
@@ -12,12 +17,6 @@ import {
   LucideDynamicIcon,
 } from '@lucide/angular';
 
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { TeacherService } from '../../../core/services/teachers/teacher';
-import { OnInit } from '@angular/core';
-import { TableModule } from 'primeng/table';
-
 interface Buttons {
   label: string;
   icon: any;
@@ -26,18 +25,21 @@ interface Buttons {
 
 @Component({
   selector: 'app-teachers',
+  standalone: true,
   imports: [
     LucideDynamicIcon,
     CommonModule,
-    FormsModule,
+    ReactiveFormsModule,
     TableModule
   ],
   templateUrl: './teachers.html',
   styleUrl: './teachers.css',
 })
-export class Teachers implements OnInit {
+export class Teachers {
   authService = inject(AuthService);
   private teacherService = inject(TeacherService);
+  private fb = inject(FormBuilder);
+
   user = this.authService.user;
 
   icons = {
@@ -58,47 +60,46 @@ export class Teachers implements OnInit {
     return this.butonItems.filter((btn) => btn.roles.includes(currentUser.role));
   });
 
-  mostrarFormulario = false;
-  mostrarTabla = false;
+  mostrarFormulario = signal(false);
+  mostrarTabla = signal(false);
+  mostrarDetalle = signal(false);
 
-  teachers: any[] = [];
-  selectedTeacher: any = null;
-  mostrarDetalle = false;
-  filteredTeachers: any[] = [];
+  teachers = signal<any[]>([]);
+  selectedTeacher = signal<any>(null);
+  searchTerm = signal('');
 
-  searchTerm = '';
-  nombreError = false;
-  apellidosError = false;
-  passwordError = false;
-  nombreTouched = false;
-  apellidosTouched = false;
-  passwordTouched = false;
+  //se actualiza con la barra de busqueda automaticamente.
+  filteredTeachers = computed(() => {
+    const term = this.searchTerm().toLowerCase();
+    const allTeachers = this.teachers();
+    
+    if (!term) return allTeachers;
+    
+    return allTeachers.filter(teacher =>
+      teacher.nombre.toLowerCase().includes(term) ||
+      teacher.apellidos.toLowerCase().includes(term) ||
+      teacher.id.toString().includes(term)
+    );
+  });
 
-  teacher = {
-    nombre: '',
-    apellidos: '',
-    password: '',
-    activo: true
-  };
-
-  idCurso = 1;
-  ngOnInit() {
-    this.filteredTeachers = [];
-  }
+  teacherForm: FormGroup = this.fb.group({
+    nombre: ['', Validators.required],
+    apellidos: ['', Validators.required],
+    password: ['', Validators.required],
+    idCurso: [1, [Validators.required, Validators.min(1)]]
+  });
 
   toggleCrearProfesor() {
-    this.mostrarTabla = false;
-    this.mostrarFormulario = true;
+    this.mostrarTabla.set(false);
+    this.mostrarFormulario.set(true);
   }
 
   loadTeachers() {
-    this.mostrarFormulario = false;
-    this.mostrarTabla = true;
-
     this.teacherService.getTeachers().subscribe({
       next: (data: any) => {
-        this.teachers = data;
-        this.filterTeachers();
+        this.teachers.set(data);
+        this.mostrarFormulario.set(false);
+        this.mostrarTabla.set(true);
       },
       error: (error) => {
         console.error(error);
@@ -107,38 +108,29 @@ export class Teachers implements OnInit {
     });
   }
 
-  filterTeachers() {
-    this.filteredTeachers = this.teachers.filter(teacher =>
-      teacher.nombre.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-      teacher.apellidos.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-      teacher.id.toString().includes(this.searchTerm)
-    );
+  updateSearchTerm(event: Event) {
+    const input = event.target as HTMLInputElement;
+    this.searchTerm.set(input.value);
   }
 
   createTeacher() {
-    this.validateForm();
-    if (
-      this.nombreError ||
-      this.apellidosError ||
-      this.passwordError
-    ) {
+    if (this.teacherForm.invalid) {
+      this.teacherForm.markAllAsTouched();
       return;
     }
-    this.teacherService.createTeacher(this.teacher, this.idCurso).subscribe({
+
+    const formValue = this.teacherForm.value;
+    const teacherData = {
+      nombre: formValue.nombre,
+      apellidos: formValue.apellidos,
+      password: formValue.password,
+      activo: true
+    };
+
+    this.teacherService.createTeacher(teacherData, formValue.idCurso).subscribe({
       next: (response) => {
         console.log(response);
-
-        this.teacher = {
-          nombre: '',
-          apellidos: '',
-          password: '',
-          activo: true
-        };
-
-        this.idCurso = 1;
-        this.nombreError = false;
-        this.apellidosError = false;
-        this.passwordError = false;
+        this.teacherForm.reset({ idCurso: 1 });
         alert('Profesor creado correctamente');
       },
       error: (error) => {
@@ -151,17 +143,16 @@ export class Teachers implements OnInit {
   viewTeacher(teacher: any) {
     this.teacherService.getTeacherById(teacher.id).subscribe({
       next: (data) => {
-        this.selectedTeacher = data;
-        this.mostrarDetalle = true;
+        this.selectedTeacher.set(data);
+        this.mostrarDetalle.set(true);
       }
     });
   }
 
   deleteTeacher(teacher: any) {
-    const confirmar = confirm(
-      `¿Dar de baja a ${teacher.nombre} ${teacher.apellidos}?`
-    );
+    const confirmar = confirm(`¿Dar de baja a ${teacher.nombre} ${teacher.apellidos}?`);
     if (!confirmar) return;
+    
     this.teacherService.deleteTeacher(teacher.id).subscribe({
       next: () => {
         alert('Profesor dado de baja correctamente');
@@ -175,25 +166,12 @@ export class Teachers implements OnInit {
   }
 
   closeModal() {
-    this.mostrarDetalle = false;
-    this.selectedTeacher = null;
+    this.mostrarDetalle.set(false);
+    this.selectedTeacher.set(null);
   }
 
-  validateForm() {
-    this.nombreError = !this.teacher.nombre.trim();
-    this.apellidosError = !this.teacher.apellidos.trim();
-    this.passwordError = !this.teacher.password.trim();
-  }
-
-  onNombreBlur() {
-    this.nombreTouched = true;
-  }
-
-  onApellidosBlur() {
-    this.apellidosTouched = true;
-  }
-
-  onPasswordBlur() {
-    this.passwordTouched = true;
+  hasError(controlName: string, errorName: string = 'required') {
+    const control = this.teacherForm.get(controlName);
+    return control?.hasError(errorName) && control?.touched;
   }
 }
