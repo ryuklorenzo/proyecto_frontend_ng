@@ -5,18 +5,18 @@ import { AuthService } from '../../auth/auth';
 @Injectable({
     providedIn: 'root',
 })
-export class CourseService {
+export class AttitudeService {
 
     private http = inject(HttpClient);
     private authService = inject(AuthService);
 
-    createCourse(idHorario: number, course: any) {
+    createAttitude(idAlumno: number, attitude: any) {
 
         const token = this.authService.token();
 
         return this.http.post(
-            `/api/courses/?id_horario/${idHorario}`,
-            course,
+            `/api/attitudes/?id_alumno=${idAlumno}`,
+            attitude,
             {
                 headers: new HttpHeaders({
                     Authorization: `Bearer ${this.authService.token()}`
@@ -25,17 +25,9 @@ export class CourseService {
         );
     }
 
-    getCourses() {
-        return this.http.get('/api/courses/', {
-            headers: {
-                Authorization: `Bearer ${this.authService.token()}`
-            }
-        });
-    }
-
-    getCourseById(id: number) {
+    getAttituddesByStudent(idAlumno: number) {
         return this.http.get(
-            `/api/courses/${id}`,
+            `/api//attitudes/users/${idAlumno}`,
             {
                 headers: {
                     Authorization: `Bearer ${this.authService.token()}`
@@ -44,21 +36,9 @@ export class CourseService {
         );
     }
 
-    updateCourse(id: number, course: any) {
-        return this.http.put(
-            `/api/courses/${id}`,
-            course,
-            {
-                headers: {
-                    Authorization: `Bearer ${this.authService.token()}`
-                }
-            }
-        );
-    }
-
-    deleteCourse(id: number) {
+    deleteMention(id: number) {
         return this.http.delete(
-            `/api/courses /${id}`,
+            `/api/attitudes/${id}`,
             {
                 headers: {
                     Authorization: `Bearer ${this.authService.token()}`

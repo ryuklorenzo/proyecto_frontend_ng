@@ -5,18 +5,18 @@ import { AuthService } from '../../auth/auth';
 @Injectable({
     providedIn: 'root',
 })
-export class CourseService {
+export class MentionService {
 
     private http = inject(HttpClient);
     private authService = inject(AuthService);
 
-    createCourse(idHorario: number, course: any) {
+    createMention(idReconocimiento: number, mention: any) {
 
         const token = this.authService.token();
 
         return this.http.post(
-            `/api/courses/?id_horario/${idHorario}`,
-            course,
+            `/api/mentions/recognitions/${idReconocimiento}`,
+            mention,
             {
                 headers: new HttpHeaders({
                     Authorization: `Bearer ${this.authService.token()}`
@@ -25,17 +25,17 @@ export class CourseService {
         );
     }
 
-    getCourses() {
-        return this.http.get('/api/courses/', {
+    getMentions() {
+        return this.http.get('/api/mentions/', {
             headers: {
                 Authorization: `Bearer ${this.authService.token()}`
             }
         });
     }
 
-    getCourseById(id: number) {
+    getMentionById(id: number) {
         return this.http.get(
-            `/api/courses/${id}`,
+            `/api/mentions/${id}`,
             {
                 headers: {
                     Authorization: `Bearer ${this.authService.token()}`
@@ -44,10 +44,21 @@ export class CourseService {
         );
     }
 
-    updateCourse(id: number, course: any) {
+    getMentionsByRecognition(idReconocimiento: number) {
+        return this.http.get(
+            `/api/mentions/recognitions/${idReconocimiento}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${this.authService.token()}`
+                }
+            }
+        );
+    }
+
+    updateMention(id: number, mention: any) {
         return this.http.put(
-            `/api/courses/${id}`,
-            course,
+            `/api/mentions/${id}`,
+            mention,
             {
                 headers: {
                     Authorization: `Bearer ${this.authService.token()}`
@@ -56,9 +67,9 @@ export class CourseService {
         );
     }
 
-    deleteCourse(id: number) {
+    deleteMention(id: number) {
         return this.http.delete(
-            `/api/courses /${id}`,
+            `/api/mentions/${id}`,
             {
                 headers: {
                     Authorization: `Bearer ${this.authService.token()}`
