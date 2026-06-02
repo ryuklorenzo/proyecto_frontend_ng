@@ -25,7 +25,7 @@ export class TaskService {
 
     getTasksByStudent(idAlumno: number) {
         return this.http.get(
-            `/api/tasks/students/${idAlumno}`,
+            `/api/tasks/students/${idAlumno}/`,
             {
                 headers: {
                     Authorization: `Bearer ${this.token}`
@@ -36,7 +36,7 @@ export class TaskService {
 
     getTasksByTeacher(idProfesor: number) {
         return this.http.get(
-            `/api/tasks/teachers/${idProfesor}`,
+            `/api/tasks/teachers/${idProfesor}/`,
             {
                 headers: {
                     Authorization: `Bearer ${this.token}`

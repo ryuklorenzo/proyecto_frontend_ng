@@ -149,19 +149,11 @@ export class Teachers {
     });
   }
 
-<<<<<<< HEAD
-  deleteTeacher(teacher: any) {
-    const confirmar = confirm(`¿Dar de baja a ${teacher.nombre} ${teacher.apellidos}?`);
-    if (!confirmar) return;
-    
-    this.teacherService.deleteTeacher(teacher.id).subscribe({
-=======
   bajaTeacher(teacher: any) {
     const confirmar = confirm(`¿Dar de baja a ${teacher.nombre} ${teacher.apellidos}?`);
     if (!confirmar) return;
     
     this.teacherService.bajaTeacher(teacher.id).subscribe({
->>>>>>> fd6e720cea0e89595fbef1d6448b8c7ab766657a
       next: () => {
         alert('Profesor dado de baja correctamente');
         this.loadTeachers();

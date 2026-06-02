@@ -20,6 +20,8 @@ import {
 
 import { TableModule } from 'primeng/table';
 import { TaskService } from '../../../core/services/tasks/task';
+import { StudentService } from '../../../core/services/students/student';
+import { TeacherService } from '../../../core/services/teachers/teacher';
 
 interface Buttons {
   label: string;
@@ -42,6 +44,8 @@ export class Tasks {
   authService = inject(AuthService);
   private taskService = inject(TaskService);
   private fb = inject(FormBuilder);
+  private studentService = inject(StudentService);
+  private teacherService = inject(TeacherService);
   user = this.authService.user;
 
   icons = {
@@ -71,6 +75,14 @@ export class Tasks {
   selectedTask = signal<any>(null);
   searchTerm = signal('');
 
+  alumnos = signal<any[]>([]);
+  alumnoSeleccionado = signal<number | null>(null);
+  mostrarBusquedaAlumno = signal(false);
+
+  profesores = signal<any[]>([]);
+  profesorSeleccionado = signal<number | null>(null);
+  mostrarBusquedaProfesor = signal(false);
+
   filteredTasks = computed(() => {
     const term = this.searchTerm().toLowerCase();
     if (!term) return this.tasks();
@@ -89,7 +101,7 @@ export class Tasks {
 
   toggleCrearTarea() {
     this.mostrarTabla.set(false);
-    this.mostrarFormulario.set(false);
+    this.mostrarFormulario.set(true);
   }
 
   createTask() {
@@ -146,7 +158,7 @@ export class Tasks {
     this.mostrarFormulario.set(false);
     this.mostrarTabla.set(true);
 
-    this.taskService.getTasksByStudent(idProfesor).subscribe({
+    this.taskService.getTasksByTeacher(idProfesor).subscribe({
       next: (data: any) => {
         this.tasks.set(data);
       },
@@ -170,6 +182,66 @@ export class Tasks {
   hasError(field: string): boolean {
     const control = this.taskForm.get(field);
     return !!(control && control.invalid && (control.touched || control.dirty));
+  }
+
+  showStudentSelector() {
+
+    this.mostrarFormulario.set(false);
+    this.mostrarTabla.set(false);
+    this.mostrarBusquedaAlumno.set(true);
+
+    this.studentService.getStudents().subscribe({
+      next: (data: any) => {
+        this.alumnos.set(data);
+      },
+      error: (error) => {
+        console.error(error);
+        alert('Error cargando alumnos');
+      }
+    });
+  }
+
+  buscarTareasAlumno() {
+
+    const idAlumno = this.alumnoSeleccionado();
+
+    if (!idAlumno) {
+      alert('Selecciona un alumno');
+      return;
+    }
+
+    this.loadStudentTasks(idAlumno);
+    this.mostrarBusquedaAlumno.set(false);
+  }
+
+  showTeacherSelector() {
+
+    this.mostrarFormulario.set(false);
+    this.mostrarTabla.set(false);
+    this.mostrarBusquedaProfesor.set(true);
+
+    this.teacherService.getTeachers().subscribe({
+      next: (data: any) => {
+        this.profesores.set(data);
+      },
+      error: (error) => {
+        console.error(error);
+        alert('Error cargando profesores');
+      }
+    });
+  }
+
+  buscarTareasProfesor() {
+
+    const idProfesor = this.profesorSeleccionado();
+
+    if (!idProfesor) {
+      alert('Selecciona un profesor');
+      return;
+    }
+
+    this.loadStudentTasks(idProfesor);
+    this.mostrarBusquedaAlumno.set(false);
   }
 
 }
