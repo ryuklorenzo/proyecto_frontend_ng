@@ -28,6 +28,7 @@ export class Sidebar {
 
   authService = inject(AuthService);
   user = this.authService.user; 
+  mostrarLogoutModal = false;
 
   // Registro de iconos estáticos para usarlos en el template HTML
   icons = { 
@@ -70,7 +71,15 @@ export class Sidebar {
     return labels[role] || role;
   }
 
-  onLogout() {
+  openLogoutModal() {
+    this.mostrarLogoutModal = true;
+  }
+
+  confirmLogout() {
     this.authService.logout();
+  }
+
+  closeLogoutModal() {
+    this.mostrarLogoutModal = false;
   }
 }

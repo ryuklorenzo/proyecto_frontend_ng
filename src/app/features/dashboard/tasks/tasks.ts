@@ -101,6 +101,8 @@ export class Tasks {
 
   toggleCrearTarea() {
     this.mostrarTabla.set(false);
+    this.mostrarBusquedaAlumno.set(false);
+    this.mostrarBusquedaProfesor.set(false);
     this.mostrarFormulario.set(true);
   }
 
@@ -185,19 +187,13 @@ export class Tasks {
   }
 
   showStudentSelector() {
-
     this.mostrarFormulario.set(false);
     this.mostrarTabla.set(false);
+    this.mostrarBusquedaProfesor.set(false);
     this.mostrarBusquedaAlumno.set(true);
 
     this.studentService.getStudents().subscribe({
-      next: (data: any) => {
-        this.alumnos.set(data);
-      },
-      error: (error) => {
-        console.error(error);
-        alert('Error cargando alumnos');
-      }
+      next: (data: any) => this.alumnos.set(data)
     });
   }
 
@@ -215,19 +211,13 @@ export class Tasks {
   }
 
   showTeacherSelector() {
-
     this.mostrarFormulario.set(false);
     this.mostrarTabla.set(false);
+    this.mostrarBusquedaAlumno.set(false);
     this.mostrarBusquedaProfesor.set(true);
 
     this.teacherService.getTeachers().subscribe({
-      next: (data: any) => {
-        this.profesores.set(data);
-      },
-      error: (error) => {
-        console.error(error);
-        alert('Error cargando profesores');
-      }
+      next: (data: any) => this.profesores.set(data)
     });
   }
 
@@ -240,8 +230,8 @@ export class Tasks {
       return;
     }
 
-    this.loadStudentTasks(idProfesor);
-    this.mostrarBusquedaAlumno.set(false);
+    this.loadTeachersTasks(idProfesor);
+    this.mostrarBusquedaProfesor.set(false);
   }
 
 }

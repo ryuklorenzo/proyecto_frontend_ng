@@ -84,10 +84,10 @@
                     Estado
                 </label>
                 <select formControlName="estado" class="w-full border rounded-xl p-4">
-                    <option value="PENDIENTE">
+                    <option value="PENDIENTE" class="bg-slate-900 text-white">
                         Pendiente
                     </option>
-                    <option value="COMPLETADA">
+                    <option value="COMPLETADA" class="bg-slate-900 text-white">
                         Completada
                     </option>
                 </select>
@@ -120,13 +120,13 @@
             Seleccionar Alumno
         </h3>
         <div class="space-y-4">
-            <select class="w-full border rounded-xl p-4" [value]="alumnoSeleccionado()"
-                (change)="alumnoSeleccionado.set(+$any($event.target).value)">
-                <option value="">
+            <select class="w-full border border-slate-700 bg-slate-900 text-white rounded-xl p-4"
+                [value]="alumnoSeleccionado()" (change)="alumnoSeleccionado.set(+$any($event.target).value)">
+                <option value="" class="bg-slate-900 text-white">
                     Selecciona un alumno
                 </option>
                 @for(alumno of alumnos(); track alumno.id){
-                <option [value]="alumno.id">
+                <option [value]="alumno.id" class="bg-slate-900 text-white">
                     {{ alumno.nombre }} {{ alumno.apellidos }}
                 </option>
                 }
@@ -143,13 +143,13 @@
             Seleccionar Profesor
         </h3>
         <div class="space-y-4">
-            <select class="w-full border rounded-xl p-4" [value]="profesorSeleccionado()"
+            <select class="w-full border border-slate-700 bg-slate-900 text-white rounded-xl p-4" [value]="profesorSeleccionado()"
                 (change)="profesorSeleccionado.set(+$any($event.target).value)">
-                <option value="">
+                <option value="" class="bg-slate-900 text-white">
                     Selecciona un profesor
                 </option>
                 @for(profesor of profesores(); track profesor.id){
-                <option [value]="profesor.id">
+                <option [value]="profesor.id" class="bg-slate-900 text-white">
                     {{ profesor.nombre }} {{ profesor.apellidos }}
                 </option>
                 }

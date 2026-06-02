@@ -35,15 +35,16 @@
         <ul class="space-y-1">
             @for (item of filteredNavItems(); track item.href) {
             <li>
-                <a [routerLink]="item.href" routerLinkActive="bg-primary text-primary-foreground"
+                <a [routerLink]="item.href"
+                    routerLinkActive="bg-blue-500/20 text-blue-400 border border-blue-500/40 shadow-lg shadow-blue-500/20"
                     [routerLinkActiveOptions]="{exact: true}"
-                    class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors hover:bg-sidebar-accent"
+                    class="group flex items-center gap-3 px-3 py-2.5 rounded-lg border border-transparent transition-all duration-300 hover:bg-blue-500/20 hover:text-blue-400 hover:border-blue-500/40 hover:shadow-lg hover:shadow-blue-500/20 hover:translate-x-1 active:scale-95"
                     [ngClass]="{'justify-center': collapsed}" [title]="collapsed ? item.label : ''">
-                    
-                    <svg [lucideIcon]="item.icon" class="w-5 h-5"></svg>
-
+                    <svg [lucideIcon]="item.icon"
+                        class="w-5 h-5 transition-all duration-300 group-hover:text-blue-400 group-hover:scale-110">
+                    </svg>
                     @if (!collapsed) {
-                    <span>{{ item.label }}</span>
+                    <span class="font-medium">{{ item.label }}</span>
                     }
                 </a>
             </li>
@@ -52,13 +53,47 @@
     </nav>
 
     <div class="p-2 border-t border-sidebar-accent">
-        <button (click)="onLogout()"
-            class="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sidebar-foreground hover:bg-destructive hover:text-destructive-foreground transition-colors"
-            [ngClass]="{'justify-center': collapsed}" [title]="collapsed ? 'Cerrar sesion' : ''">
-            <svg [lucideIcon]="icons.LogOut" class="w-5 h-5"></svg>
+        <button (click)="openLogoutModal()"
+            class="group flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sidebar-foreground hover:bg-red-500 hover:text-white hover:shadow-lg hover:shadow-red-500/30 hover:translate-x-1 active:scale-95 transition-all duration-300"
+            [ngClass]="{'justify-center': collapsed}" [title]="collapsed ? 'Cerrar sesión' : ''">
+            <svg [lucideIcon]="icons.LogOut"
+                class="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1">
+            </svg>
             @if (!collapsed) {
-            <span>Cerrar Sesion</span>
+            <span>Cerrar Sesión</span>
             }
         </button>
     </div>
+
+    @if (mostrarLogoutModal) {
+    <div
+        class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 animate-in fade-in duration-300">
+        <div
+            class="bg-card rounded-3xl shadow-2xl p-8 w-full max-w-md animate-in zoom-in-95 slide-in-from-bottom-4 duration-300">
+            <div class="text-center">
+                <div
+                    class="w-20 h-20 mx-auto rounded-full bg-red-100 flex items-center justify-center mb-6 hover:scale-110 transition-transform duration-300">
+                    <svg [lucideIcon]="icons.LogOut" class="w-10 h-10 text-red-600"></svg>
+                </div>
+                <h3 class="text-2xl font-bold m-3">
+                    ¿Cerrar sesión?
+                </h3>
+                <p class="text-muted-foreground mb-8">
+                    Se cerrara tu sesión actual y volverás al panel de inicio de sesión
+                </p>
+                <div class="flex gap-4">
+                    <button (click)="closeLogoutModal()"
+                        class="flex-1 py-3 rounded-xl border border-border hover:bg-muted hover:scale-[1.02] active:scale-95 transition-all duration-200">
+                        Cancelar
+                    </button>
+                    <button (click)="confirmLogout()"
+                        class="flex-1 py-3 rounded-xl bg-red-600 text-white hover:bg-red-700">
+                        Cerrar sesión
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    }
+
 </aside>
