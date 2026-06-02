@@ -150,11 +150,11 @@ export class Students {
     });
   }
 
-  deleteStudent(student: any) {
+  bajaStudent(student: any) {
     const confirmar = confirm(`¿Dar de baja a ${student.nombre} ${student.apellidos}?`);
     if (!confirmar) return;
     
-    this.studentService.deleteStudent(student.id).subscribe({
+    this.studentService.bajaStudent(student.id).subscribe({
       next: () => {
         alert('Alumno dado de baja correctamente');
         this.loadStudents();
