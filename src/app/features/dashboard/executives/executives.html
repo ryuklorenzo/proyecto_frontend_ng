@@ -33,7 +33,7 @@
 
                     <p class="text-muted-foreground mt-1">
                         {{ btn.label === 'Crear'
-                        ? 'Registra un nuevo directivo en el sistema'
+                        ? 'Asigna un cargo directivo a un profesor existente'
                         : btn.label === 'Ver todos' 
                         ? 'Visualiza y gestiona la lista de todos los directivos'
                         : 'Acción de gestión de directivos'
@@ -64,64 +64,47 @@
         <h3 class="text-4xl font-bold mb-8">
             Crear Directivo
         </h3>
+        
+        <p class="text-muted-foreground mb-6">
+            Introduce el ID de un profesor existente para asignarle un cargo directivo.
+        </p>
 
         <form [formGroup]="executiveForm" (ngSubmit)="createExecutive()" class="grid gap-6">
 
             <div>
                 <label class="block mb-2 font-semibold">
-                    Nombre
+                    ID del Profesor
                 </label>
 
-                <input formControlName="nombre" placeholder="Ingresa el nombre"
+                <input type="number" formControlName="id_profesor" placeholder="Ej: 3"
                     class="w-full border rounded-xl p-4">
 
-                @if(hasError('nombre')){
+                @if(hasError('id_profesor')){
                 <p class="text-red-500 text-sm mt-2">
-                    El nombre es obligatorio.
+                    El ID del profesor es obligatorio.
                 </p>
                 }
             </div>
 
             <div>
                 <label class="block mb-2 font-semibold">
-                    Apellidos
+                    Cargo
                 </label>
 
-                <input formControlName="apellidos" placeholder="Ingresa los apellidos"
+                <input type="text" formControlName="cargo" placeholder="Ej: Jefe de Estudios, Director..."
                     class="w-full border rounded-xl p-4">
 
-                @if(hasError('apellidos')){
+                @if(hasError('cargo')){
                 <p class="text-red-500 text-sm mt-2">
-                    Los apellidos son obligatorios.
+                    El cargo es obligatorio.
                 </p>
                 }
-            </div>
-
-            <div>
-                <label class="block mb-2 font-semibold">
-                    Contraseña
-                </label>
-                <input type="password" formControlName="password" placeholder="Ingresa la contraseña"
-                    class="w-full border rounded-xl p-4">
-                
-                @if(hasError('password')){
-                <p class="text-red-500 text-sm mt-2">
-                    La contraseña es obligatoria.
-                </p>
-                }
-            </div>
-            
-            <div>
-                <label class="block mb-2 font-semibold">
-                    Curso
-                </label>
-                <input type="number" formControlName="idCurso" class="w-full border border-slate-300 rounded-xl p-4">
             </div>
 
             <button type="submit"
                 [disabled]="executiveForm.invalid"
                 class="w-full py-4 rounded-xl text-white font-bold text-lg transition-colors disabled:bg-slate-400 disabled:cursor-not-allowed bg-blue-600 hover:bg-blue-700">
-                Crear Directivo
+                Asignar Cargo Directivo
             </button>
 
         </form>
@@ -150,9 +133,7 @@
                         <th class="py-6">ID</th>
                         <th class="py-6">Nombre</th>
                         <th class="py-6">Apellidos</th>
-                        <th class="py-6">Curso</th>
-                        <th class="py-6">Módulo</th>
-                        <th class="py-6">Estado</th>
+                        <th class="py-6">Cargo</th> <th class="py-6">Estado</th>
                         <th class="py-6">Acciones</th>
                     </tr>
                 </ng-template>
@@ -173,11 +154,9 @@
                         </td>
 
                         <td>
-                            {{ executive.curso }}
-                        </td>
-
-                        <td>
-                            {{ executive.modulo }}
+                            <span class="px-3 py-1 bg-purple-100 text-purple-800 rounded-lg font-medium">
+                                {{ executive.cargo }}
+                            </span>
                         </td>
 
                         <td>
@@ -252,27 +231,18 @@
                         </p>
                     </div>
                     <div
-                        class="bg-white border border-blue-100 rounded-3xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
+                        class="md:col-span-2 bg-white border border-blue-100 rounded-3xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
                         <p class="text-blue-500 font-medium text-base mb-2">
-                            Curso
+                            Cargo
                         </p>
-                        <p class="text-2xl font-bold text-blue-950">
-                            {{ selectedExecutives().curso }}
-                        </p>
-                    </div>
-                    <div
-                        class="bg-white border border-blue-100 rounded-3xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
-                        <p class="text-blue-500 font-medium text-base mb-2">
-                            Módulo
-                        </p>
-                        <p class="text-2xl font-bold text-blue-950">
-                            {{ selectedExecutives().modulo }}
+                        <p class="text-2xl font-bold text-purple-700">
+                            {{ selectedExecutives().cargo }}
                         </p>
                     </div>
                     <div
                         class="md:col-span-2 bg-white border border-blue-100 rounded-3xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
                         <p class="text-blue-500 font-medium text-base mb-2">
-                            ID
+                            ID de Usuario / Profesor
                         </p>
                         <p class="text-2xl font-bold text-blue-950">
                             {{ selectedExecutives().id }}

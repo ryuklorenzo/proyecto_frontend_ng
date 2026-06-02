@@ -1,5 +1,6 @@
 import { Component, inject, computed, signal } from '@angular/core';
 import { AuthService, UserRole } from '../../../core/auth/auth';
+import { TableModule } from 'primeng/table';
 import {
   LucideHome, LucideUsers, LucideGraduationCap, LucideBookOpen, LucideCalendar,
   LucideClipboardList, LucideTriangleAlert, LucideFileText, LucideBuilding,
@@ -8,6 +9,7 @@ import {
 } from '@lucide/angular';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ExecutiveService } from '../../../core/services/executives/executive';
 
 interface Buttons {
   label: string;
@@ -17,7 +19,8 @@ interface Buttons {
 
 @Component({
   selector: 'app-executives',
-  imports: [LucideDynamicIcon, CommonModule, ReactiveFormsModule],
+  standalone : true,
+  imports: [LucideDynamicIcon, CommonModule, ReactiveFormsModule, TableModule],
   templateUrl: './executives.html',
   styleUrl: './executives.css',
 })
@@ -35,11 +38,8 @@ export class Executives {
   };
 
   private butonItems: Buttons[] = [
-    { label: 'Crear', icon: LucideHome, roles: ['admin', 'directivo', 'profesor', 'alumno'] },
-    { label: 'Ver todos', icon: LucideGraduationCap, roles: ['admin', 'directivo', 'profesor'] },
-    { label: 'Ver por Id', icon: LucideUsers, roles: ['admin'] },
-    { label: 'Actualizar', icon: LucideGraduationCap, roles: ['admin', 'directivo'] },
-    { label: 'Borrar', icon: LucideGraduationCap, roles: ['admin', 'directivo'] },
+    { label: 'Crear', icon: LucideUsers, roles: ['admin'] },
+    { label: 'Ver todos', icon: LucideUsers, roles: ['admin'] },
   ];
 
   filteredButtons = computed(() => {
@@ -71,10 +71,8 @@ export class Executives {
   });
   
   executiveForm: FormGroup = this.fb.group({
-    nombre: ['', Validators.required],
-    apellidos: ['', Validators.required],
-    password: ['', Validators.required],
-    idCurso: [1, [Validators.required, Validators.min(1)]]
+    id_profesor: ['', Validators.required],
+    cargo: ['', Validators.required]
   });
 
   toggleCrearExecutive() {
@@ -83,7 +81,7 @@ export class Executives {
   }
 
   loadExecutive() {
-    this.executiveService.getExecutive().subscribe({
+    this.executiveService.getExecutives().subscribe({
       next: (data: any) => {
         this.executives.set(data);
         this.mostrarFormulario.set(false);
@@ -91,7 +89,7 @@ export class Executives {
       },
       error: (error) => {
         console.error(error);
-        alert('Error cargando profesores');
+        alert('Error cargando directivos');
       }
     });
   }
@@ -109,21 +107,19 @@ export class Executives {
 
     const formValue = this.executiveForm.value;
     const executiveData = {
-      nombre: formValue.nombre,
-      apellidos: formValue.apellidos,
-      password: formValue.password,
-      activo: true
+      id_profesor: formValue.id_profesor,
+      cargo: formValue.cargo
     };
 
-    this.executiveService.createExecutive(executiveData, formValue.idCurso).subscribe({
+    this.executiveService.createExecutive(executiveData.id_profesor, executiveData.cargo).subscribe({
       next: (response) => {
         console.log(response);
         this.executiveForm.reset({ idCurso: 1 });
-        alert('Profesor creado correctamente');
+        alert('Directivo asignado correctamente');
       },
       error: (error) => {
         console.error(error);
-        alert('Error creando profesor');
+        alert('Error creando directivo');
       }
     });
   }
@@ -131,7 +127,7 @@ export class Executives {
   viewExecutive(executive: any) {
     this.executiveService.getExecutiveById(executive.id).subscribe({
       next: (data) => {
-        this.selectedExecutive.set(data);
+        this.selectedExecutives.set(data);
         this.mostrarDetalle.set(true);
       }
     });
@@ -143,19 +139,19 @@ export class Executives {
     
     this.executiveService.deleteExecutive(executive.id).subscribe({
       next: () => {
-        alert('Profesor dado de baja correctamente');
-        this.loadExecutives();
+        alert('Directivo dado de baja correctamente');
+        this.loadExecutive();
       },
       error: (error) => {
         console.error(error);
-        alert('Error dando de baja al profesor');
+        alert('Error dando de baja al directivo');
       }
     });
   }
 
   closeModal() {
     this.mostrarDetalle.set(false);
-    this.selectedExecutive.set(null);
+    this.selectedExecutives.set(null);
   }
 
   hasError(controlName: string, errorName: string = 'required') {
