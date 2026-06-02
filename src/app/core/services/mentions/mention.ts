@@ -9,17 +9,15 @@ export class MentionService {
 
     private http = inject(HttpClient);
     private authService = inject(AuthService);
+    token = this.authService.token();
 
     createMention(idReconocimiento: number, mention: any) {
-
-        const token = this.authService.token();
-
         return this.http.post(
             `/api/mentions/recognitions/${idReconocimiento}`,
             mention,
             {
                 headers: new HttpHeaders({
-                    Authorization: `Bearer ${this.authService.token()}`
+                    Authorization: `Bearer ${this.token}`
                 })
             }
         );
@@ -28,7 +26,7 @@ export class MentionService {
     getMentions() {
         return this.http.get('/api/mentions/', {
             headers: {
-                Authorization: `Bearer ${this.authService.token()}`
+                Authorization: `Bearer ${this.token}`
             }
         });
     }
@@ -38,7 +36,7 @@ export class MentionService {
             `/api/mentions/${id}`,
             {
                 headers: {
-                    Authorization: `Bearer ${this.authService.token()}`
+                    Authorization: `Bearer ${this.token}`
                 }
             }
         );
@@ -49,19 +47,19 @@ export class MentionService {
             `/api/mentions/recognitions/${idReconocimiento}`,
             {
                 headers: {
-                    Authorization: `Bearer ${this.authService.token()}`
+                    Authorization: `Bearer ${this.token}`
                 }
             }
         );
     }
 
-    updateMention(id: number, mention: any) {
+    updateMention(id: number, id_reconocimiento: number, mention: any) {
         return this.http.put(
-            `/api/mentions/${id}`,
+            `/api/mentions/${id}?id_reconocimiento=${id_reconocimiento}`,
             mention,
             {
                 headers: {
-                    Authorization: `Bearer ${this.authService.token()}`
+                    Authorization: `Bearer ${this.token}`
                 }
             }
         );
@@ -72,7 +70,7 @@ export class MentionService {
             `/api/mentions/${id}`,
             {
                 headers: {
-                    Authorization: `Bearer ${this.authService.token()}`
+                    Authorization: `Bearer ${this.token}`
                 }
             }
         );
