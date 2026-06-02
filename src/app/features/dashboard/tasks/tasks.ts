@@ -1,4 +1,4 @@
-import { Component, inject, computed } from '@angular/core';
+import { Component, inject, computed, signal } from '@angular/core';
 import { AuthService, UserRole } from '../../../core/auth/auth';
 import {
   LucideClipboardList,
@@ -11,6 +11,15 @@ import {
   LucideDynamicIcon,
 } from '@lucide/angular';
 import { CommonModule } from '@angular/common';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  ReactiveFormsModule
+} from '@angular/forms';
+
+import { TableModule } from 'primeng/table';
+import { TaskService } from '../../../core/services/tasks/task';
 
 interface Buttons {
   label: string;
@@ -19,13 +28,20 @@ interface Buttons {
 }
 @Component({
   selector: 'app-tasks',
-  imports: [LucideDynamicIcon, CommonModule],
+  imports: [
+    LucideDynamicIcon,
+    CommonModule,
+    ReactiveFormsModule,
+    TableModule
+  ],
   templateUrl: './tasks.html',
   styleUrl: './tasks.css',
 })
 export class Tasks {
 
   authService = inject(AuthService);
+  private taskService = inject(TaskService);
+  private fb = inject(FormBuilder);
   user = this.authService.user;
 
   icons = {
@@ -47,4 +63,113 @@ export class Tasks {
     if (!currentUser) return [];
     return this.butonItems.filter((btn) => btn.roles.includes(currentUser.role));
   });
+
+  mostrarFormulario = signal(false);
+  mostrarTabla = signal(false);
+  mostrarDetalle = signal(false);
+  tasks = signal<any[]>([]);
+  selectedTask = signal<any>(null);
+  searchTerm = signal('');
+
+  filteredTasks = computed(() => {
+    const term = this.searchTerm().toLowerCase();
+    if (!term) return this.tasks();
+    return this.tasks().filter((task: any) =>
+      task.descripcion?.toLowerCase().includes(term) ||
+      task.estado?.toLowerCase().includes(term)
+    );
+  });
+
+  taskForm: FormGroup = this.fb.group({
+    descripcion: ['', Validators.required],
+    estado: ['PENDIENTE', Validators.required],
+    idProfesor: [null, Validators.required],
+    idAlumno: [null, Validators.required]
+  });
+
+  toggleCrearTarea() {
+    this.mostrarTabla.set(false);
+    this.mostrarFormulario.set(false);
+  }
+
+  createTask() {
+    if (this.taskForm.invalid) {
+      this.taskForm.markAllAsTouched();
+      return;
+    }
+
+    const formValue = this.taskForm.value;
+
+    const taskData = {
+      descripcion: formValue.descripcion,
+      estado: formValue.estado
+    };
+    this.taskService.createTask(
+      formValue.idProfesor,
+      formValue.idAlumno,
+      taskData
+    ).subscribe({
+      next: (response) => {
+        console.log(response);
+
+        this.taskForm.reset({
+          estado: 'PENDIENTE',
+          idProfesor: null,
+          idAlumno: null
+        });
+
+        alert('Tarea creada correctamente');
+      },
+      error: (error) => {
+        console.error(error);
+        alert('Error creando tarea');
+      }
+    });
+  }
+
+  loadStudentTasks(idAlumno: number = 1) {
+    this.mostrarFormulario.set(false);
+    this.mostrarTabla.set(true);
+
+    this.taskService.getTasksByStudent(idAlumno).subscribe({
+      next: (data: any) => {
+        this.tasks.set(data);
+      },
+      error: (error) => {
+        console.error(error);
+        alert('Error cargando tareas');
+      }
+    });
+  }
+
+  loadTeachersTasks(idProfesor: number = 1) {
+    this.mostrarFormulario.set(false);
+    this.mostrarTabla.set(true);
+
+    this.taskService.getTasksByStudent(idProfesor).subscribe({
+      next: (data: any) => {
+        this.tasks.set(data);
+      },
+      error: (error) => {
+        console.error(error);
+        alert('Error cargando tareas');
+      }
+    });
+  }
+
+  viewTask(task: any) {
+    this.selectedTask.set(task);
+    this.mostrarDetalle.set(true);
+  }
+
+  closeModal() {
+    this.mostrarDetalle.set(false);
+    this.selectedTask.set(null);
+  }
+
+  hasError(field: string): boolean {
+    const control = this.taskForm.get(field);
+    return !!(control && control.invalid && (control.touched || control.dirty));
+  }
+
 }
