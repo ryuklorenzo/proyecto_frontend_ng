@@ -9,17 +9,15 @@ export class ClassroomService {
 
     private http = inject(HttpClient);
     private authService = inject(AuthService);
+    token = this.authService.token();
 
     createClassroom(idHorario: number, classroom: any) {
-
-        const token = this.authService.token();
-
         return this.http.post(
             `/api/aula_convivencia/?id_horario=${idHorario}`,
             classroom,
             {
                 headers: new HttpHeaders({
-                    Authorization: `Bearer ${this.authService.token()}`
+                    Authorization: `Bearer ${this.token}`
                 })
             }
         );
@@ -28,7 +26,7 @@ export class ClassroomService {
     getClassrooms() {
         return this.http.get('/api/aula_convivencia/', {
             headers: {
-                Authorization: `Bearer ${this.authService.token()}`
+                Authorization: `Bearer ${this.token}`
             }
         });
     }
@@ -38,7 +36,7 @@ export class ClassroomService {
             `/api/aula_convivencia/${id}`,
             {
                 headers: {
-                    Authorization: `Bearer ${this.authService.token()}`
+                    Authorization: `Bearer ${this.token}`
                 }
             }
         );
@@ -50,7 +48,7 @@ export class ClassroomService {
             classroom,
             {
                 headers: {
-                    Authorization: `Bearer ${this.authService.token()}`
+                    Authorization: `Bearer ${this.token}`
                 }
             }
         );
@@ -61,7 +59,7 @@ export class ClassroomService {
             `/api/aula_convivencia/${id}`,
             {
                 headers: {
-                    Authorization: `Bearer ${this.authService.token()}`
+                    Authorization: `Bearer ${this.token}`
                 }
             }
         );
@@ -73,7 +71,7 @@ export class ClassroomService {
             data,
             {
                 headers: {
-                    Authorization: `Bearer ${this.authService.token()}`
+                    Authorization: `Bearer ${this.token}`
                 }
             }
         );
@@ -84,7 +82,7 @@ export class ClassroomService {
             `/api/aula_convivencia/${idAula}/students`,
             {
                 headers: {
-                    Authorization: `Bearer ${this.authService.token()}`
+                    Authorization: `Bearer ${this.token}`
                 }
             }
         );
@@ -95,7 +93,7 @@ export class ClassroomService {
             `/api/aula_convivencia/${idAula}/students/${idAlumno}`,
             {
                 headers: {
-                    Authorization: `Bearer ${this.authService.token()}`
+                    Authorization: `Bearer ${this.token}`
                 }
             }
         );

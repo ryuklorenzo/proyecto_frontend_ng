@@ -9,17 +9,15 @@ export class ScheduleService {
 
     private http = inject(HttpClient);
     private authService = inject(AuthService);
+    token = this.authService.token();
 
     createSchedule(schedule: any) {
-
-        const token = this.authService.token();
-
         return this.http.post(
             `/api/schedules/`,
             schedule,
             {
                 headers: new HttpHeaders({
-                    Authorization: `Bearer ${this.authService.token()}`
+                    Authorization: `Bearer ${this.token}`
                 })
             }
         );
@@ -28,7 +26,7 @@ export class ScheduleService {
     getSchedules() {
         return this.http.get('/api/schedules/', {
             headers: {
-                Authorization: `Bearer ${this.authService.token()}`
+                Authorization: `Bearer ${this.token}`
             }
         });
     }
@@ -39,7 +37,7 @@ export class ScheduleService {
             schedule,
             {
                 headers: {
-                    Authorization: `Bearer ${this.authService.token()}`
+                    Authorization: `Bearer ${this.token}`
                 }
             }
         );
@@ -50,7 +48,7 @@ export class ScheduleService {
             `/api/schedules /${id}`,
             {
                 headers: {
-                    Authorization: `Bearer ${this.authService.token()}`
+                    Authorization: `Bearer ${this.token}`
                 }
             }
         );

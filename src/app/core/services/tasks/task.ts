@@ -9,17 +9,15 @@ export class TaskService {
 
     private http = inject(HttpClient);
     private authService = inject(AuthService);
+    token = this.authService.token();
 
     createTask(idProfesor: number, idAlumno: number, task: any) {
-
-        const token = this.authService.token();
-
         return this.http.post(
             `/api/tasks/?id_profesor=${idProfesor}&id_alumno=${idAlumno}`,
             task,
             {
                 headers: new HttpHeaders({
-                    Authorization: `Bearer ${this.authService.token()}`
+                    Authorization: `Bearer ${this.token}`
                 })
             }
         );
@@ -30,7 +28,7 @@ export class TaskService {
             `/api/tasks/students/${idAlumno}`,
             {
                 headers: {
-                    Authorization: `Bearer ${this.authService.token()}`
+                    Authorization: `Bearer ${this.token}`
                 }
             }
         );
@@ -41,7 +39,7 @@ export class TaskService {
             `/api/tasks/teachers/${idProfesor}`,
             {
                 headers: {
-                    Authorization: `Bearer ${this.authService.token()}`
+                    Authorization: `Bearer ${this.token}`
                 }
             }
         );

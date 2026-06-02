@@ -9,17 +9,18 @@ export class CourseService {
 
     private http = inject(HttpClient);
     private authService = inject(AuthService);
+    token = this.authService.token();
 
     createCourse(idHorario: number, course: any) {
 
         const token = this.authService.token();
 
         return this.http.post(
-            `/api/courses/?id_horario/${idHorario}`,
+            `/api/courses/?id_horario=${idHorario}`,
             course,
             {
                 headers: new HttpHeaders({
-                    Authorization: `Bearer ${this.authService.token()}`
+                    Authorization: `Bearer ${this.token}`
                 })
             }
         );
@@ -28,7 +29,7 @@ export class CourseService {
     getCourses() {
         return this.http.get('/api/courses/', {
             headers: {
-                Authorization: `Bearer ${this.authService.token()}`
+                Authorization: `Bearer ${this.token}`
             }
         });
     }
@@ -38,30 +39,30 @@ export class CourseService {
             `/api/courses/${id}`,
             {
                 headers: {
-                    Authorization: `Bearer ${this.authService.token()}`
+                    Authorization: `Bearer ${this.token}`
                 }
             }
         );
     }
 
-    updateCourse(id: number, course: any) {
-        return this.http.put(
-            `/api/courses/${id}`,
-            course,
-            {
-                headers: {
-                    Authorization: `Bearer ${this.authService.token()}`
-                }
+    updateCourse(id: number, id_horario: number, course: any) {
+    return this.http.put(
+        `/api/courses/${id}?id_horario=${id_horario}`, 
+        course, 
+        {
+            headers: {
+                Authorization: `Bearer ${this.token}`
             }
-        );
-    }
+        }
+    );
+}
 
     deleteCourse(id: number) {
         return this.http.delete(
-            `/api/courses /${id}`,
+            `/api/courses/${id}`,
             {
                 headers: {
-                    Authorization: `Bearer ${this.authService.token()}`
+                    Authorization: `Bearer ${this.token}`
                 }
             }
         );

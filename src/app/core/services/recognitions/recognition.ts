@@ -9,18 +9,20 @@ export class RecognitionService {
 
     private http = inject(HttpClient);
     private authService = inject(AuthService);
+    token = this.authService.token();
 
-    createRecognition(idActitud: number, idAlumno: number, idProfesor: number, recognition: any) {
-
-        const token = this.authService.token();
-
+    createRecognition(idAlumno: number, idProfesor: number, reconocimientoData: any, actitudData: any) {
+        const payload = {
+            reconocimiento: reconocimientoData,
+            actitud: actitudData
+        };
         return this.http.post(
-            `/api/recognitions/attitudes/${idActitud}?id_alumno=${idAlumno}&id_profesor=${idProfesor}`,
-            recognition,
+            `/api/recognitions/?id_alumno=${idAlumno}&id_profesor=${idProfesor}`,
+            payload,
             {
-                headers: new HttpHeaders({
-                    Authorization: `Bearer ${this.authService.token()}`
-                })
+                headers: {
+                    Authorization: `Bearer ${this.token}`
+                }
             }
         );
     }
@@ -28,7 +30,7 @@ export class RecognitionService {
     getRecognitions() {
         return this.http.get('/api/recognitions/', {
             headers: {
-                Authorization: `Bearer ${this.authService.token()}`
+                Authorization: `Bearer ${this.token}`
             }
         });
     }
@@ -38,7 +40,7 @@ export class RecognitionService {
             `/api/recognitions/${id}`,
             {
                 headers: {
-                    Authorization: `Bearer ${this.authService.token()}`
+                    Authorization: `Bearer ${this.token}`
                 }
             }
         );
@@ -49,19 +51,19 @@ export class RecognitionService {
             `/api/recognitions/attitudes/${idActitud}`,
             {
                 headers: {
-                    Authorization: `Bearer ${this.authService.token()}`
+                    Authorization: `Bearer ${this.token}`
                 }
             }
         );
     }
 
-    updateRecognition(id: number, recognition: any) {
+    updateRecognition(id: number, id_actitud:number, recognition: any) {
         return this.http.put(
-            `/api/recognitions/${id}`,
+            `/api/recognitions/${id}?id_actitud=${id_actitud}`,
             recognition,
             {
                 headers: {
-                    Authorization: `Bearer ${this.authService.token()}`
+                    Authorization: `Bearer ${this.token}`
                 }
             }
         );
@@ -72,7 +74,7 @@ export class RecognitionService {
             `/api/recognitions /${id}`,
             {
                 headers: {
-                    Authorization: `Bearer ${this.authService.token()}`
+                    Authorization: `Bearer ${this.token}`
                 }
             }
         );

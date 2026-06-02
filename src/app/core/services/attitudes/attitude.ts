@@ -9,17 +9,16 @@ export class AttitudeService {
 
     private http = inject(HttpClient);
     private authService = inject(AuthService);
+    token = this.authService.token();
 
     createAttitude(idAlumno: number, attitude: any) {
-
-        const token = this.authService.token();
 
         return this.http.post(
             `/api/attitudes/?id_alumno=${idAlumno}`,
             attitude,
             {
                 headers: new HttpHeaders({
-                    Authorization: `Bearer ${this.authService.token()}`
+                    Authorization: `Bearer ${this.token}`
                 })
             }
         );
@@ -27,10 +26,10 @@ export class AttitudeService {
 
     getAttituddesByStudent(idAlumno: number) {
         return this.http.get(
-            `/api//attitudes/users/${idAlumno}`,
+            `/api/attitudes/users/${idAlumno}`,
             {
                 headers: {
-                    Authorization: `Bearer ${this.authService.token()}`
+                    Authorization: `Bearer ${this.token}`
                 }
             }
         );
@@ -41,7 +40,7 @@ export class AttitudeService {
             `/api/attitudes/${id}`,
             {
                 headers: {
-                    Authorization: `Bearer ${this.authService.token()}`
+                    Authorization: `Bearer ${this.token}`
                 }
             }
         );

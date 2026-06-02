@@ -9,6 +9,7 @@ export class ExecutiveService {
 
   private http = inject(HttpClient);
   private authService = inject(AuthService);
+  token = this.authService.token();
 
   createExecutive(idProfesor: number, cargo: string) {
     return this.http.post(
@@ -16,7 +17,7 @@ export class ExecutiveService {
       { cargo },
       {
         headers: new HttpHeaders({
-          Authorization: `Bearer ${this.authService.token()}`
+          Authorization: `Bearer ${this.token}`
         })
       }
     );
@@ -25,7 +26,7 @@ export class ExecutiveService {
   getExecutives() {
     return this.http.get('/api/executives/', {
       headers: {
-        Authorization: `Bearer ${this.authService.token()}`
+        Authorization: `Bearer ${this.token}`
       }
     });
   }
@@ -33,7 +34,7 @@ export class ExecutiveService {
   getExecutiveById(id: number) {
     return this.http.get(`/api/executives/${id}/`, {
       headers: {
-        Authorization: `Bearer ${this.authService.token()}`
+        Authorization: `Bearer ${this.token}`
       }
     });
   }
@@ -41,7 +42,7 @@ export class ExecutiveService {
   deleteExecutive(id: number) {
     return this.http.delete(`/api/executives/${id}/baja/`, {
       headers: {
-        Authorization: `Bearer ${this.authService.token()}`
+        Authorization: `Bearer ${this.token}`
       }
     });
   }

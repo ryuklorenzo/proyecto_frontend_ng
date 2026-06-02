@@ -9,17 +9,15 @@ export class PreviService {
 
     private http = inject(HttpClient);
     private authService = inject(AuthService);
+    token = this.authService.token();
 
     createPrevi(idDirectivo: number, idExpediente: number, previ: any) {
-
-        const token = this.authService.token();
-
         return this.http.post(
             `/api/previ/?id_directivo=${idDirectivo}&id_expediente=${idExpediente}`,
             previ,
             {
                 headers: new HttpHeaders({
-                    Authorization: `Bearer ${this.authService.token()}`
+                    Authorization: `Bearer ${this.token}`
                 })
             }
         );
@@ -28,7 +26,7 @@ export class PreviService {
     getPrevis() {
         return this.http.get('/api/previ/', {
             headers: {
-                Authorization: `Bearer ${this.authService.token()}`
+                Authorization: `Bearer ${this.token}`
             }
         });
     }
@@ -38,7 +36,7 @@ export class PreviService {
             `/api/previ/expediente/${idExpediente}`,
             {
                 headers: {
-                    Authorization: `Bearer ${this.authService.token()}`
+                    Authorization: `Bearer ${this.token}`
                 }
             }
         );
@@ -49,7 +47,7 @@ export class PreviService {
             `/api/previ/directivo/${idDirectivo}`,
             {
                 headers: {
-                    Authorization: `Bearer ${this.authService.token()}`
+                    Authorization: `Bearer ${this.token}`
                 }
             }
         );
@@ -61,7 +59,7 @@ export class PreviService {
             previ,
             {
                 headers: {
-                    Authorization: `Bearer ${this.authService.token()}`
+                    Authorization: `Bearer ${this.token}`
                 }
             }
         );
@@ -72,7 +70,7 @@ export class PreviService {
             `/api/previ/${id}`,
             {
                 headers: {
-                    Authorization: `Bearer ${this.authService.token()}`
+                    Authorization: `Bearer ${this.token}`
                 }
             }
         );

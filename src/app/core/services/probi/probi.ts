@@ -9,17 +9,15 @@ export class ProbiService {
 
     private http = inject(HttpClient);
     private authService = inject(AuthService);
+    token = this.authService.token();
 
     createProbi(idMencion: number, probi: any) {
-
-        const token = this.authService.token();
-
         return this.http.post(
             `/api/probis/?id_mencion=${idMencion}`,
             probi,
             {
                 headers: new HttpHeaders({
-                    Authorization: `Bearer ${this.authService.token()}`
+                    Authorization: `Bearer ${this.token}`
                 })
             }
         );
@@ -28,7 +26,7 @@ export class ProbiService {
     getProbis() {
         return this.http.get('/api/probis/', {
             headers: {
-                Authorization: `Bearer ${this.authService.token()}`
+                Authorization: `Bearer ${this.token}`
             }
         });
     }
@@ -38,19 +36,19 @@ export class ProbiService {
             `/api/probis/${id}`,
             {
                 headers: {
-                    Authorization: `Bearer ${this.authService.token()}`
+                    Authorization: `Bearer ${this.token}`
                 }
             }
         );
     }
 
-    updateProbi(id: number, probi: any) {
+    updateProbi(id: number, id_mencion: number, probi: any) {
         return this.http.put(
-            `/api/probis/${id}`,
+            `/api/probis/${id}?id_mencion=${id_mencion}`,
             probi,
             {
                 headers: {
-                    Authorization: `Bearer ${this.authService.token()}`
+                    Authorization: `Bearer ${this.token}`
                 }
             }
         );
@@ -61,7 +59,7 @@ export class ProbiService {
             `/api/probis/${id}`,
             {
                 headers: {
-                    Authorization: `Bearer ${this.authService.token()}`
+                    Authorization: `Bearer ${this.token}`
                 }
             }
         );

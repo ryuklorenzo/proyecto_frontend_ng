@@ -9,17 +9,15 @@ export class TeacherService {
 
   private http = inject(HttpClient);
   private authService = inject(AuthService);
+  token = this.authService.token();
 
   createTeacher(teacher: any, idCurso: number) {
-
-    const token = this.authService.token();
-
     return this.http.post(
       `/api/teachers/?id_curso=${idCurso}`,
       teacher,
       {
         headers: new HttpHeaders({
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${this.token}`
         })
       }
     );
@@ -28,7 +26,7 @@ export class TeacherService {
   getTeachers() {
     return this.http.get('/api/teachers/', {
       headers: {
-        Authorization: `Bearer ${this.authService.token()}`
+        Authorization: `Bearer ${this.token}`
       }
     });
   }
@@ -36,15 +34,15 @@ export class TeacherService {
   getTeacherById(id: number) {
     return this.http.get(`/api/teachers/${id}/`, {
       headers: {
-        Authorization: `Bearer ${this.authService.token()}`
+        Authorization: `Bearer ${this.token}`
       }
     });
   }
 
-  deleteTeacher(id: number) {
+  bajaTeacher(id: number) {
     return this.http.delete(`/api/teachers/${id}/baja/`, {
       headers: {
-        Authorization: `Bearer ${this.authService.token()}`
+        Authorization: `Bearer ${this.token}`
       }
     });
   }
