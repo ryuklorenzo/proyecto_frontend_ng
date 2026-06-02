@@ -42,7 +42,7 @@ export class Sidebar {
     { href: '/dashboard', label: 'Inicio', icon: LucideHome, roles: ['admin', 'directivo', 'profesor', 'alumno'] },
     { href: '/dashboard/students', label: 'Alumnos', icon: LucideGraduationCap, roles: ['admin', 'directivo'] },
     { href: '/dashboard/teachers', label: 'Profesores', icon: LucideGraduationCap, roles: ['admin', 'directivo'] },
-    { href: '/dashboard/executives', label: 'Directivos', icon: LucideGraduationCap, roles: ['admin', 'directivo', 'profesor', 'alumno'] }, // solo admin y directivo, pongo mas para testear.
+    { href: '/dashboard/executives', label: 'Directivos', icon: LucideGraduationCap, roles: ['admin'] },
     { href: '/dashboard/courses', label: 'Cursos', icon: LucideBookOpen, roles: ['admin'] },
     { href: '/dashboard/schedules', label: 'Horarios', icon: LucideCalendar, roles: ['admin'] },
     { href: '/dashboard/records', label: 'Expedientes', icon: LucideFileText, roles: ['admin', 'directivo'] },
