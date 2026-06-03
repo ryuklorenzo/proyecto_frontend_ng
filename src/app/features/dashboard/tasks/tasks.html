@@ -127,7 +127,7 @@
                 </option>
                 @for(alumno of alumnos(); track alumno.id){
                 <option [value]="alumno.id" class="bg-slate-900 text-white">
-                    {{ alumno.nombre }} {{ alumno.apellidos }}
+                    {{ alumno.nombre }} {{ alumno.apellidos }} (ID: {{alumno.id}})
                 </option>
                 }
             </select>
@@ -150,7 +150,7 @@
                 </option>
                 @for(profesor of profesores(); track profesor.id){
                 <option [value]="profesor.id" class="bg-slate-900 text-white">
-                    {{ profesor.nombre }} {{ profesor.apellidos }}
+                    {{ profesor.nombre }} {{ profesor.apellidos }}  (ID: {{profesor.id}})
                 </option>
                 }
             </select>
