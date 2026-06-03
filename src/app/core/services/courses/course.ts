@@ -36,7 +36,7 @@ export class CourseService {
 
     getCourseById(id: number) {
         return this.http.get(
-            `/api/courses/${id}`,
+            `/api/courses/${id}/`,
             {
                 headers: {
                     Authorization: `Bearer ${this.token}`
@@ -45,21 +45,21 @@ export class CourseService {
         );
     }
 
-    updateCourse(id: number, id_horario: number, course: any) {
-    return this.http.put(
-        `/api/courses/${id}?id_horario=${id_horario}`, 
-        course, 
-        {
-            headers: {
-                Authorization: `Bearer ${this.token}`
+    updateCourse(id: number, idHorario: number, course: any) {
+        return this.http.put(
+            `/api/courses/${id}/?id_horario=${idHorario}`,
+            course,
+            {
+                headers: {
+                    Authorization: `Bearer ${this.token}`
+                }
             }
-        }
-    );
-}
+        );
+    }
 
     deleteCourse(id: number) {
         return this.http.delete(
-            `/api/courses/${id}`,
+            `/api/courses/${id}/`,
             {
                 headers: {
                     Authorization: `Bearer ${this.token}`
