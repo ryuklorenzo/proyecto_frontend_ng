@@ -113,7 +113,21 @@
                 <label class="block mb-2 font-semibold">
                     Curso
                 </label>
-                <input type="number" formControlName="idCurso" class="w-full border border-slate-300 rounded-xl p-4">
+                <select formControlName="idCurso" class="w-full border border-slate-700 bg-slate-900 text-white rounded-xl p-4">
+                    <option [ngValue]="null" disabled selected class="bg-slate-900 text-white">Selecciona un curso...</option>
+                    
+                    @for(curso of cursos(); track curso.id){
+                    <option [value]="curso.id" class="bg-slate-900 text-white">
+                        {{ curso.curso }} - {{ curso.modulo }} (Nivel: {{ curso.nivel }})
+                    </option>
+                    }
+                </select>
+
+                @if(hasError('idCurso')){
+                <p class="text-red-500 text-sm mt-2">
+                    Seleccionar un curso es obligatorio.
+                </p>
+                }
             </div>
 
             <button type="submit"

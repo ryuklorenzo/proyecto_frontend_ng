@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { TableModule } from 'primeng/table';
 import { AuthService, UserRole } from '../../../core/auth/auth';
 import { StudentService } from '../../../core/services/students/student';
+import { CourseService } from '../../../core/services/courses/course';
 import {
   LucideGraduationCap,
   LucideUsers,
@@ -35,6 +36,7 @@ interface Buttons {
 export class Students {
   authService = inject(AuthService);
   private studentService = inject(StudentService);
+  private courseService = inject(CourseService);
   private fb = inject(FormBuilder);
 
   user = this.authService.user;
@@ -61,6 +63,7 @@ export class Students {
   mostrarTabla = signal(false);
   mostrarDetalle = signal(false);
 
+  cursos = signal<any[]>([]);
   students = signal<any[]>([]);
   selectedStudent = signal<any>(null);
   searchTerm = signal(''); //barra de busqueda.
@@ -90,6 +93,12 @@ export class Students {
   toggleCrearAlumno() {
     this.mostrarTabla.set(false);
     this.mostrarFormulario.set(true);
+    
+    //desplegable de cursos dispo
+    this.courseService.getCourses().subscribe({
+      next: (data: any) => this.cursos.set(data),
+      error: (error) => console.error('Error cargando cursos', error)
+    });
   }
 
   loadStudents() {

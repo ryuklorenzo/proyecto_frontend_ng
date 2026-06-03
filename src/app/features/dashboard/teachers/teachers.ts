@@ -16,6 +16,7 @@ import {
   LucideUserCircle,
   LucideDynamicIcon,
 } from '@lucide/angular';
+import { CourseService } from '../../../core/services/courses/course';
 
 interface Buttons {
   label: string;
@@ -38,6 +39,7 @@ interface Buttons {
 export class Teachers {
   authService = inject(AuthService);
   private teacherService = inject(TeacherService);
+  private courseService = inject(CourseService);
   private fb = inject(FormBuilder);
 
   user = this.authService.user;
@@ -64,6 +66,7 @@ export class Teachers {
   mostrarTabla = signal(false);
   mostrarDetalle = signal(false);
 
+  cursos = signal<any[]>([]);
   teachers = signal<any[]>([]);
   selectedTeacher = signal<any>(null);
   searchTerm = signal('');
@@ -92,6 +95,12 @@ export class Teachers {
   toggleCrearProfesor() {
     this.mostrarTabla.set(false);
     this.mostrarFormulario.set(true);
+
+    //pillar cursos dispo
+    this.courseService.getCourses().subscribe({
+      next: (data: any) => this.cursos.set(data),
+      error: (error) => console.error('Error cargando cursos', error)
+    });
   }
 
   loadTeachers() {
