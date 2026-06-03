@@ -5,7 +5,7 @@ import { AuthService } from '../../auth/auth';
 @Injectable({
     providedIn: 'root',
 })
-export class RecordSercive {
+export class RecordService {
 
     private http = inject(HttpClient);
     private authService = inject(AuthService);
