@@ -10,6 +10,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ExecutiveService } from '../../../core/services/executives/executive';
+import { TeacherService } from '../../../core/services/teachers/teacher';
 
 interface Buttons {
   label: string;
@@ -27,6 +28,7 @@ interface Buttons {
 export class Executives {
   authService = inject(AuthService);
   private executiveService = inject(ExecutiveService)
+  private teacherService = inject(TeacherService)
   private fb = inject(FormBuilder);
   user = this.authService.user;
 
@@ -38,8 +40,8 @@ export class Executives {
   };
 
   private butonItems: Buttons[] = [
-    { label: 'Crear', icon: LucideUsers, roles: ['admin'] },
-    { label: 'Ver todos', icon: LucideUsers, roles: ['admin'] },
+    { label: 'Crear Directivo', icon: LucideUsers, roles: ['admin'] },
+    { label: 'Ver todos los Directivos', icon: LucideUsers, roles: ['admin'] },
   ];
 
   filteredButtons = computed(() => {
@@ -52,6 +54,7 @@ export class Executives {
   mostrarTabla = signal(false);
   mostrarDetalle = signal(false);
 
+  teachers = signal<any[]>([]);
   executives = signal<any[]>([]);
   selectedExecutives = signal<any>(null);
   searchTerm = signal('');
@@ -71,13 +74,19 @@ export class Executives {
   });
   
   executiveForm: FormGroup = this.fb.group({
-    id_profesor: ['', Validators.required],
+    id_profesor: [null, Validators.required],
     cargo: ['', Validators.required]
   });
 
   toggleCrearExecutive() {
     this.mostrarTabla.set(false);
     this.mostrarFormulario.set(true);
+
+    // desplegable teachers
+    this.teacherService.getTeachers().subscribe({
+      next: (data: any) => this.teachers.set(data),
+      error: (error) => console.error('Error cargando profesor', error)
+    });
   }
 
   loadExecutive() {

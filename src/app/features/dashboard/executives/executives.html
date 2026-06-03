@@ -17,7 +17,7 @@
         @for (btn of filteredButtons(); track btn.label) {
 
         <button
-            (click)="btn.label === 'Crear' ? toggleCrearExecutive() : btn.label === 'Ver todos' ? loadExecutive() : null"
+            (click)="btn.label === 'Crear Directivo' ? toggleCrearExecutive() : btn.label === 'Ver todos los Directivos' ? loadExecutive() : null"
             class="flex items-center justify-between p-8 bg-card border border-border rounded-3xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
 
             <div class="flex items-center gap-6">
@@ -32,7 +32,7 @@
                     </h3>
 
                     <p class="text-muted-foreground mt-1">
-                        {{ btn.label === 'Crear'
+                        {{ btn.label === 'Crear Directivo'
                         ? 'Asigna un cargo directivo a un profesor existente'
                         : btn.label === 'Ver todos' 
                         ? 'Visualiza y gestiona la lista de todos los directivos'
@@ -72,16 +72,20 @@
         <form [formGroup]="executiveForm" (ngSubmit)="createExecutive()" class="grid gap-6">
 
             <div>
-                <label class="block mb-2 font-semibold">
-                    ID del Profesor
-                </label>
-
-                <input type="number" formControlName="id_profesor" placeholder="Ej: 3"
-                    class="w-full border rounded-xl p-4">
+                <label class="block mb-2 font-semibold">Profesor</label>
+                <select formControlName="id_profesor" class="w-full border border-slate-700 bg-slate-900 text-white rounded-xl p-4">
+                    <option [ngValue]="null" disabled selected class="bg-slate-900 text-white">Selecciona un profesor...</option>
+                    
+                    @for(profesor of teachers(); track profesor.id){
+                    <option [value]="profesor.id" class="bg-slate-900 text-white">
+                        {{ profesor.nombre }} {{ profesor.apellidos }} (ID: {{ profesor.id }})
+                    </option>
+                    }
+                </select>
 
                 @if(hasError('id_profesor')){
                 <p class="text-red-500 text-sm mt-2">
-                    El ID del profesor es obligatorio.
+                    Seleccionar un profesor es obligatorio.
                 </p>
                 }
             </div>
