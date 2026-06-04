@@ -14,6 +14,8 @@ import { Recognitions } from './features/dashboard/recognitions/recognitions';
 import { Probi } from './features/dashboard/probi/probi';
 import { Previ } from './features/dashboard/previ/previ';
 import { AulaConvivencia } from './features/dashboard/aula-convivencia/aula-convivencia';
+import { Mentions } from './features/dashboard/mentions/mentions';
+import { Attitudes } from './features/dashboard/attitudes/attitudes';
 //import { authGuard } from './core/auth/auth.guard'; // Importante para proteger el dashboard
 
 export const routes: Routes = [
@@ -47,6 +49,8 @@ export const routes: Routes = [
       {path: 'probi',component: Probi,},
       {path: 'previ',component: Previ,},
       {path: 'aula-convivencia',component: AulaConvivencia,},
+      {path: 'mentions',component: Mentions,},
+      {path: 'attitudes',component: Attitudes,},
       // mas paginas futuro
     ],
   },
