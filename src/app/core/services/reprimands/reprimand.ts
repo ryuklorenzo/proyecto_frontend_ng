@@ -13,7 +13,7 @@ export class ReprimandService {
 
     createReprimand(idAlumno: number, idProfesor: number, reprimand: any) {
         return this.http.post(
-            `/api/records/?id_alumno=${idAlumno}&id_profesor=${idProfesor}`,
+            `/api/reprimands/?id_alumno=${idAlumno}&id_profesor=${idProfesor}`,
             reprimand,
             {
                 headers: new HttpHeaders({
@@ -33,7 +33,7 @@ export class ReprimandService {
 
     getReprimandById(id: number) {
         return this.http.get(
-            `/api/reprimands/${id}`,
+            `/api/reprimands/${id}/`,
             {
                 headers: {
                     Authorization: `Bearer ${this.token}`
@@ -43,6 +43,7 @@ export class ReprimandService {
     }
 
     getReprimandByStudent(idAlumno: number) {
+        //console.log('TOKEN:', this.token);
         return this.http.get(
             `/api/reprimands/students/${idAlumno}`,
             {
