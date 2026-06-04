@@ -10,7 +10,6 @@ import {
   LucideChevronLeft, 
   LucideChevronRight, 
   LucideLogOut, 
-  LucidePencil, 
   LucideSearch, 
   LucideShieldAlert, 
   LucideTrash, 
@@ -58,6 +57,7 @@ export class Attitudes implements OnInit {
 
   private butonItems: Buttons[] = [
     { label: 'Crear actitud', icon: LucideShieldAlert, roles: ['admin', 'directivo'] },
+    { label: 'Ver actitudes', icon: LucideSearch, roles: ['admin', 'directivo'] },
     { label: 'Ver por alumno', icon: LucideSearch, roles: ['admin', 'directivo'] },
   ];
 
@@ -67,27 +67,42 @@ export class Attitudes implements OnInit {
     return this.butonItems.filter((btn) => btn.roles.includes(currentUser.role));
   });
 
-  // Vistas
   mostrarFormulario = signal(false);
   mostrarBusquedaAlumno = signal(false);
   mostrarTabla = signal(false);
   mostrarDetalle = signal(false);
+  isShowingAll = signal(false);
 
-  // Datos
   actitudes = signal<any[]>([]);
   alumnos = signal<any[]>([]);
   selectedActitud = signal<any>(null);
   alumnoSeleccionado = signal<number | null>(null);
   searchTerm = signal('');
 
+  //cruzar actitudes con el nombre del alumno
   filteredActitudes = computed(() => {
     const term = this.searchTerm().toLowerCase();
-    const list = this.actitudes();
-    if (!term) return list;
-    return list.filter((act: any) =>
+    const allAttitudes = this.actitudes();
+    const allStudents = this.alumnos();
+
+    const enrichedAttitudes = allAttitudes.map(act => {
+      //cruzamos usando id_alumno o id_usuario según lo que devuelva tu backend
+      const idEstudiante = act.id_alumno || act.id_usuario;
+      const student = allStudents.find(s => Number(s.id) === Number(idEstudiante));
+      
+      return {
+        ...act,
+        nombre_alumno_completo: student ? `${student.nombre} ${student.apellidos}` : 'Desconocido'
+      };
+    });
+
+    if (!term) return enrichedAttitudes;
+    
+    return enrichedAttitudes.filter((act: any) =>
       act.tipo?.toLowerCase().includes(term) ||
       act.descripcion?.toLowerCase().includes(term) ||
-      act.fecha?.includes(term)
+      act.fecha?.includes(term) ||
+      act.nombre_alumno_completo?.toLowerCase().includes(term)
     );
   });
 
@@ -126,6 +141,29 @@ export class Attitudes implements OnInit {
     this.mostrarBusquedaAlumno.set(true);
     this.cargarAlumnos();
     this.actitudes.set([]);
+    this.isShowingAll.set(false);
+  }
+
+  loadAttitudes() {
+    this.ocultarTodo();
+    this.cargarAlumnos();
+    this.isShowingAll.set(true);
+    
+    this.attitudeService.getAttitudes().subscribe({
+      next: (data: any) => {
+        this.actitudes.set(data);
+        this.mostrarTabla.set(true);
+      },
+      error: (err) => {
+        if (err.status === 404) {
+          this.actitudes.set([]);
+          this.mostrarTabla.set(true);
+        } else {
+          console.error(err);
+          alert('Error cargando las actitudes');
+        }
+      }
+    });
   }
 
   createAttitude() {
@@ -167,7 +205,6 @@ export class Attitudes implements OnInit {
         this.mostrarTabla.set(true);
       },
       error: (err) => {
-        // Gestión del 404 igual que en amonestaciones
         if (err.status === 404) {
           this.actitudes.set([]);
           this.mostrarTabla.set(true);
@@ -199,15 +236,12 @@ export class Attitudes implements OnInit {
         this.actitudes.set(this.actitudes().filter((a: any) => a.id !== actitud.id));
       },
       error: (err) => {
-        // error 409 Conflict del backend
         if (err.status === 409) {
           alert('No se puede borrar la actitud porque tiene una amonestación o reconocimiento asociado.');
         } 
-        // error 404 Not Found por si acaso
         else if (err.status === 404) {
           alert('La actitud no fue encontrada (es posible que ya haya sido borrada).');
         } 
-        // error 500
         else {
           console.error(err);
           alert('Error desconocido eliminando la actitud.');

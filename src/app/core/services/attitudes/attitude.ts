@@ -24,6 +24,17 @@ export class AttitudeService {
         );
     }
 
+    getAttitudes(){
+        return this.http.get(
+            `/api/attitudes/`,
+            {
+                headers: {
+                    Authorization: `Bearer ${this.token}`
+                }
+            }
+        )
+    }
+
     getAttituddesByStudent(idAlumno: number) {
         return this.http.get(
             `/api/attitudes/users/${idAlumno}/`,
