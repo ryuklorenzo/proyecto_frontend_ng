@@ -26,7 +26,7 @@ export class AttitudeService {
 
     getAttituddesByStudent(idAlumno: number) {
         return this.http.get(
-            `/api/attitudes/users/${idAlumno}`,
+            `/api/attitudes/users/${idAlumno}/`,
             {
                 headers: {
                     Authorization: `Bearer ${this.token}`
@@ -35,7 +35,7 @@ export class AttitudeService {
         );
     }
 
-    deleteMention(id: number) {
+    deleteAttitude(id: number) {
         return this.http.delete(
             `/api/attitudes/${id}`,
             {
