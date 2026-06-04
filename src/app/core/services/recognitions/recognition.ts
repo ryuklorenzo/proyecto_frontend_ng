@@ -11,18 +11,14 @@ export class RecognitionService {
     private authService = inject(AuthService);
     token = this.authService.token();
 
-    createRecognition(idAlumno: number, idProfesor: number, reconocimientoData: any, actitudData: any) {
-        const payload = {
-            reconocimiento: reconocimientoData,
-            actitud: actitudData
-        };
+    createRecognition(idAlumno: number, idProfesor: number, payload: any) {
         return this.http.post(
             `/api/recognitions/?id_alumno=${idAlumno}&id_profesor=${idProfesor}`,
             payload,
-            {
+            { 
                 headers: {
-                    Authorization: `Bearer ${this.token}`
-                }
+                    Authorization: `Bearer ${this.token}` 
+                } 
             }
         );
     }
@@ -48,7 +44,7 @@ export class RecognitionService {
 
     getRecognitionsByAttitude(idActitud: number) {
         return this.http.get(
-            `/api/recognitions/attitudes/${idActitud}`,
+            `/api/recognitions/attitudes/${idActitud}/`,
             {
                 headers: {
                     Authorization: `Bearer ${this.token}`
@@ -57,18 +53,13 @@ export class RecognitionService {
         );
     }
 
-    updateRecognition(id: number, id_actitud:number, recognition: any) {
+    updateRecognition(id: number, idActitud: number, payload: any) {
         return this.http.put(
-            `/api/recognitions/${id}?id_actitud=${id_actitud}`,
-            recognition,
-            {
-                headers: {
-                    Authorization: `Bearer ${this.token}`
-                }
-            }
+            `/api/recognitions/${id}?id_actitud=${idActitud}`,
+            payload,
+            { headers: { Authorization: `Bearer ${this.token}` } }
         );
     }
-
     deleteRecognition(id: number) {
         return this.http.delete(
             `/api/recognitions /${id}`,
