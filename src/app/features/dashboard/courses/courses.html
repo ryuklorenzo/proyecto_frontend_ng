@@ -12,16 +12,14 @@
         </p>
     </div>
 
+    <!-- TARJETAS DE BOTONES -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-
         @for (btn of filteredButtons(); track btn.label) {
-
         <button
-            (click)="btn.label === 'Crear curso' ? toggleCrearCurso() : btn.label === 'Ver cursos' ? loadCourses() : null"
+            (click)="btn.label === 'Crear curso' ? toggleCrearCurso() : loadCourses()"
             class="flex items-center justify-between p-8 bg-card border border-border rounded-3xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
 
             <div class="flex items-center gap-6">
-
                 <div class="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center">
                     <svg [lucideIcon]="btn.icon" class="w-10 h-10 text-blue-600"></svg>
                 </div>
@@ -30,35 +28,27 @@
                     <h3 class="text-2xl font-bold text-card-foreground">
                         {{ btn.label }}
                     </h3>
-
                     <p class="text-muted-foreground mt-1">
                         {{ btn.label === 'Crear curso'
-                        ? 'Registra un nuevo curso en el sistema'
-                        : 'Visualiza y gestiona todos los cursos'
+                        ? 'Añade un nuevo curso y asígnale un horario'
+                        : 'Visualiza la lista de cursos disponibles'
                         }}
                     </p>
                 </div>
-
             </div>
-
-            <svg [lucideIcon]="icons.ChevronRight" class="w-8 h-8 text-blue-600">
-            </svg>
-
+            <svg [lucideIcon]="icons.ChevronRight" class="w-8 h-8 text-blue-600"></svg>
         </button>
-
         } @empty {
-
         <div class="col-span-full p-8 text-center bg-destructive/10 rounded-xl border border-destructive/20">
             <p class="text-destructive font-medium">
                 No tienes permisos para realizar acciones en este módulo.
             </p>
         </div>
-
         }
     </div>
 
+    <!-- FORMULARIO DE CREACIÓN -->
     <div class="mt-10 bg-card border border-border rounded-3xl shadow-md p-8" [hidden]="!mostrarFormulario()">
-
         <h3 class="text-4xl font-bold mb-8">
             Crear Curso
         </h3>
@@ -66,54 +56,63 @@
         <form [formGroup]="courseForm" (ngSubmit)="createCourse()" class="grid gap-6">
 
             <div>
-                <label class="block mb-2 font-semibold">
-                    Nivel
-                </label>
-                <input formControlName="nivel" placeholder="ESO, Bachillerato..." class="w-full border rounded-xl p-4">
+                <label class="block mb-2 font-semibold">Nivel</label>
+                <input formControlName="nivel" placeholder="Ej: Secundaria, Bachillerato, FP..." class="w-full border rounded-xl p-4">
+                @if(hasError('nivel')){
+                <p class="text-red-500 text-sm mt-2">El nivel es obligatorio.</p>
+                }
             </div>
 
             <div>
-                <label class="block mb-2 font-semibold">
-                    Curso
-                </label>
-                <input formControlName="curso" placeholder="3º ESO" class="w-full border rounded-xl p-4">
-
+                <label class="block mb-2 font-semibold">Curso</label>
+                <input formControlName="curso" placeholder="Ej: 3º ESO, 1º DAW..." class="w-full border rounded-xl p-4">
+                @if(hasError('curso')){
+                <p class="text-red-500 text-sm mt-2">El curso es obligatorio.</p>
+                }
             </div>
 
             <div>
-                <label class="block mb-2 font-semibold">
-                    Módulo
-                </label>
-                <input formControlName="modulo" placeholder="Matemáticas" class="w-full border rounded-xl p-4">
-
+                <label class="block mb-2 font-semibold">Módulo / Asignatura</label>
+                <input formControlName="modulo" placeholder="Ej: Matemáticas, Programación..." class="w-full border rounded-xl p-4">
+                @if(hasError('modulo')){
+                <p class="text-red-500 text-sm mt-2">El módulo es obligatorio.</p>
+                }
             </div>
 
+            <!-- DESPLEGABLE OSCURO DE HORARIO -->
             <div>
-                <label class="block mb-2 font-semibold">
-                    ID Horario
-                </label>
-                <input formControlName="idHorario" type="number" class="w-full border rounded-xl p-4">
-
+                <label class="block mb-2 font-semibold">Horario Asignado</label>
+                <select formControlName="id_horario" class="w-full border border-slate-700 bg-slate-900 text-white rounded-xl p-4">
+                    <option [ngValue]="null" disabled selected class="bg-slate-900 text-white">Selecciona un horario...</option>
+                    @for(horario of horarios(); track horario.id){
+                    <option [value]="horario.id" class="bg-slate-900 text-white">
+                        Horario - {{ horario.formato}} ({{ horario.hora_inicio }} a {{ horario.hora_fin }}) (ID:{{ horario.id }})
+                    </option>
+                    }
+                </select>
+                @if(hasError('id_horario')){
+                <p class="text-red-500 text-sm mt-2">Seleccionar un horario es obligatorio.</p>
+                }
             </div>
 
             <button type="submit" [disabled]="courseForm.invalid"
                 class="w-full py-4 rounded-xl text-white font-bold text-lg transition-colors disabled:bg-slate-400 disabled:cursor-not-allowed bg-blue-600 hover:bg-blue-700">
-
                 Crear Curso
-
             </button>
 
         </form>
     </div>
 
+    <!-- TABLA DE RESULTADOS -->
     <div class="mt-10" [hidden]="!mostrarTabla()">
-
         <div class="bg-card border border-border rounded-3xl shadow-md overflow-hidden">
-
             <div class="p-8 border-b border-border">
-                <h3 class="text-4xl font-bold">
-                    Listado de cursos
-                </h3>
+                <h3 class="text-4xl font-bold">Listado de Cursos</h3>
+            </div>
+            
+            <div class="p-8 border-b border-border">
+                <input [value]="searchTerm()" (input)="searchTerm.set($any($event.target).value)"
+                    placeholder="Filtrar por nombre, nivel o módulo..." class="w-full border rounded-lg p-3">
             </div>
 
             <p-table [value]="filteredCourses()" [paginator]="true" [rows]="5" styleClass="p-datatable-striped">
@@ -123,42 +122,28 @@
                         <th class="py-6">Nivel</th>
                         <th class="py-6">Curso</th>
                         <th class="py-6">Módulo</th>
-                        <th class="py-6">Formato</th>
-                        <th class="py-6">Acciones</th>
+                        <th class="py-6 text-center">Acciones</th>
                     </tr>
                 </ng-template>
                 <ng-template pTemplate="body" let-course>
-
                     <tr class="h-24">
-
-                        <td class="font-bold">
-                            {{ course.id }}
-                        </td>
+                        <td class="font-bold">{{ course.id }}</td>
+                        <td class="font-semibold">{{ course.nivel }}</td>
+                        <td>{{ course.curso }}</td>
                         <td>
-                            {{ course.nivel }}
+                            <span class="px-3 py-1 bg-purple-100 text-purple-800 rounded-lg font-medium">
+                                {{ course.modulo }}
+                            </span>
                         </td>
-                        <td>
-                            {{ course.curso }}
-                        </td>
-                        <td>
-                            {{ course.modulo }}
-                        </td>
-                        <td>
-                            {{ course.formato }}
-                        </td>
-                        <td>
-                            <div class="flex gap-3">
-
+                        <td class="text-center">
+                            <div class="flex gap-3 justify-center">
                                 <button (click)="viewCourse(course)"
-                                    class="w-12 h-12 rounded-xl bg-blue-600 text-white flex items-center justify-center hover:bg-blue-700 hover:scale-110 active:scale-95 transition-all duration-200"
-                                    title="Ver curso">
+                                    class="w-12 h-12 rounded-xl bg-blue-600 text-white inline-flex items-center justify-center hover:bg-blue-700">
                                     👁
                                 </button>
                                 <button (click)="deleteCourse(course)"
-                                    class="w-12 h-12 rounded-xl bg-red-600 text-white flex items-center justify-center hover:bg-red-700 hover:scale-110 active:scale-95 transition-all duration-200"
-                                    title="Eliminar curso">
-                                    <svg [lucideIcon]="icons.Trash" class="w-5 h-5"></svg>
-
+                                    class="w-12 h-12 rounded-xl bg-red-600 text-white inline-flex items-center justify-center hover:bg-red-700 transition-colors">
+                                    🚫
                                 </button>
                             </div>
                         </td>
@@ -168,10 +153,10 @@
         </div>
     </div>
 
+    <!-- MODAL DE DETALLE DEL CURSO -->
     @if(mostrarDetalle() && selectedCourse()) {
     <div class="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center z-50 p-6">
-        <div
-            class="w-full max-w-5xl bg-gradient-to-b from-white to-blue-50 rounded-[32px] shadow-2xl border border-blue-100 overflow-hidden">
+        <div class="w-full max-w-4xl bg-gradient-to-b from-white to-blue-50 rounded-[32px] shadow-2xl border border-blue-100 overflow-hidden">
             <div class="flex items-center justify-between px-10 py-8 border-b border-blue-100">
                 <div>
                     <h3 class="text-4xl font-bold text-blue-950">
@@ -181,97 +166,35 @@
                         Información detallada del curso
                     </p>
                 </div>
-                <div class="flex gap-3">
-                    @if(!editMode()){
-                    <button (click)="enableEdit()"
-                        class="px-5 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700">
-                        Editar
-                    </button>
-                    }
-                    <button (click)="closeModal()"
-                        class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl text-blue-500 hover:bg-blue-100 hover:text-blue-700 transition-all duration-300">
-                        ✕
-                    </button>
-                </div>
+                <button (click)="closeModal()"
+                    class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl text-blue-500 hover:bg-blue-100">
+                    ✕
+                </button>
             </div>
+            
             <div class="p-8">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="bg-white border border-blue-100 rounded-3xl p-6">
-                        <p class="text-blue-500 font-medium mb-2">
-                            Nivel
-                        </p>
-                        @if(editMode()){
-                        <input [(ngModel)]="selectedCourse().nivel"
-                            class="w-full border rounded-xl p-3 text-black bg-white">
-                        } @else {
+                        <p class="text-blue-500 font-medium mb-2">Nivel</p>
                         <p class="text-2xl font-bold text-blue-950">
                             {{ selectedCourse().nivel }}
                         </p>
-                        }
                     </div>
+                    
                     <div class="bg-white border border-blue-100 rounded-3xl p-6">
-                        <p class="text-blue-500 font-medium mb-2">
-                            Curso
-                        </p>
-                        @if(editMode()){
-                        <input [(ngModel)]="selectedCourse().curso"
-                            class="w-full border rounded-xl p-3 text-black bg-white">
-                        } @else {
+                        <p class="text-blue-500 font-medium mb-2">Curso</p>
                         <p class="text-2xl font-bold text-blue-950">
                             {{ selectedCourse().curso }}
                         </p>
-                        }
                     </div>
-                    <div class="bg-white border border-blue-100 rounded-3xl p-6">
-                        <p class="text-blue-500 font-medium mb-2">
-                            Módulo
-                        </p>
-                        @if(editMode()){
-                        <input [(ngModel)]="selectedCourse().modulo"
-                            class="w-full border rounded-xl p-3 text-black bg-white">
-                        } @else {
-                        <p class="text-2xl font-bold text-blue-950">
+
+                    <div class="md:col-span-2 bg-white border border-blue-100 rounded-3xl p-6">
+                        <p class="text-blue-500 font-medium mb-2">Módulo / Asignatura</p>
+                        <p class="text-2xl font-bold text-purple-700">
                             {{ selectedCourse().modulo }}
                         </p>
-                        }
-                    </div>
-                    <div class="bg-white border border-blue-100 rounded-3xl p-6">
-                        <p class="text-blue-500 font-medium mb-2">
-                            Formato
-                        </p>
-                        <p class="text-2xl font-bold text-blue-950">
-                            {{ selectedCourse().formato }}
-                        </p>
-                    </div>
-                    <div class="bg-white border border-blue-100 rounded-3xl p-6">
-                        <p class="text-blue-500 font-medium mb-2">
-                            Hora inicio
-                        </p>
-                        <p class="text-2xl font-bold text-blue-950">
-                            {{ selectedCourse().hora_inicio }}
-                        </p>
-                    </div>
-                    <div class="bg-white border border-blue-100 rounded-3xl p-6">
-                        <p class="text-blue-500 font-medium mb-2">
-                            Hora fin
-                        </p>
-                        <p class="text-2xl font-bold text-blue-950">
-                            {{ selectedCourse().hora_fin }}
-                        </p>
                     </div>
                 </div>
-                @if(editMode()){
-                <div class="flex justify-end gap-4 mt-8">
-                    <button (click)="cancelEdit()"
-                        class="px-6 py-3 rounded-xl bg-red-600 text-white font-medium hover:bg-slate-700 hover:scale-105 active:scale-95 transition-all duration-200 shadow-md">
-                        Cancelar
-                    </button>
-                    <button (click)="saveCourse()"
-                        class="px-6 py-3 rounded-xl bg-green-600 text-white font-medium hover:bg-slate-700 hover:scale-105 active:scale-95 transition-all duration-200 shadow-md">
-                        Guardar
-                    </button>
-                </div>
-                }
             </div>
         </div>
     </div>

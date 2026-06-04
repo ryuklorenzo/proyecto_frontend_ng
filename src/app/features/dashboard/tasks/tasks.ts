@@ -28,8 +28,10 @@ interface Buttons {
   icon: any;
   roles: UserRole[];
 }
+
 @Component({
   selector: 'app-tasks',
+  standalone: true,
   imports: [
     LucideDynamicIcon,
     CommonModule,
@@ -61,7 +63,6 @@ export class Tasks {
     { label: 'Ver tareas profesor', icon: LucideUsers, roles: ['admin', 'directivo', 'profesor'] },
   ];
 
-  // 2. Filtramos la lista según el rol del usuario (igual que en el sidebar)
   filteredButtons = computed(() => {
     const currentUser = this.user();
     if (!currentUser) return [];
@@ -104,6 +105,14 @@ export class Tasks {
     this.mostrarBusquedaAlumno.set(false);
     this.mostrarBusquedaProfesor.set(false);
     this.mostrarFormulario.set(true);
+
+    // Cargar listas para los desplegables de Crear Tarea
+    this.studentService.getStudents().subscribe({
+      next: (data: any) => this.alumnos.set(data)
+    });
+    this.teacherService.getTeachers().subscribe({
+      next: (data: any) => this.profesores.set(data)
+    });
   }
 
   createTask() {
@@ -141,7 +150,7 @@ export class Tasks {
     });
   }
 
-  loadStudentTasks(idAlumno: number = 1) {
+  loadStudentTasks(idAlumno: number) {
     this.mostrarFormulario.set(false);
     this.mostrarTabla.set(true);
 
@@ -151,12 +160,12 @@ export class Tasks {
       },
       error: (error) => {
         console.error(error);
-        alert('Error cargando tareas');
+        alert('Error cargando tareas del alumno');
       }
     });
   }
 
-  loadTeachersTasks(idProfesor: number = 1) {
+  loadTeachersTasks(idProfesor: number) {
     this.mostrarFormulario.set(false);
     this.mostrarTabla.set(true);
 
@@ -166,7 +175,7 @@ export class Tasks {
       },
       error: (error) => {
         console.error(error);
-        alert('Error cargando tareas');
+        alert('Error cargando tareas del profesor');
       }
     });
   }
@@ -198,7 +207,6 @@ export class Tasks {
   }
 
   buscarTareasAlumno() {
-
     const idAlumno = this.alumnoSeleccionado();
 
     if (!idAlumno) {
@@ -222,7 +230,6 @@ export class Tasks {
   }
 
   buscarTareasProfesor() {
-
     const idProfesor = this.profesorSeleccionado();
 
     if (!idProfesor) {
@@ -233,5 +240,4 @@ export class Tasks {
     this.loadTeachersTasks(idProfesor);
     this.mostrarBusquedaProfesor.set(false);
   }
-
 }

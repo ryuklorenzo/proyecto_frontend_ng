@@ -34,15 +34,14 @@
                     <p class="text-muted-foreground mt-1">
                         {{ btn.label === 'Crear tarea'
                         ? 'Registra un nueva tarea en el sistema'
-                        : 'Visualiza y gestiona la lista de todos las tareas'
+                        : 'Visualiza y gestiona la lista de todas las tareas'
                         }}
                     </p>
                 </div>
 
             </div>
 
-            <svg [lucideIcon]="icons.ChevronRight" class="w-8 h-8 text-blue-600">
-            </svg>
+            <svg [lucideIcon]="icons.ChevronRight" class="w-8 h-8 text-blue-600"></svg>
 
         </button>
 
@@ -66,45 +65,50 @@
         <form [formGroup]="taskForm" (ngSubmit)="createTask()" class="grid gap-6">
 
             <div>
-                <label class="block mb-2 font-semibold">
-                    Descripción
-                </label>
-
+                <label class="block mb-2 font-semibold">Descripción</label>
                 <textarea rows="4" formControlName="descripcion" class="w-full border rounded-xl p-4"></textarea>
 
                 @if(hasError('descripcion')){
-                <p class="text-red-500 text-sm mt-2">
-                    La descripción es obligatoria.
-                </p>
+                <p class="text-red-500 text-sm mt-2">La descripción es obligatoria.</p>
                 }
             </div>
 
             <div>
-                <label class="block mb-2 font-semibold">
-                    Estado
-                </label>
-                <select formControlName="estado" class="w-full border rounded-xl p-4">
-                    <option value="PENDIENTE" class="bg-slate-900 text-white">
-                        Pendiente
-                    </option>
-                    <option value="COMPLETADA" class="bg-slate-900 text-white">
-                        Completada
-                    </option>
+                <label class="block mb-2 font-semibold">Estado</label>
+                <select formControlName="estado" class="w-full border border-slate-700 bg-slate-900 text-white rounded-xl p-4">
+                    <option value="PENDIENTE" class="bg-slate-900 text-white">Pendiente</option>
+                    <option value="COMPLETADA" class="bg-slate-900 text-white">Completada</option>
                 </select>
             </div>
 
             <div>
-                <label class="block mb-2 font-semibold">
-                    Profesor
-                </label>
-                <input formControlName="idProfesor" type="number" class="w-full border border-slate-300 rounded-xl p-4">
+                <label class="block mb-2 font-semibold">Profesor</label>
+                <select formControlName="idProfesor" class="w-full border border-slate-700 bg-slate-900 text-white rounded-xl p-4">
+                    <option [ngValue]="null" disabled selected class="bg-slate-900 text-white">Selecciona un profesor...</option>
+                    @for(profesor of profesores(); track profesor.id){
+                    <option [value]="profesor.id" class="bg-slate-900 text-white">
+                        {{ profesor.nombre }} {{ profesor.apellidos }} (ID: {{profesor.id}})
+                    </option>
+                    }
+                </select>
+                @if(hasError('idProfesor')){
+                <p class="text-red-500 text-sm mt-2">Seleccionar profesor es obligatorio.</p>
+                }
             </div>
 
             <div>
-                <label class="block mb-2 font-semibold">
-                    Alumno
-                </label>
-                <input formControlName="idAlumno" type="number" class="w-full border border-slate-300 rounded-xl p-4">
+                <label class="block mb-2 font-semibold">Alumno</label>
+                <select formControlName="idAlumno" class="w-full border border-slate-700 bg-slate-900 text-white rounded-xl p-4">
+                    <option [ngValue]="null" disabled selected class="bg-slate-900 text-white">Selecciona un alumno...</option>
+                    @for(alumno of alumnos(); track alumno.id){
+                    <option [value]="alumno.id" class="bg-slate-900 text-white">
+                        {{ alumno.nombre }} {{ alumno.apellidos }} (ID: {{alumno.id}})
+                    </option>
+                    }
+                </select>
+                @if(hasError('idAlumno')){
+                <p class="text-red-500 text-sm mt-2">Seleccionar alumno es obligatorio.</p>
+                }
             </div>
 
             <button type="submit" [disabled]="taskForm.invalid"
@@ -116,15 +120,11 @@
     </div>
 
     <div class="mt-10 bg-card border border-border rounded-3xl shadow-md p-8" [hidden]="!mostrarBusquedaAlumno()">
-        <h3 class="text-3xl font-bold mb-6">
-            Seleccionar Alumno
-        </h3>
+        <h3 class="text-3xl font-bold mb-6">Seleccionar Alumno</h3>
         <div class="space-y-4">
             <select class="w-full border border-slate-700 bg-slate-900 text-white rounded-xl p-4"
                 [value]="alumnoSeleccionado()" (change)="alumnoSeleccionado.set(+$any($event.target).value)">
-                <option value="" class="bg-slate-900 text-white">
-                    Selecciona un alumno
-                </option>
+                <option value="" class="bg-slate-900 text-white">Selecciona un alumno...</option>
                 @for(alumno of alumnos(); track alumno.id){
                 <option [value]="alumno.id" class="bg-slate-900 text-white">
                     {{ alumno.nombre }} {{ alumno.apellidos }} (ID: {{alumno.id}})
@@ -139,18 +139,14 @@
     </div>
 
     <div class="mt-10 bg-card border border-border rounded-3xl shadow-md p-8" [hidden]="!mostrarBusquedaProfesor()">
-        <h3 class="text-3xl font-bold mb-6">
-            Seleccionar Profesor
-        </h3>
+        <h3 class="text-3xl font-bold mb-6">Seleccionar Profesor</h3>
         <div class="space-y-4">
             <select class="w-full border border-slate-700 bg-slate-900 text-white rounded-xl p-4" [value]="profesorSeleccionado()"
                 (change)="profesorSeleccionado.set(+$any($event.target).value)">
-                <option value="" class="bg-slate-900 text-white">
-                    Selecciona un profesor
-                </option>
+                <option value="" class="bg-slate-900 text-white">Selecciona un profesor...</option>
                 @for(profesor of profesores(); track profesor.id){
                 <option [value]="profesor.id" class="bg-slate-900 text-white">
-                    {{ profesor.nombre }} {{ profesor.apellidos }}  (ID: {{profesor.id}})
+                    {{ profesor.nombre }} {{ profesor.apellidos }} (ID: {{profesor.id}})
                 </option>
                 }
             </select>
@@ -162,13 +158,9 @@
     </div>
 
     <div class="mt-10" [hidden]="!mostrarTabla()">
-
         <div class="bg-card border border-border rounded-3xl shadow-md overflow-hidden">
-
             <div class="p-8 border-b border-border">
-                <h3 class="text-4xl font-bold">
-                    Listado de tareas
-                </h3>
+                <h3 class="text-4xl font-bold">Listado de tareas</h3>
             </div>
 
             <p-table [value]="filteredTasks()" [paginator]="true" [rows]="5" styleClass="p-datatable-striped">
@@ -209,8 +201,7 @@
 
     @if(mostrarDetalle() && selectedTask()) {
     <div class="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center z-50 p-6">
-        <div
-            class="w-full max-w-3xl bg-gradient-to-b from-white to-blue-50 rounded-[32px] shadow-2xl border border-blue-100 overflow-hidden">
+        <div class="w-full max-w-3xl bg-gradient-to-b from-white to-blue-50 rounded-[32px] shadow-2xl border border-blue-100 overflow-hidden">
             <div class="flex items-center justify-between px-10 py-8 border-b border-blue-100">
                 <div>
                     <h3 class="text-4xl font-bold text-blue-950">
@@ -228,20 +219,24 @@
             <div class="p-8">
                 <div class="grid gap-6">
                     <div class="bg-white border border-blue-100 rounded-3xl p-6">
-                        <p class="text-blue-500 font-medium mb-2">
-                            Descripción
-                        </p>
+                        <p class="text-blue-500 font-medium mb-2">Descripción</p>
                         <p class="text-xl font-bold text-blue-950">
                             {{ selectedTask().descripcion }}
                         </p>
                     </div>
                     <div class="bg-white border border-blue-100 rounded-3xl p-6">
-                        <p class="text-blue-500 font-medium mb-2">
-                            Estado
-                        </p>
-                        <p class="text-xl font-bold text-blue-950">
-                            {{ selectedTask().estado }}
-                        </p>
+                        <p class="text-blue-500 font-medium mb-2">Estado</p>
+                        <div class="mt-2">
+                            @if(selectedTask().estado === 'COMPLETADA'){
+                            <span class="px-4 py-2 rounded-xl bg-green-100 text-green-700 font-bold text-sm uppercase">
+                                ✓ Completada
+                            </span>
+                            } @else {
+                            <span class="px-4 py-2 rounded-xl bg-yellow-100 text-yellow-700 font-bold text-sm uppercase">
+                                ↻ Pendiente
+                            </span>
+                            }
+                        </div>
                     </div>
                 </div>
             </div>
