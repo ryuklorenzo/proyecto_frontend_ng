@@ -33,7 +33,7 @@ export class ScheduleService {
 
     updateSchedule(id: number, schedule: any) {
         return this.http.put(
-            `/api/schedules/${id}`,
+            `/api/schedules/${id}/`,
             schedule,
             {
                 headers: {
@@ -45,7 +45,7 @@ export class ScheduleService {
 
     deleteSchedule(id: number) {
         return this.http.delete(
-            `/api/schedules /${id}`,
+            `/api/schedules /${id}/`,
             {
                 headers: {
                     Authorization: `Bearer ${this.token}`
