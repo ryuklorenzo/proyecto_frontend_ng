@@ -42,9 +42,9 @@ export class ClassroomService {
         );
     }
 
-    updateClassroom(id: number, classroom: any) {
+    updateClassroom(id: number, idHorario: number, classroom: any) { 
         return this.http.put(
-            `/api/aula_convivencia/${id}`,
+            `/api/aula_convivencia/${id}?id_horario=${idHorario}`, 
             classroom,
             {
                 headers: {
