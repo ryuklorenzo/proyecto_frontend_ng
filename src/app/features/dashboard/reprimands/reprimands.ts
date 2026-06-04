@@ -57,7 +57,8 @@ export class Reprimands {
     ChevronLeft: LucideChevronLeft,
     ChevronRight: LucideChevronRight,
     UserCircle: LucideUserCircle,
-    LogOut: LucideLogOut
+    LogOut: LucideLogOut,
+    Search: LucideSearch
   }
 
   private butonItems: Buttons[] = [
@@ -155,15 +156,22 @@ export class Reprimands {
 
   loadStudentReprimands(idAlumno: number) {
     this.mostrarFormulario.set(false);
-    this.mostrarTabla.set(true);
-
+    
     this.reprimandService.getReprimandByStudent(idAlumno).subscribe({
       next: (data: any) => {
         this.reprimands.set(data);
+        this.mostrarTabla.set(true);
       },
-      error: (error) => {
-        console.error(error);
-        alert('Error cargando amonestaciones del alumno');
+      error: (err) => {
+        if (err.status === 404) {
+          // Vaciamos la lista y mostramos la tabla
+          this.reprimands.set([]);
+          this.mostrarTabla.set(true);
+          // ¡Hemos quitado el alert!
+        } else {
+          console.error(err);
+          alert('Error cargando amonestaciones del alumno');
+        }
       }
     });
   }
