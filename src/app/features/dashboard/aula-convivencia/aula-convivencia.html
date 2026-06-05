@@ -12,7 +12,7 @@
         </p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
         @for (btn of filteredButtons(); track btn.label) {
         <button (click)="btn.label === 'Crear aula' ? toggleCrearAula() : 
                      (btn.label === 'Ver aulas' || btn.label === 'Actualizar aula' || btn.label === 'Borrar aula') ? loadClassrooms() : 
@@ -25,11 +25,24 @@
                     <svg [lucideIcon]="btn.icon" class="w-10 h-10 text-blue-600"></svg>
                 </div>
                 <div class="text-left">
-                    <h3 class="text-xl font-bold text-card-foreground">
+                    <h3 class="text-2xl font-bold text-card-foreground">
                         {{ btn.label }}
                     </h3>
+                    
+                    <p class="text-muted-foreground mt-1">
+                        {{ btn.label === 'Crear aula' 
+                        ? 'Registra una nueva aula de convivencia' 
+                        : btn.label === 'Ver aulas' 
+                        ? 'Visualiza y gestiona las aulas creadas' 
+                        : btn.label === 'Asignar alumnos' 
+                        ? 'Añade alumnos a un aula específica' 
+                        : 'Revisa o saca alumnos de un aula'
+                        }}
+                    </p>
                 </div>
             </div>
+            
+            <svg [lucideIcon]="icons.ChevronRight" class="w-8 h-8 text-blue-600"></svg>
         </button>
         } @empty {
         <div class="col-span-full p-8 text-center bg-destructive/10 rounded-xl border border-destructive/20">
@@ -47,8 +60,7 @@
                 <label class="block mb-2 font-semibold">Nombre del Aula</label>
                 <input type="text" formControlName="nombre" placeholder="Ej: Aula de Castigo Jueves..."
                     class="w-full border rounded-xl p-4">
-                @if(hasErrorForm(classroomForm, 'nombre')){ <p class="text-red-500 text-sm mt-2">El nombre es
-                    obligatorio.</p> }
+                @if(hasErrorForm(classroomForm, 'nombre')){ <p class="text-red-500 text-sm mt-2">El nombre es obligatorio.</p> }
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -62,17 +74,14 @@
                     <label class="block mb-2 font-semibold">Horario Base</label>
                     <select formControlName="id_horario"
                         class="w-full border border-slate-700 bg-slate-900 text-white rounded-xl p-4">
-                        <option [ngValue]="null" disabled selected class="bg-slate-900 text-white">Selecciona un
-                            horario...</option>
+                        <option [ngValue]="null" disabled selected class="bg-slate-900 text-white">Selecciona un horario...</option>
                         @for(horario of horarios(); track horario.id){
                         <option [value]="horario.id" class="bg-slate-900 text-white">
-                            Horario #{{ horario.id }} - {{ horario.formato }} ({{ horario.hora_inicio }} - {{
-                            horario.hora_fin }})
+                            Horario #{{ horario.id }} - {{ horario.formato }} ({{ horario.hora_inicio }} - {{ horario.hora_fin }})
                         </option>
                         }
                     </select>
-                    @if(hasErrorForm(classroomForm, 'id_horario')){ <p class="text-red-500 text-sm mt-2">Obligatorio.
-                    </p> }
+                    @if(hasErrorForm(classroomForm, 'id_horario')){ <p class="text-red-500 text-sm mt-2">Obligatorio.</p> }
                 </div>
             </div>
 
@@ -93,16 +102,14 @@
                 <label class="block mb-2 font-semibold">Aula de Convivencia Destino</label>
                 <select formControlName="id_aula_convivencia"
                     class="w-full border border-slate-700 bg-slate-900 text-white rounded-xl p-4">
-                    <option [ngValue]="null" disabled selected class="bg-slate-900 text-white">Selecciona un aula...
-                    </option>
+                    <option [ngValue]="null" disabled selected class="bg-slate-900 text-white">Selecciona un aula...</option>
                     @for(aula of filteredAulas(); track aula.id){
                     <option [value]="aula.id" class="bg-slate-900 text-white">
                         Aula #{{ aula.id }} - {{ aula.nombre }} (Fecha: {{ aula.fecha }})
                     </option>
                     }
                 </select>
-                @if(hasErrorForm(assignForm, 'id_aula_convivencia')){ <p class="text-red-500 text-sm mt-2">Debes
-                    seleccionar un aula.</p> }
+                @if(hasErrorForm(assignForm, 'id_aula_convivencia')){ <p class="text-red-500 text-sm mt-2">Debes seleccionar un aula.</p> }
             </div>
 
             <div>
@@ -124,8 +131,7 @@
                     <option disabled class="text-slate-500 italic p-2">Todos los alumnos están ya asignados.</option>
                     }
                 </select>
-                @if(hasErrorForm(assignForm, 'alumnos_ids')){ <p class="text-red-500 text-sm mt-2">Debes elegir al menos
-                    un alumno.</p> }
+                @if(hasErrorForm(assignForm, 'alumnos_ids')){ <p class="text-red-500 text-sm mt-2">Debes elegir al menos un alumno.</p> }
             </div>
 
             <button type="submit" [disabled]="assignForm.invalid"
@@ -149,7 +155,7 @@
                     }
                 </select>
                 <button (click)="buscarAlumnosEnAula()"
-                    class="w-full bg-blue-600 text-white rounded-xl py-4 font-semibold hover:bg-blue-700">
+                    class="w-full bg-blue-600 text-white rounded-xl py-4 font-semibold hover:bg-blue-700 transition-colors">
                     Ver Alumnos
                 </button>
             </div>
@@ -222,11 +228,11 @@
                         <td class="text-center">
                             <div class="flex gap-3 justify-center">
                                 <button (click)="viewClassroom(aula)"
-                                    class="w-12 h-12 rounded-xl bg-blue-600 text-white flex items-center justify-center hover:bg-blue-700 hover:scale-110 transition-all duration-200">
+                                    class="w-12 h-12 rounded-xl bg-blue-600 text-white flex items-center justify-center hover:bg-blue-700 transition-colors duration-200">
                                     <svg [lucideIcon]="icons.Pencil" class="w-5 h-5"></svg>
                                 </button>
                                 <button (click)="deleteClassroom(aula)"
-                                    class="w-12 h-12 rounded-xl bg-red-600 text-white flex items-center justify-center hover:bg-red-700 hover:scale-110 transition-all duration-200">
+                                    class="w-12 h-12 rounded-xl bg-red-600 text-white flex items-center justify-center hover:bg-red-700 transition-colors duration-200">
                                     <svg [lucideIcon]="icons.Trash" class="w-5 h-5"></svg>
                                 </button>
                             </div>
@@ -241,11 +247,14 @@
     <div class="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center z-50 p-6">
         <div
             class="w-full max-w-4xl bg-gradient-to-b from-white to-blue-50 rounded-[32px] shadow-2xl border border-blue-100 overflow-hidden">
-            <div class="flex items-center justify-between px-10 py-8 border-b border-blue-100 bg-white">
+            <div class="flex items-center justify-between px-10 py-8 border-b border-blue-100">
                 <div>
-                    <h3 class="text-3xl font-bold text-blue-950">
-                        Editando Aula #{{ selectedClassroom().id }}
+                    <h3 class="text-4xl font-bold text-blue-950">
+                        Aula #{{ selectedClassroom().id }}
                     </h3>
+                    <p class="text-blue-600/70 text-lg mt-2">
+                        Edición de detalles del aula de convivencia
+                    </p>
                 </div>
                 <button (click)="closeModal()"
                     class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl text-blue-500 hover:bg-blue-100 hover:text-blue-700 transition-all duration-300">
@@ -256,32 +265,32 @@
             <div class="p-8">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                    <div class="bg-white border border-blue-100 rounded-3xl p-6 md:col-span-2">
-                        <p class="text-blue-500 font-medium mb-2">Nombre del Aula</p>
+                    <div class="md:col-span-2 bg-white border border-blue-100 rounded-3xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
+                        <p class="text-blue-500 font-medium text-base mb-2">Nombre del Aula</p>
                         <input type="text" [(ngModel)]="selectedClassroom().nombre"
-                            class="w-full border border-slate-300 rounded-xl p-3 bg-white text-slate-900">
+                            class="w-full border-b border-slate-300 py-2 focus:border-blue-500 focus:outline-none bg-transparent text-2xl font-bold text-blue-950">
                     </div>
 
-                    <div class="bg-white border border-blue-100 rounded-3xl p-6">
-                        <p class="text-blue-500 font-medium mb-2">Horario Base</p>
+                    <div class="bg-white border border-blue-100 rounded-3xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
+                        <p class="text-blue-500 font-medium text-base mb-2">Horario Base</p>
                         <select [(ngModel)]="selectedClassroom().id_horario"
-                            class="w-full border border-slate-300 rounded-xl p-3 bg-white text-slate-900">
+                            class="w-full border-b border-slate-300 py-2 focus:border-blue-500 focus:outline-none bg-transparent text-xl font-bold text-blue-950">
                             @for(horario of horarios(); track horario.id){
                             <option [value]="horario.id">Horario #{{ horario.id }} - {{ horario.formato }}</option>
                             }
                         </select>
                     </div>
 
-                    <div class="bg-white border border-blue-100 rounded-3xl p-6">
-                        <p class="text-blue-500 font-medium mb-2">Fecha</p>
+                    <div class="bg-white border border-blue-100 rounded-3xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
+                        <p class="text-blue-500 font-medium text-base mb-2">Fecha</p>
                         <input type="date" [(ngModel)]="selectedClassroom().fecha"
-                            class="w-full border border-slate-300 rounded-xl p-3 bg-white text-slate-900">
+                            class="w-full border-b border-slate-300 py-2 focus:border-blue-500 focus:outline-none bg-transparent text-xl font-bold text-blue-950">
                     </div>
 
                 </div>
             </div>
 
-            <div class="px-8 pb-8 flex justify-end gap-4">
+            <div class="px-10 pb-8 flex justify-end gap-4">
                 <button (click)="closeModal()"
                     class="px-6 py-3 rounded-xl bg-slate-500 text-white font-medium hover:bg-slate-600 transition-all duration-200">
                     Cancelar
