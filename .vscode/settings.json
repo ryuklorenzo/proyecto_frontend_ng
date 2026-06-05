@@ -1,0 +1,5 @@
+{
+  "typescript.inlayHints.variableTypes": false,
+  "typescript.inlayHints.parameterTypes": false,
+  "typescript.inlayHints.functionLikeReturnTypes": false
+}

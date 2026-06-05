@@ -1,0 +1,278 @@
+<div class="p-8">
+    <div class="mb-10">
+        <h2 class="text-5xl font-bold text-foreground mb-4">
+            Gestión de Previs
+        </h2>
+
+        <p class="text-lg text-muted-foreground flex items-center gap-3">
+            Mostrando acciones disponibles para tu rol:
+            <span class="px-4 py-1 rounded-xl bg-blue-100 text-blue-700 font-bold text-sm uppercase">
+                {{ user()?.role }}
+            </span>
+        </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        @for (btn of filteredButtons(); track btn.label) {
+        <button (click)="btn.label === 'Crear previ' ? toggleCrearPrevi() : 
+                     btn.label === 'Ver previs' ? loadAllPrevis() : 
+                     btn.label === 'Ver por expediente' ? showExpedienteSelector() : 
+                     showExecutiveSelector()"
+            class="flex items-center justify-between p-8 bg-card border border-border rounded-3xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+
+            <div class="flex items-center gap-6">
+                <div class="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center">
+                    <svg [lucideIcon]="btn.icon" class="w-10 h-10 text-blue-600"></svg>
+                </div>
+                <div class="text-left">
+                    <h3 class="text-2xl font-bold text-card-foreground">
+                        {{ btn.label }}
+                    </h3>
+                    <p class="text-muted-foreground mt-1">
+                        {{ btn.label === 'Crear previ' ? 'Registra una nueva medida preventiva' :
+                        btn.label === 'Ver previs' ? 'Visualiza la lista completa de previs' :
+                        'Filtrar búsqueda avanzada' }}
+                    </p>
+                </div>
+            </div>
+            <svg [lucideIcon]="icons.ChevronRight" class="w-8 h-8 text-blue-600"></svg>
+        </button>
+        } @empty {
+        <div class="col-span-full p-8 text-center bg-destructive/10 rounded-xl border border-destructive/20">
+            <p class="text-destructive font-medium">No tienes permisos para realizar acciones en este módulo.</p>
+        </div>
+        }
+    </div>
+
+    <div class="mt-10 bg-card border border-border rounded-3xl shadow-md p-8" [hidden]="!mostrarFormulario()">
+        <h3 class="text-4xl font-bold mb-8">Crear Previ</h3>
+
+        <form [formGroup]="previForm" (ngSubmit)="createPrevi()" class="grid gap-6">
+
+            <div>
+                <label class="block mb-2 font-semibold">Directivo a Cargo</label>
+                <select formControlName="idDirectivo"
+                    class="w-full border border-slate-700 bg-slate-900 text-white rounded-xl p-4">
+                    <option [ngValue]="null" disabled selected class="bg-slate-900 text-white">Selecciona un
+                        directivo...</option>
+                    @for(directivo of directivos(); track directivo.id){
+                    <option [value]="directivo.id" class="bg-slate-900 text-white">
+                        {{ directivo.nombre }} {{ directivo.apellidos }} - {{ directivo.cargo }} (ID: {{ directivo.id
+                        }})
+                    </option>
+                    }
+                </select>
+                @if(hasError('idDirectivo')){ <p class="text-red-500 text-sm mt-2">Obligatorio.</p> }
+            </div>
+
+            <div>
+                <label class="block mb-2 font-semibold">Expediente Asociado</label>
+                <select formControlName="idExpediente"
+                    class="w-full border border-slate-700 bg-slate-900 text-white rounded-xl p-4">
+                    <option [ngValue]="null" disabled selected class="bg-slate-900 text-white">Selecciona un
+                        expediente...</option>
+                    @for(expediente of expedientesDetallados(); track expediente.id){
+                    <option [value]="expediente.id" class="bg-slate-900 text-white">
+                        Expediente #{{ expediente.id }} - {{ expediente.nombre_alumno }} {{ expediente.apellidos_alumno
+                        }} (ID Alumno: {{ expediente.id_alumno }}) - Estado: {{ expediente.estado }}
+                    </option>
+                    }
+                </select>
+                @if(hasError('idExpediente')){ <p class="text-red-500 text-sm mt-2">Obligatorio.</p> }
+            </div>
+
+            <div>
+                <label class="block mb-2 font-semibold">Fecha</label>
+                <input type="date" formControlName="fecha" class="w-full border rounded-xl p-4">
+                @if(hasError('fecha')){ <p class="text-red-500 text-sm mt-2">Obligatorio.</p> }
+            </div>
+
+            <div>
+                <label class="block mb-2 font-semibold">Detalle</label>
+                <textarea rows="4" formControlName="detalle" class="w-full border rounded-xl p-4"></textarea>
+                @if(hasError('detalle')){ <p class="text-red-500 text-sm mt-2">Obligatorio.</p> }
+            </div>
+
+            <button type="submit" [disabled]="previForm.invalid"
+                class="w-full py-4 rounded-xl text-white font-bold text-lg bg-blue-600 hover:bg-blue-700 disabled:bg-slate-400">
+                Registrar Previ
+            </button>
+        </form>
+    </div>
+
+    <div class="mt-10 bg-card border border-border rounded-3xl shadow-md p-8" [hidden]="!mostrarBusquedaExpediente()">
+        <h3 class="text-3xl font-bold mb-6">Seleccionar Expediente</h3>
+        <div class="space-y-4">
+            <select class="w-full border border-slate-700 bg-slate-900 text-white rounded-xl p-4"
+                [value]="expedienteSeleccionado()" (change)="expedienteSeleccionado.set(+$any($event.target).value)">
+                <option value="" class="bg-slate-900 text-white">Selecciona un expediente...</option>
+                @for(expediente of expedientesDetallados(); track expediente.id){
+                <option [value]="expediente.id" class="bg-slate-900 text-white">
+                    Expediente #{{ expediente.id }} - {{ expediente.nombre_alumno }} {{ expediente.apellidos_alumno }}
+                    (ID Alumno: {{ expediente.id_alumno }}) - Estado: {{ expediente.estado }}
+                </option>
+                }
+            </select>
+            <button (click)="buscarPrevisExpediente()"
+                class="w-full bg-blue-600 text-white rounded-xl py-4 font-semibold hover:bg-blue-700">
+                Buscar Previs
+            </button>
+        </div>
+    </div>
+
+    <div class="mt-10 bg-card border border-border rounded-3xl shadow-md p-8" [hidden]="!mostrarBusquedaDirectivo()">
+        <h3 class="text-3xl font-bold mb-6">Seleccionar Directivo</h3>
+        <div class="space-y-4">
+            <select class="w-full border border-slate-700 bg-slate-900 text-white rounded-xl p-4"
+                [value]="directivoSeleccionado()" (change)="directivoSeleccionado.set(+$any($event.target).value)">
+                <option value="" class="bg-slate-900 text-white">Selecciona un directivo...</option>
+                @for(directivo of directivos(); track directivo.id){
+                <option [value]="directivo.id" class="bg-slate-900 text-white">
+                    {{ directivo.nombre }} {{ directivo.apellidos }} - {{ directivo.cargo }} (ID: {{ directivo.id }})
+                </option>
+                }
+            </select>
+            <button (click)="buscarPrevisDirectivo()"
+                class="w-full bg-blue-600 text-white rounded-xl py-4 font-semibold hover:bg-blue-700">
+                Buscar Previs
+            </button>
+        </div>
+    </div>
+
+    <div class="mt-10" [hidden]="!mostrarTabla()">
+        <div class="bg-card border border-border rounded-3xl shadow-md overflow-hidden">
+            <div class="p-8 border-b border-border">
+                <h3 class="text-4xl font-bold">Listado de Previs</h3>
+            </div>
+            <div class="p-8 border-b border-border">
+                <input [value]="searchTerm()" (input)="searchTerm.set($any($event.target).value)"
+                    placeholder="Filtrar por detalle, nombre de directivo o alumno..."
+                    class="w-full border rounded-lg p-3">
+            </div>
+
+            <p-table [value]="filteredPrevis()" [paginator]="true" [rows]="5" styleClass="p-datatable-striped">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th class="py-6">ID Previ</th>
+                        <th class="py-6">Fecha</th>
+                        <th class="py-6">Expediente Asociado</th>
+                        <th class="py-6">Directivo a Cargo</th>
+                        <th class="py-6 text-center">Acciones</th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-previ>
+                    <tr class="h-24">
+                        <td class="font-bold">{{ previ.id }}</td>
+                        <td>{{ previ.fecha }}</td>
+                        <td>
+                            <p class="font-semibold">#{{ previ.id_expediente }}</p>
+                            <span class="text-sm text-slate-500">{{ previ.nombre_alumno_completo }}</span>
+                        </td>
+                        <td>
+                            <p class="font-medium">{{ previ.nombre_directivo_completo }}</p>
+                            <span class="text-sm text-slate-500">{{ previ.cargo_directivo }}</span>
+                        </td>
+                        <td class="text-center">
+                            <div class="flex gap-3 justify-center">
+                                <button (click)="viewPrevi(previ)"
+                                    class="w-12 h-12 rounded-xl bg-blue-600 text-white flex items-center justify-center hover:bg-blue-700 hover:scale-110 active:scale-95 transition-all duration-200">
+                                    <svg [lucideIcon]="icons.Pencil" class="w-5 h-5"></svg>
+                                </button>
+                                <button (click)="deletePrevi(previ)"
+                                    class="w-12 h-12 rounded-xl bg-red-600 text-white flex items-center justify-center hover:bg-red-700 hover:scale-110 active:scale-95 transition-all duration-200">
+                                    <svg [lucideIcon]="icons.Trash" class="w-5 h-5"></svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </div>
+
+    @if(mostrarDetalle() && selectedPrevi()) {
+    <div class="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center z-50 p-6">
+        <div
+            class="w-full max-w-4xl bg-gradient-to-b from-white to-blue-50 rounded-[32px] shadow-2xl border border-blue-100 overflow-hidden">
+            <div class="flex items-center justify-between px-10 py-8 border-b border-blue-100">
+                <div>
+                    <h3 class="text-4xl font-bold text-blue-950">
+                        Previ #{{ selectedPrevi().id }}
+                    </h3>
+                    <p class="text-blue-600/70 text-lg mt-2">
+                        {{ editMode() ? 'Editando la medida preventiva' : 'Información de la medida preventiva' }}
+                    </p>
+                </div>
+                <div class="flex gap-3">
+                    @if(!editMode()){
+                    <button (click)="enableEdit()"
+                        class="px-5 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700">
+                        Editar
+                    </button>
+                    }
+                    <button (click)="closeModal()"
+                        class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl text-blue-500 hover:bg-blue-100 hover:text-blue-700 transition-all duration-300">
+                        ✕
+                    </button>
+                </div>
+            </div>
+
+            <div class="p-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white border border-blue-100 rounded-3xl p-6">
+                        <p class="text-blue-500 font-medium mb-2">Expediente / Alumno Implicado</p>
+                        <p class="text-xl font-bold text-blue-950">
+                            Expediente ID: #{{ selectedPrevi().id_expediente }}
+                        </p>
+                        <p class="text-sm text-slate-500 mt-1">Alumno: {{ selectedPrevi().nombre_alumno_completo }} (ID:
+                            {{ selectedPrevi().id_alumno_real }})</p>
+                    </div>
+
+                    <div class="bg-white border border-blue-100 rounded-3xl p-6">
+                        <p class="text-blue-500 font-medium mb-2">Directivo a Cargo</p>
+                        <p class="text-xl font-bold text-blue-950">
+                            {{ selectedPrevi().nombre_directivo_completo }}
+                        </p>
+                        <p class="text-sm text-slate-500 mt-1">
+                            Cargo: {{ selectedPrevi().cargo_directivo }} | ID: {{ selectedPrevi().id_directivo }}
+                        </p>
+                    </div>
+
+                    <div class="bg-white border border-blue-100 rounded-3xl p-6">
+                        <p class="text-blue-500 font-medium mb-2">Fecha</p>
+                        @if(editMode()){
+                        <input type="date" [(ngModel)]="selectedPrevi().fecha"
+                            class="w-full border rounded-xl p-3 text-black bg-white">
+                        } @else {
+                        <p class="text-xl font-bold text-blue-950">{{ selectedPrevi().fecha }}</p>
+                        }
+                    </div>
+
+                    <div class="md:col-span-2 bg-white border border-blue-100 rounded-3xl p-6">
+                        <p class="text-blue-500 font-medium mb-2">Detalle</p>
+                        @if(editMode()){
+                        <textarea rows="4" [(ngModel)]="selectedPrevi().detalle"
+                            class="w-full border rounded-xl p-3 text-black bg-white"></textarea>
+                        } @else {
+                        <p class="text-xl font-bold text-blue-950">{{ selectedPrevi().detalle }}</p>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            @if(editMode()){
+            <div class="px-8 pb-8 flex justify-end gap-4">
+                <button (click)="cancelEdit()"
+                    class="px-6 py-3 rounded-xl bg-red-600 text-white font-medium hover:bg-red-700 hover:scale-105 active:scale-95 transition-all duration-200 shadow-md">
+                    Cancelar
+                </button>
+                <button (click)="savePrevi()"
+                    class="px-6 py-3 rounded-xl bg-green-600 text-white font-medium hover:bg-green-700 hover:scale-105 active:scale-95 transition-all duration-200 shadow-md">
+                    Guardar
+                </button>
+            </div>
+            }
+        </div>
+    </div>
+    }
+</div>

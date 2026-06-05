@@ -15,6 +15,7 @@ export interface User {
 
 export interface AuthResponse {
   access_token: string;
+  role: string;
 }
 
 @Injectable({
@@ -32,7 +33,7 @@ export class AuthService {
   // Signal computada para saber si está autenticado
   isAuthenticated = computed(() => !!this.token());
 
-  private readonly API_URL = 'http://localhost:8082';
+  private readonly API_URL = '/api';
 
   constructor() {
     this.checkSession();
@@ -49,18 +50,19 @@ export class AuthService {
     this.isLoading.set(false);
   }
 
-  private detectUserRole(username: string): UserRole {
-    const lowerName = username.toLowerCase();
-    if (lowerName.includes('alumno') || lowerName.includes('estudiante')) {
-      return 'alumno';
+  private detectUserRole(role: string): UserRole {
+    //TODO cambiar esto de alguna manera saber que es, pero asi no
+    const role_lowercase = role.toLowerCase();
+    if (role_lowercase.includes('admin')){
+      return 'admin';
     }
-    if (lowerName.includes('profesor') || lowerName.includes('teacher')) {
-      return 'profesor';
-    }
-    if (lowerName.includes('directivo') || lowerName.includes('director')) {
+    if (role_lowercase.includes('directivo')) {
       return 'directivo';
     }
-    return 'admin';
+    if (role_lowercase.includes('profesor')) {
+      return 'profesor';
+    }
+    return 'alumno';
   }
 
   async login(username: string, password: string): Promise<boolean> {
@@ -74,14 +76,32 @@ export class AuthService {
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
         })
       );
+      // console.log(response)
 
-      const userRole = this.detectUserRole(username);
+      if (!response.access_token) {
+        console.error('La respuesta no contiene access_token');
+        return false;
+      }
+
+      const userRole = this.detectUserRole(response.role);
+
+      // const alumno = this.detectUserRole("alumno");
+      // const profe = this.detectUserRole("profesor");
+      // const directivo = this.detectUserRole("directivo");
+      // const admin = this.detectUserRole("admin");
+
       const userData: User = {
         id: 1,
         nombre: username,
         apellidos: '',
         activo: true,
-        role: userRole,
+        role: userRole, //asi tendrá que ser
+
+        //TESTEO
+        // role: alumno,
+        // role: profe,
+        // role: directivo,
+        // role: admin,
       };
 
       this.token.set(response.access_token);
@@ -90,9 +110,18 @@ export class AuthService {
       localStorage.setItem('access_token', response.access_token);
       localStorage.setItem('user', JSON.stringify(userData));
 
+      console.log('Login exitoso');
+      console.log(response.access_token);
+      console.log(response.role);
       return true;
     } catch (error) {
       console.error('Login error:', error);
+      if (error instanceof Error) {
+        console.error('   Error message:', error.message);
+      }
+      if (typeof error === 'object' && error !== null) {
+        console.error('   Error details:', JSON.stringify(error, null, 2));
+      }
       return false;
     }
   }

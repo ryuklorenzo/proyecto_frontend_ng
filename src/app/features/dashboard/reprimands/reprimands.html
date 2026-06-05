@@ -1,0 +1,311 @@
+<div class="p-8">
+    <div class="mb-10">
+        <h2 class="text-5xl font-bold text-foreground mb-4">
+            Gestión de Amonestaciones
+        </h2>
+
+        <p class="text-lg text-muted-foreground flex items-center gap-3">
+            Mostrando acciones disponibles para tu rol:
+            <span class="px-4 py-1 rounded-xl bg-blue-100 text-blue-700 font-bold text-sm uppercase">
+                {{ user()?.role }}
+            </span>
+        </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+        @for (btn of filteredButtons(); track btn.label) {
+
+        <button
+            (click)="btn.label === 'Crear amonestacion' ? toggleCrearAmonestacion() : btn.label === 'Ver amonestaciones' ? loadReprimands() : showStudentSelector()"
+            class="flex items-center justify-between p-8 bg-card border border-border rounded-3xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+
+            <div class="flex items-center gap-6">
+
+                <div class="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center">
+                    <svg [lucideIcon]="btn.icon" class="w-10 h-10 text-blue-600"></svg>
+                </div>
+
+                <div class="text-left">
+                    <h3 class="text-2xl font-bold text-card-foreground">
+                        {{ btn.label }}
+                    </h3>
+
+                    <p class="text-muted-foreground mt-1">
+                        {{ btn.label === 'Crear amonestacion'
+                        ? 'Registra un nueva amonestación en el sistema'
+                        : 'Visualiza y gestiona la lista de todas las amonestaciones'
+                        }}
+                    </p>
+                </div>
+
+            </div>
+
+            <svg [lucideIcon]="icons.ChevronRight" class="w-8 h-8 text-blue-600"></svg>
+
+        </button>
+
+        } @empty {
+
+        <div class="col-span-full p-8 text-center bg-destructive/10 rounded-xl border border-destructive/20">
+            <p class="text-destructive font-medium">
+                No tienes permisos para realizar acciones en este módulo.
+            </p>
+        </div>
+
+        }
+    </div>
+
+    <div class="mt-10 bg-card border border-border rounded-3xl shadow-md p-8" [hidden]="!mostrarFormulario()">
+        <h3 class="text-4xl font-bold mb-8">
+            Crear Amonestación
+        </h3>
+        <form [formGroup]="reprimandForm" (ngSubmit)="createReprimand()" class="grid gap-6">
+            <div>
+                <label class="block mb-2 font-semibold">Nivel</label>
+                <select formControlName="nivel"
+                    class="w-full border border-slate-700 bg-slate-900 text-white rounded-xl p-4">
+                    <option value="">Selecciona un nivel...</option>
+                    <option value="LEVE">Leve</option>
+                    <option value="GRAVE">Grave</option>
+                    <option value="MUY_GRAVE">Muy Grave</option>
+                </select>
+                @if(hasError('nivel')){
+                <p class="text-red-500 text-sm mt-2">
+                    El nivel es obligatorio.
+                </p>
+                }
+            </div>
+            <div>
+                <label class="block mb-2 font-semibold">Descripción</label>
+                <textarea rows="4" formControlName="descripcion" class="w-full border rounded-xl p-4"></textarea>
+                @if(hasError('descripcion')){
+                <p class="text-red-500 text-sm mt-2">
+                    La descripción es obligatoria.
+                </p>
+                }
+            </div>
+            <div>
+                <label class="block mb-2 font-semibold">Tipo</label>
+                <input type="text" formControlName="tipo" class="w-full border rounded-xl p-4"
+                    placeholder="Ej: Conducta, Falta de respeto, Retraso...">
+                @if(hasError('tipo')){
+                <p class="text-red-500 text-sm mt-2">
+                    El tipo es obligatorio.
+                </p>
+                }
+            </div>
+            <div>
+                <label class="block mb-2 font-semibold">Fecha</label>
+                <input type="date" formControlName="fecha" class="w-full border rounded-xl p-4">
+                @if(hasError('fecha')){
+                <p class="text-red-500 text-sm mt-2">
+                    La fecha es obligatoria.
+                </p>
+                }
+            </div>
+            <div>
+                <label class="block mb-2 font-semibold">Profesor</label>
+                <select formControlName="idProfesor"
+                    class="w-full border border-slate-700 bg-slate-900 text-white rounded-xl p-4">
+                    <option [ngValue]="null" disabled selected>
+                        Selecciona un profesor...
+                    </option>
+                    @for(profesor of profesores(); track profesor.id){
+                    <option [value]="profesor.id">
+                        {{ profesor.nombre }} {{ profesor.apellidos }}
+                        (ID: {{ profesor.id }})
+                    </option>
+                    }
+                </select>
+                @if(hasError('idProfesor')){
+                <p class="text-red-500 text-sm mt-2">
+                    Seleccionar profesor es obligatorio.
+                </p>
+                }
+            </div>
+            <div>
+                <label class="block mb-2 font-semibold">Alumno</label>
+                <select formControlName="idAlumno"
+                    class="w-full border border-slate-700 bg-slate-900 text-white rounded-xl p-4">
+
+                    <option [ngValue]="null" disabled selected>
+                        Selecciona un alumno...
+                    </option>
+                    @for(alumno of alumnos(); track alumno.id){
+                    <option [value]="alumno.id">
+                        {{ alumno.nombre }} {{ alumno.apellidos }}
+                        (ID: {{ alumno.id }})
+                    </option>
+                    }
+                </select>
+                @if(hasError('idAlumno')){
+                <p class="text-red-500 text-sm mt-2">
+                    Seleccionar alumno es obligatorio.
+                </p>
+                }
+            </div>
+            <button type="submit" [disabled]="reprimandForm.invalid"
+                class="w-full py-4 rounded-xl text-white font-bold text-lg transition-colors disabled:bg-slate-400 disabled:cursor-not-allowed bg-blue-600 hover:bg-blue-700">
+                Crear Amonestación
+            </button>
+        </form>
+    </div>
+
+    <div class="mt-10 bg-card border border-border rounded-3xl shadow-md p-8" [hidden]="!mostrarBusquedaAlumno()">
+        <h3 class="text-3xl font-bold mb-6">Seleccionar Alumno</h3>
+        <div class="space-y-4">
+            <select class="w-full border border-slate-700 bg-slate-900 text-white rounded-xl p-4"
+                [value]="alumnoSeleccionado()" (change)="alumnoSeleccionado.set(+$any($event.target).value)">
+                <option value="" class="bg-slate-900 text-white">Selecciona un alumno...</option>
+                @for(alumno of alumnos(); track alumno.id){
+                <option [value]="alumno.id" class="bg-slate-900 text-white">
+                    {{ alumno.nombre }} {{ alumno.apellidos }} (ID: {{alumno.id}})
+                </option>
+                }
+            </select>
+            <button (click)="buscarAmonestacionesAlumno()"
+                class="w-full bg-blue-600 text-white rounded-xl py-4 font-semibold hover:bg-blue-700">
+                Buscar amonestaciones
+            </button>
+        </div>
+    </div>
+
+    <div class="mt-10" [hidden]="!mostrarTabla()">
+        <div class="bg-card border border-border rounded-3xl shadow-md overflow-hidden">
+            <div class="p-8 border-b border-border">
+                <h3 class="text-4xl font-bold">Listado de amonestaciones</h3>
+            </div>
+
+            <p-table [value]="filteredReprimands()" [paginator]="filteredReprimands().length > 0" [rows]="5" styleClass="p-datatable-striped">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th>ID</th>
+                        <th>Nivel</th>
+                        <th>Tipo</th>
+                        <th>Fecha</th>
+                        <th>Acciones</th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-reprimand>
+                    <tr class="h-24">
+                        <td>{{ reprimand.id }}</td>
+                        <td>
+                            @if(reprimand.nivel === 'MUY_GRAVE'){
+                            <span class="px-4 py-2 rounded-xl bg-red-100 text-red-700 font-semibold">
+                                ● Muy Grave
+                            </span>
+                            } @else if(reprimand.nivel === 'GRAVE') {
+                            <span class="px-4 py-2 rounded-xl bg-orange-100 text-orange-700 font-semibold">
+                                ● Grave
+                            </span>
+                            } @else {
+                            <span class="px-4 py-2 rounded-xl bg-yellow-100 text-yellow-700 font-semibold">
+                                ● Leve
+                            </span>
+                            }
+                        </td>
+                        <td>{{ reprimand.actitud_tipo }}</td>
+                        <td>{{ reprimand.actitud_fecha }}</td>
+                        <td>
+                            <button (click)="viewReprimand(reprimand)"
+                                class="w-12 h-12 rounded-xl bg-blue-600 text-white flex items-center justify-center">
+                                👁
+                            </button>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+
+            @if(filteredReprimands().length === 0) {
+            <div class="p-12 text-center ">
+                <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg [lucideIcon]="icons.Search" class="w-10 h-10 text-blue-500"></svg>
+                </div>
+                <h4 class="text-2xl font-bold mb-2">Sin resultados</h4>
+                <p class=" text-lg font-medium">
+                    Este usuario no tiene ninguna reclamación o amonestación registrada.
+                </p>
+            </div>
+            }
+        </div>
+    </div>
+
+    @if(mostrarDetalle() && selectedReprimand()) {
+    <div class="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center z-50 p-6">
+        <div
+            class="w-full max-w-3xl bg-gradient-to-b from-white to-blue-50 rounded-[32px] shadow-2xl border border-blue-100 overflow-hidden">
+            <div class="flex items-center justify-between px-10 py-8 border-b border-blue-100">
+                <div>
+                    <h3 class="text-4xl font-bold text-blue-950">
+                        Amonestación #{{ selectedReprimand().id }}
+                    </h3>
+                    <p class="text-blue-600/70 text-lg mt-2">
+                        Información detallada de la amonestacion
+                    </p>
+                </div>
+                <button (click)="closeModal()"
+                    class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl text-blue-500 hover:bg-blue-100">
+                    ✕
+                </button>
+            </div>
+            <div class="p-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white border border-red-100 rounded-3xl p-6">
+                        <p class="text-red-500 font-medium mb-2">
+                            Nivel
+                        </p>
+                        <div class="mt-2">
+                            @if(selectedReprimand().nivel === 'MUY_GRAVE'){
+                            <span class="px-4 py-2 rounded-xl bg-red-100 text-red-700 font-bold uppercase">
+                                ● Muy Grave
+                            </span>
+                            } @else if(selectedReprimand().nivel === 'GRAVE') {
+                            <span class="px-4 py-2 rounded-xl bg-orange-100 text-orange-700 font-bold uppercase">
+                                ● Grave
+                            </span>
+                            } @else {
+                            <span class="px-4 py-2 rounded-xl bg-yellow-100 text-yellow-700 font-bold uppercase">
+                                ● Leve
+                            </span>
+                            }
+                        </div>
+                    </div>
+                    <div class="bg-white border border-red-100 rounded-3xl p-6">
+                        <p class="text-red-500 font-medium mb-2">
+                            Tipo
+                        </p>
+                        <p class="text-xl font-bold text-red-950">
+                            {{ selectedReprimand().actitud_tipo }}
+                        </p>
+                    </div>
+                    <div class="bg-white border border-red-100 rounded-3xl p-6">
+                        <p class="text-red-500 font-medium mb-2">
+                            Fecha
+                        </p>
+                        <p class="text-xl font-bold text-red-950">
+                            {{ selectedReprimand().actitud_fecha }}
+                        </p>
+                    </div>
+                    <div class="bg-white border border-red-100 rounded-3xl p-6">
+                        <p class="text-red-500 font-medium mb-2">
+                            ID
+                        </p>
+                        <p class="text-xl font-bold text-red-950">
+                            {{ selectedReprimand().id }}
+                        </p>
+                    </div>
+                    <div class="bg-white border border-red-100 rounded-3xl p-6 md:col-span-2">
+                        <p class="text-red-500 font-medium mb-2">
+                            Descripción
+                        </p>
+                        <p class="text-lg text-slate-700 leading-relaxed">
+                            {{ selectedReprimand().actitud_descripcion }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    }
+</div>

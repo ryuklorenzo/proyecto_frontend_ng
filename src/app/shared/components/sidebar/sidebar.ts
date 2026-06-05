@@ -28,6 +28,7 @@ export class Sidebar {
 
   authService = inject(AuthService);
   user = this.authService.user; 
+  mostrarLogoutModal = false;
 
   // Registro de iconos estáticos para usarlos en el template HTML
   icons = { 
@@ -37,19 +38,23 @@ export class Sidebar {
     LogOut: LucideLogOut
   };
 
+  //TODO verificar permisos de cada campo
   private navItems: NavItem[] = [
     { href: '/dashboard', label: 'Inicio', icon: LucideHome, roles: ['admin', 'directivo', 'profesor', 'alumno'] },
-    { href: '/dashboard/usuarios', label: 'Usuarios', icon: LucideUsers, roles: ['admin'] },
-    { href: '/dashboard/alumnos', label: 'Alumnos', icon: LucideGraduationCap, roles: ['admin', 'directivo'] },
-    { href: '/dashboard/cursos', label: 'Cursos', icon: LucideBookOpen, roles: ['admin', 'directivo'] },
-    { href: '/dashboard/horarios', label: 'Horarios', icon: LucideCalendar, roles: ['admin', 'directivo'] },
-    { href: '/dashboard/expedientes', label: 'Expedientes', icon: LucideFileText, roles: ['admin', 'directivo'] },
-    { href: '/dashboard/tareas', label: 'Tareas', icon: LucideClipboardList, roles: ['admin', 'directivo', 'profesor', 'alumno'] },
-    { href: '/dashboard/amonestaciones', label: 'Amonestaciones', icon: LucideTriangleAlert, roles: ['admin', 'directivo', 'profesor'] },
-    { href: '/dashboard/mencion', label: 'Menciones', icon: LucideClipboardList, roles: ['admin', 'directivo'] },
-    { href: '/dashboard/probi', label: 'Probi', icon: LucideClipboardList, roles: ['admin', 'directivo'] },
+    { href: '/dashboard/courses', label: 'Cursos', icon: LucideBookOpen, roles: ['admin'] },
+    { href: '/dashboard/schedules', label: 'Horarios', icon: LucideCalendar, roles: ['admin'] },
+    { href: '/dashboard/students', label: 'Alumnos', icon: LucideGraduationCap, roles: ['admin', 'directivo'] },
+    { href: '/dashboard/teachers', label: 'Profesores', icon: LucideGraduationCap, roles: ['admin', 'directivo'] },
+    { href: '/dashboard/executives', label: 'Directivos', icon: LucideGraduationCap, roles: ['admin'] },
+    { href: '/dashboard/tasks', label: 'Tareas', icon: LucideClipboardList, roles: ['admin', 'directivo', 'profesor', 'alumno'] },
+    { href: '/dashboard/records', label: 'Expedientes', icon: LucideFileText, roles: ['admin', 'directivo'] },
     { href: '/dashboard/previ', label: 'Previ', icon: LucideClipboardList, roles: ['admin', 'directivo'] },
-    { href: '/dashboard/aula_convivencia', label: 'Aula_convivencia', icon: LucideClipboardList, roles: ['admin', 'directivo'] },
+    { href: '/dashboard/attitudes', label: 'Actitudes', icon: LucideTriangleAlert, roles: ['admin', 'directivo', 'profesor'] },
+    { href: '/dashboard/reprimands', label: 'Amonestaciones', icon: LucideTriangleAlert, roles: ['admin', 'directivo', 'profesor'] },
+    { href: '/dashboard/recognitions', label: 'Reconocimientos', icon: LucideClipboardList, roles: ['admin', 'directivo'] },
+    { href: '/dashboard/mentions', label: 'Menciones', icon: LucideClipboardList, roles: ['admin', 'directivo'] },
+    { href: '/dashboard/probi', label: 'Probi', icon: LucideClipboardList, roles: ['admin', 'directivo'] },
+    { href: '/dashboard/aula-convivencia', label: 'Aula_convivencia', icon: LucideClipboardList, roles: ['admin', 'directivo'] },
   ];
 
   filteredNavItems = computed(() => {
@@ -68,7 +73,15 @@ export class Sidebar {
     return labels[role] || role;
   }
 
-  onLogout() {
+  openLogoutModal() {
+    this.mostrarLogoutModal = true;
+  }
+
+  confirmLogout() {
     this.authService.logout();
+  }
+
+  closeLogoutModal() {
+    this.mostrarLogoutModal = false;
   }
 }

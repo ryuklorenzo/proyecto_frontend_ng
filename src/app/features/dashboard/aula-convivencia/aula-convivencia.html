@@ -1,0 +1,306 @@
+<div class="p-8">
+    <div class="mb-10">
+        <h2 class="text-5xl font-bold text-foreground mb-4">
+            Aula de Convivencia
+        </h2>
+
+        <p class="text-lg text-muted-foreground flex items-center gap-3">
+            Mostrando acciones disponibles para tu rol:
+            <span class="px-4 py-1 rounded-xl bg-blue-100 text-blue-700 font-bold text-sm uppercase">
+                {{ user()?.role }}
+            </span>
+        </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        @for (btn of filteredButtons(); track btn.label) {
+        <button (click)="btn.label === 'Crear aula' ? toggleCrearAula() : 
+                     (btn.label === 'Ver aulas' || btn.label === 'Actualizar aula' || btn.label === 'Borrar aula') ? loadClassrooms() : 
+                     btn.label === 'Asignar alumnos' ? toggleAsignarAlumnos() : 
+                     toggleVerAlumnos()"
+            class="flex items-center justify-between p-8 bg-card border border-border rounded-3xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+
+            <div class="flex items-center gap-6">
+                <div class="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
+                    <svg [lucideIcon]="btn.icon" class="w-10 h-10 text-blue-600"></svg>
+                </div>
+                <div class="text-left">
+                    <h3 class="text-2xl font-bold text-card-foreground">
+                        {{ btn.label }}
+                    </h3>
+                    
+                    <p class="text-muted-foreground mt-1">
+                        {{ btn.label === 'Crear aula' 
+                        ? 'Registra una nueva aula de convivencia' 
+                        : btn.label === 'Ver aulas' 
+                        ? 'Visualiza y gestiona las aulas creadas' 
+                        : btn.label === 'Asignar alumnos' 
+                        ? 'Añade alumnos a un aula específica' 
+                        : 'Revisa o saca alumnos de un aula'
+                        }}
+                    </p>
+                </div>
+            </div>
+            
+            <svg [lucideIcon]="icons.ChevronRight" class="w-8 h-8 text-blue-600"></svg>
+        </button>
+        } @empty {
+        <div class="col-span-full p-8 text-center bg-destructive/10 rounded-xl border border-destructive/20">
+            <p class="text-destructive font-medium">No tienes permisos para realizar acciones en este módulo.</p>
+        </div>
+        }
+    </div>
+
+    <div class="mt-10 bg-card border border-border rounded-3xl shadow-md p-8" [hidden]="!mostrarFormulario()">
+        <h3 class="text-4xl font-bold mb-8">Crear Aula de Convivencia</h3>
+
+        <form [formGroup]="classroomForm" (ngSubmit)="createClassroom()" class="grid gap-6">
+
+            <div>
+                <label class="block mb-2 font-semibold">Nombre del Aula</label>
+                <input type="text" formControlName="nombre" placeholder="Ej: Aula de Castigo Jueves..."
+                    class="w-full border rounded-xl p-4">
+                @if(hasErrorForm(classroomForm, 'nombre')){ <p class="text-red-500 text-sm mt-2">El nombre es obligatorio.</p> }
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block mb-2 font-semibold">Fecha</label>
+                    <input type="date" formControlName="fecha" class="w-full border rounded-xl p-4">
+                    @if(hasErrorForm(classroomForm, 'fecha')){ <p class="text-red-500 text-sm mt-2">Obligatorio.</p> }
+                </div>
+
+                <div>
+                    <label class="block mb-2 font-semibold">Horario Base</label>
+                    <select formControlName="id_horario"
+                        class="w-full border border-slate-700 bg-slate-900 text-white rounded-xl p-4">
+                        <option [ngValue]="null" disabled selected class="bg-slate-900 text-white">Selecciona un horario...</option>
+                        @for(horario of horarios(); track horario.id){
+                        <option [value]="horario.id" class="bg-slate-900 text-white">
+                            Horario #{{ horario.id }} - {{ horario.formato }} ({{ horario.hora_inicio }} - {{ horario.hora_fin }})
+                        </option>
+                        }
+                    </select>
+                    @if(hasErrorForm(classroomForm, 'id_horario')){ <p class="text-red-500 text-sm mt-2">Obligatorio.</p> }
+                </div>
+            </div>
+
+            <button type="submit" [disabled]="classroomForm.invalid"
+                class="w-full py-4 rounded-xl text-white font-bold text-lg transition-colors disabled:bg-slate-400 disabled:cursor-not-allowed bg-blue-600 hover:bg-blue-700">
+                Registrar Aula
+            </button>
+        </form>
+    </div>
+
+    <div class="mt-10 bg-card border border-border rounded-3xl shadow-md p-8" [hidden]="!mostrarAsignar()">
+        <h3 class="text-4xl font-bold mb-8">Asignar Alumnos al Aula</h3>
+        <p class="text-muted-foreground mb-6">Selecciona el aula y uno o más alumnos para asignarlos.</p>
+
+        <form [formGroup]="assignForm" (ngSubmit)="assignStudentsToAula()" class="grid gap-6">
+
+            <div>
+                <label class="block mb-2 font-semibold">Aula de Convivencia Destino</label>
+                <select formControlName="id_aula_convivencia"
+                    class="w-full border border-slate-700 bg-slate-900 text-white rounded-xl p-4">
+                    <option [ngValue]="null" disabled selected class="bg-slate-900 text-white">Selecciona un aula...</option>
+                    @for(aula of filteredAulas(); track aula.id){
+                    <option [value]="aula.id" class="bg-slate-900 text-white">
+                        Aula #{{ aula.id }} - {{ aula.nombre }} (Fecha: {{ aula.fecha }})
+                    </option>
+                    }
+                </select>
+                @if(hasErrorForm(assignForm, 'id_aula_convivencia')){ <p class="text-red-500 text-sm mt-2">Debes seleccionar un aula.</p> }
+            </div>
+
+            <div>
+                <label class="block mb-2 font-semibold">Seleccionar Alumnos Libres</label>
+                <p class="text-sm text-blue-600 mb-3 bg-blue-50 p-3 rounded-lg border border-blue-100">
+                    <strong>Consejo: </strong> Mantén pulsada la tecla <b>Ctrl</b> (Windows) o <b>Cmd</b> (Mac) para
+                    seleccionar varios alumnos a la vez. (Solo se muestran alumnos que no están en ningún aula).
+                </p>
+                <select multiple formControlName="alumnos_ids"
+                    class="w-full border border-slate-700 bg-slate-900 text-white rounded-xl p-4 h-64 focus:ring-blue-500">
+                    
+                    @for(alumno of alumnosLibres(); track alumno.id){
+                    <option [value]="alumno.id" class="p-2 hover:bg-slate-800 border-b border-slate-800">
+                        {{ alumno.nombre }} {{ alumno.apellidos }} (ID: {{alumno.id}})
+                    </option>
+                    }
+
+                    @if(alumnosLibres().length === 0) {
+                    <option disabled class="text-slate-500 italic p-2">Todos los alumnos están ya asignados.</option>
+                    }
+                </select>
+                @if(hasErrorForm(assignForm, 'alumnos_ids')){ <p class="text-red-500 text-sm mt-2">Debes elegir al menos un alumno.</p> }
+            </div>
+
+            <button type="submit" [disabled]="assignForm.invalid"
+                class="w-full py-4 rounded-xl text-white font-bold text-lg bg-blue-600 hover:bg-blue-700 disabled:bg-slate-400">
+                Asignar Alumnos Seleccionados
+            </button>
+        </form>
+    </div>
+
+    <div class="mt-10" [hidden]="!mostrarVerAlumnos()">
+        <div class="bg-card border border-border rounded-3xl shadow-md p-8 mb-8">
+            <h3 class="text-3xl font-bold mb-6">Seleccionar Aula para Ver/Sacar Alumnos</h3>
+            <div class="space-y-4">
+                <select class="w-full border border-slate-700 bg-slate-900 text-white rounded-xl p-4"
+                    [value]="aulaSeleccionadaId()" (change)="aulaSeleccionadaId.set(+$any($event.target).value)">
+                    <option [ngValue]="null" class="bg-slate-900 text-white">Selecciona un aula...</option>
+                    @for(aula of filteredAulas(); track aula.id){
+                    <option [value]="aula.id" class="bg-slate-900 text-white">
+                        Aula #{{ aula.id }} - {{ aula.nombre }} (Fecha: {{ aula.fecha }})
+                    </option>
+                    }
+                </select>
+                <button (click)="buscarAlumnosEnAula()"
+                    class="w-full bg-blue-600 text-white rounded-xl py-4 font-semibold hover:bg-blue-700 transition-colors">
+                    Ver Alumnos
+                </button>
+            </div>
+        </div>
+
+        @if(alumnosEnAula().length > 0) {
+        <div class="bg-card border border-border rounded-3xl shadow-md overflow-hidden">
+            <div class="p-8 border-b border-border bg-slate-50">
+                <h3 class="text-2xl font-bold text-blue-950">Alumnos presentes en el Aula #{{ aulaSeleccionadaId() }}
+                </h3>
+            </div>
+            <p-table [value]="alumnosEnAulaDetallados()" [paginator]="true" [rows]="10"
+                styleClass="p-datatable-striped">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th class="py-6 pl-8">ID Alumno</th>
+                        <th class="py-6">Nombre y Apellidos</th>
+                        <th class="py-6 text-center pr-8">Sacar del Aula</th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-alumno>
+                    <tr class="h-20">
+                        <td class="font-bold pl-8">{{ alumno.id_alumno_real }}</td>
+                        <td class="font-semibold">{{ alumno.nombre_completo }}</td>
+                        <td class="text-center pr-8">
+                            <button (click)="removeStudentFromAula(alumno)"
+                                class="w-12 h-12 rounded-xl bg-red-600 text-white inline-flex items-center justify-center hover:bg-red-700 hover:scale-110 transition-all duration-200"
+                                title="Sacar del aula">
+                                <svg [lucideIcon]="icons.Trash" class="w-5 h-5"></svg>
+                            </button>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+        } @else if (aulaSeleccionadaId() !== null) {
+        <div class="p-8 text-center bg-blue-50/50 rounded-3xl border border-blue-100">
+            <p class="text-blue-600 font-medium text-lg">No hay alumnos asignados a esta aula o presiona "Ver Alumnos"
+                para cargar.</p>
+        </div>
+        }
+    </div>
+
+    <div class="mt-10" [hidden]="!mostrarTabla()">
+        <div class="bg-card border border-border rounded-3xl shadow-md overflow-hidden">
+            <div class="p-8 border-b border-border">
+                <h3 class="text-4xl font-bold">Listado de Aulas de Convivencia</h3>
+            </div>
+            <div class="p-8 border-b border-border">
+                <input [value]="searchTerm()" (input)="searchTerm.set($any($event.target).value)"
+                    placeholder="Filtrar por nombre, fecha o ID..." class="w-full border rounded-lg p-3">
+            </div>
+
+            <p-table [value]="filteredAulas()" [paginator]="true" [rows]="5" styleClass="p-datatable-striped">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th class="py-6">ID Aula</th>
+                        <th class="py-6">Nombre</th>
+                        <th class="py-6">Fecha</th>
+                        <th class="py-6">Horario Asignado</th>
+                        <th class="py-6 text-center">Acciones</th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-aula>
+                    <tr class="h-24">
+                        <td class="font-bold">#{{ aula.id }}</td>
+                        <td class="font-semibold">{{ aula.nombre }}</td>
+                        <td class="font-medium">{{ aula.fecha }}</td>
+                        <td class="text-slate-500 font-medium">{{ aula.horario_completo }}</td>
+                        <td class="text-center">
+                            <div class="flex gap-3 justify-center">
+                                <button (click)="viewClassroom(aula)"
+                                    class="w-12 h-12 rounded-xl bg-blue-600 text-white flex items-center justify-center hover:bg-blue-700 transition-colors duration-200">
+                                    <svg [lucideIcon]="icons.Pencil" class="w-5 h-5"></svg>
+                                </button>
+                                <button (click)="deleteClassroom(aula)"
+                                    class="w-12 h-12 rounded-xl bg-red-600 text-white flex items-center justify-center hover:bg-red-700 transition-colors duration-200">
+                                    <svg [lucideIcon]="icons.Trash" class="w-5 h-5"></svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </div>
+
+    @if(mostrarDetalle() && selectedClassroom()) {
+    <div class="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center z-50 p-6">
+        <div
+            class="w-full max-w-4xl bg-gradient-to-b from-white to-blue-50 rounded-[32px] shadow-2xl border border-blue-100 overflow-hidden">
+            <div class="flex items-center justify-between px-10 py-8 border-b border-blue-100">
+                <div>
+                    <h3 class="text-4xl font-bold text-blue-950">
+                        Aula #{{ selectedClassroom().id }}
+                    </h3>
+                    <p class="text-blue-600/70 text-lg mt-2">
+                        Edición de detalles del aula de convivencia
+                    </p>
+                </div>
+                <button (click)="closeModal()"
+                    class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl text-blue-500 hover:bg-blue-100 hover:text-blue-700 transition-all duration-300">
+                    ✕
+                </button>
+            </div>
+
+            <div class="p-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                    <div class="md:col-span-2 bg-white border border-blue-100 rounded-3xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
+                        <p class="text-blue-500 font-medium text-base mb-2">Nombre del Aula</p>
+                        <input type="text" [(ngModel)]="selectedClassroom().nombre"
+                            class="w-full border-b border-slate-300 py-2 focus:border-blue-500 focus:outline-none bg-transparent text-2xl font-bold text-blue-950">
+                    </div>
+
+                    <div class="bg-white border border-blue-100 rounded-3xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
+                        <p class="text-blue-500 font-medium text-base mb-2">Horario Base</p>
+                        <select [(ngModel)]="selectedClassroom().id_horario"
+                            class="w-full border-b border-slate-300 py-2 focus:border-blue-500 focus:outline-none bg-transparent text-xl font-bold text-blue-950">
+                            @for(horario of horarios(); track horario.id){
+                            <option [value]="horario.id">Horario #{{ horario.id }} - {{ horario.formato }}</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="bg-white border border-blue-100 rounded-3xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
+                        <p class="text-blue-500 font-medium text-base mb-2">Fecha</p>
+                        <input type="date" [(ngModel)]="selectedClassroom().fecha"
+                            class="w-full border-b border-slate-300 py-2 focus:border-blue-500 focus:outline-none bg-transparent text-xl font-bold text-blue-950">
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="px-10 pb-8 flex justify-end gap-4">
+                <button (click)="closeModal()"
+                    class="px-6 py-3 rounded-xl bg-slate-500 text-white font-medium hover:bg-slate-600 transition-all duration-200">
+                    Cancelar
+                </button>
+                <button (click)="saveClassroom()"
+                    class="px-6 py-3 rounded-xl bg-blue-600 text-white font-medium hover:bg-blue-700 transition-all duration-200 shadow-md">
+                    Guardar Cambios
+                </button>
+            </div>
+        </div>
+    </div>
+    }
+</div>
