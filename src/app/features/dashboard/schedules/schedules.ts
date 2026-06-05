@@ -23,6 +23,7 @@ import {
 
 import { TableModule } from 'primeng/table';
 import { ScheduleService } from '../../../core/services/schedules/schedule';
+import { ActivatedRoute } from '@angular/router';
 
 interface Buttons {
   label: string;
@@ -47,6 +48,7 @@ export class Schedules {
   authService = inject(AuthService);
   private scheduleService = inject(ScheduleService);
   private fb = inject(FormBuilder);
+  private route = inject(ActivatedRoute);
 
   user = this.authService.user;
 
@@ -205,6 +207,14 @@ export class Schedules {
   updateSearchTerm(event: Event) {
     const target = event.target as HTMLInputElement;
     this.searchTerm.set(target.value);
+  }
+
+  constructor() {
+    this.route.queryParams.subscribe(params => {
+      if (params['view'] === 'list') {
+        this.loadSchedules();
+      }
+    });
   }
 
 }

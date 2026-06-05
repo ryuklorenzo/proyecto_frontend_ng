@@ -11,6 +11,8 @@ import {
   LucideBookOpen,
   LucideCalendar
 } from '@lucide/angular';
+import { Router } from '@angular/router';
+
 @Component({
   selector: 'app-home',
   standalone: true,
@@ -33,11 +35,13 @@ export class Home {
   isDirectivo = computed(() => this.user()?.role === 'directivo');
   isProfesor = computed(() => this.user()?.role === 'profesor');
   isAlumno = computed(() => this.user()?.role === 'alumno');
+  ultimosAlumnos = signal<any[]>([]);
 
   private studentService = inject(StudentService);
   private teacherService = inject(TeacherService);
   private courseService = inject(CourseService);
   private scheduleService = inject(ScheduleService);
+  private router = inject(Router);
   totalAlumnos = signal(0);
   totalProfesores = signal(0);
   totalCursos = signal(0);
@@ -45,6 +49,7 @@ export class Home {
 
   constructor() {
     this.loadStats();
+    this.loadLastStudents();
   }
 
   openProfile() {
@@ -70,6 +75,47 @@ export class Home {
 
     this.scheduleService.getSchedules().subscribe({
       next: (data: any) => this.totalHorarios.set(data.length)
+    });
+
+  }
+
+  goToStudents() {
+    this.router.navigate(['/dashboard/students'], {
+      queryParams: {
+        view: 'list'
+      }
+    });
+  }
+  goToTeachers() {
+    this.router.navigate(['/dashboard/teachers'], {
+      queryParams: {
+        view: 'list'
+      }
+    });
+  }
+  goToCourses() {
+    this.router.navigate(['/dashboard/courses'], {
+      queryParams: {
+        view: 'list'
+      }
+    });
+  }
+  goToSchedules() {
+    this.router.navigate(['/dashboard/schedules'], {
+      queryParams: {
+        view: 'list'
+      }
+    });
+  }
+
+  loadLastStudents() {
+    this.studentService.getStudents().subscribe({
+      next: (data: any) => {
+        const ultimos = [...data]
+          .sort((a, b) => b.id - a.id)
+          .slice(0, 5);
+        this.ultimosAlumnos.set(ultimos);
+      }
     });
   }
 }

@@ -17,6 +17,7 @@ import {
   LucideDynamicIcon,
 } from '@lucide/angular';
 import { CourseService } from '../../../core/services/courses/course';
+import { ActivatedRoute } from '@angular/router';
 
 interface Buttons {
   label: string;
@@ -41,6 +42,7 @@ export class Teachers {
   private teacherService = inject(TeacherService);
   private courseService = inject(CourseService);
   private fb = inject(FormBuilder);
+  private route = inject(ActivatedRoute);
 
   user = this.authService.user;
 
@@ -75,9 +77,9 @@ export class Teachers {
   filteredTeachers = computed(() => {
     const term = this.searchTerm().toLowerCase();
     const allTeachers = this.teachers();
-    
+
     if (!term) return allTeachers;
-    
+
     return allTeachers.filter(teacher =>
       teacher.nombre.toLowerCase().includes(term) ||
       teacher.apellidos.toLowerCase().includes(term) ||
@@ -161,7 +163,7 @@ export class Teachers {
   bajaTeacher(teacher: any) {
     const confirmar = confirm(`¿Dar de baja a ${teacher.nombre} ${teacher.apellidos}?`);
     if (!confirmar) return;
-    
+
     this.teacherService.bajaTeacher(teacher.id).subscribe({
       next: () => {
         alert('Profesor dado de baja correctamente');
@@ -182,5 +184,13 @@ export class Teachers {
   hasError(controlName: string, errorName: string = 'required') {
     const control = this.teacherForm.get(controlName);
     return control?.hasError(errorName) && control?.touched;
+  }
+
+  constructor() {
+    this.route.queryParams.subscribe(params => {
+      if (params['view'] === 'list') {
+        this.loadTeachers();
+      }
+    });
   }
 }

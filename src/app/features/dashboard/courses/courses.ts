@@ -15,6 +15,7 @@ import {
   Validators,
   ReactiveFormsModule
 } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 
 import { TableModule } from 'primeng/table';
 
@@ -46,7 +47,8 @@ export class Courses {
   private courseService = inject(CourseService);
   private scheduleService = inject(ScheduleService);
   private fb = inject(FormBuilder);
-  
+  private route = inject(ActivatedRoute);
+
   user = this.authService.user;
 
   icons = {
@@ -153,7 +155,7 @@ export class Courses {
   deleteCourse(course: any) {
     const confirmar = confirm(`¿Eliminar definitivamente el curso ${course.curso}?`);
     if (!confirmar) return;
-    
+
     this.courseService.deleteCourse(course.id).subscribe({
       next: () => {
         alert('Curso eliminado correctamente');
@@ -174,5 +176,13 @@ export class Courses {
   hasError(field: string): boolean {
     const control = this.courseForm.get(field);
     return !!(control && control.invalid && (control.touched || control.dirty));
+  }
+
+  constructor() {
+    this.route.queryParams.subscribe(params => {
+      if (params['view'] === 'list') {
+        this.loadCourses();
+      }
+    });
   }
 }
