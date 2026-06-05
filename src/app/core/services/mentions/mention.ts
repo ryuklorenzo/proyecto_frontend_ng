@@ -13,7 +13,7 @@ export class MentionService {
 
     createMention(idReconocimiento: number, mention: any) {
         return this.http.post(
-            `/api/mentions/recognitions/${idReconocimiento}`,
+            `/api/mentions/?id_reconocimiento=${idReconocimiento}`,
             mention,
             {
                 headers: new HttpHeaders({
