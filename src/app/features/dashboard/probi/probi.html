@@ -1,31 +1,193 @@
-<div class="p-6">
-    <div class="mb-8">
-        <h2 class="text-3xl font-bold text-foreground">Gestión de Probis</h2>
-        <p class="text-muted-foreground mt-2">
-            Mostrando acciones disponibles para tu rol: 
-            <span class="font-bold uppercase">{{ user()?.role }}</span>
+<div class="p-8">
+    <div class="mb-10">
+        <h2 class="text-5xl font-bold text-foreground mb-4">
+            Gestión de Probis
+        </h2>
+        <p class="text-lg text-muted-foreground flex items-center gap-3">
+            Mostrando acciones disponibles para tu rol:
+            <span class="px-4 py-1 rounded-xl bg-blue-100 text-blue-700 font-bold text-sm uppercase">
+                {{ user()?.role }}
+            </span>
         </p>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
         @for (btn of filteredButtons(); track btn.label) {
-            
-            <button 
-                class="flex flex-col items-center justify-center gap-3 p-6 bg-card border border-border rounded-xl shadow-sm hover:shadow-md hover:bg-primary/10 hover:border-primary transition-all duration-200"
-            >
-                <svg [lucideIcon]="btn.icon" class="w-10 h-10 text-primary"></svg>
-                <span class="font-semibold text-card-foreground text-lg">{{ btn.label }}</span>
-            </button>
-            
-        } @empty {
-            
-            <div class="col-span-full p-8 text-center bg-destructive/10 rounded-xl border border-destructive/20">
-                <p class="text-destructive font-medium">
-                    No tienes permisos para realizar acciones en este módulo.
-                </p>
+        <button
+            (click)="btn.label === 'Crear probi' ? toggleCrearProbi() : btn.label === 'Ver probis' ? loadProbis() : null"
+            class="flex items-center justify-between p-8 bg-card border border-border rounded-3xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+            <div class="flex items-center gap-6">
+                <div class="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center">
+                    <svg [lucideIcon]="btn.icon" class="w-10 h-10 text-blue-600"></svg>
+                </div>
+                <div class="text-left">
+                    <h3 class="text-2xl font-bold text-card-foreground">
+                        {{ btn.label }}
+                    </h3>
+                    <p class="text-muted-foreground mt-1">
+                        {{ btn.label === 'Crear probi'
+                        ? 'Registra un nuevo probi en el sistema'
+                        : 'Visualiza y gestiona todos los probis'
+                        }}
+                    </p>
+                </div>
             </div>
-            
+            <svg [lucideIcon]="icons.ChevronRight" class="w-8 h-8 text-blue-600"></svg>
+        </button>
+        } @empty {
+        <div class="col-span-full p-8 text-center bg-destructive/10 rounded-xl border border-destructive/20">
+            <p class="text-destructive font-medium">
+                No tienes permisos para realizar acciones en este módulo.
+            </p>
+        </div>
         }
     </div>
-</div>
+    <div class="mt-10 bg-card border border-border rounded-3xl shadow-md p-8" [hidden]="!mostrarFormulario()">
+        <h3 class="text-4xl font-bold mb-8">
+            Crear Probi
+        </h3>
+        <form [formGroup]="probiForm" (ngSubmit)="createProbi()" class="grid gap-6">
+            <div>
+                <label class="block mb-2 font-semibold">
+                    Mención
+                </label>
+                <select formControlName="id_mencion"
+                    class="w-full border border-slate-700 bg-slate-900 text-white rounded-xl p-4">
+                    <option [ngValue]="null">
+                        Selecciona una mención...
+                    </option>
+                    @for(mencion of menciones(); track mencion.id){
+                    <option [value]="mencion.id">
+                        {{ mencion.descripcion }} (ID: {{ mencion.id }})
+                    </option>
+                    }
+                </select>
+            </div>
+            <div>
+                <label class="block mb-2 font-semibold">
+                    Fecha
+                </label>
+                <input type="date" formControlName="fecha" class="w-full border rounded-xl p-4">
+            </div>
+            <button type="submit" [disabled]="probiForm.invalid"
+                class="w-full py-4 rounded-xl text-white font-bold text-lg bg-blue-600 hover:bg-blue-700 disabled:bg-slate-400">
+                Crear Probi
+            </button>
+        </form>
+    </div>
+
+    <div class="mt-10" [hidden]="!mostrarTabla()">
+        <div class="bg-card border border-border rounded-3xl shadow-md overflow-hidden">
+            <div class="p-8 border-b border-border">
+                <h3 class="text-4xl font-bold">
+                    Listado de probis
+                </h3>
+            </div>
+
+            <p-table [value]="filteredProbis()" [paginator]="true" [rows]="5">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th>ID</th>
+                        <th>ID Mención</th>
+                        <th>Fecha</th>
+                        <th>Acciones</th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-probi>
+                    <tr>
+                        <td>{{ probi.id }}</td>
+                        <td>{{ probi.id_mencion }}</td>
+                        <td>{{ probi.fecha }}</td>
+                        <td>
+                            <div class="flex gap-3">
+                                <button (click)="viewProbi(probi)"
+                                    class="w-12 h-12 rounded-xl bg-blue-600 text-white flex items-center justify-center hover:bg-blue-700 hover:scale-110 active:scale-95 transition-all duration-200">
+                                    <svg [lucideIcon]="icons.Pencil" class="w-5 h-5"></svg>
+                                </button>
+                                <button (click)="deleteProbi(probi)"
+                                    class="w-12 h-12 rounded-xl bg-red-600 text-white flex items-center justify-center hover:bg-red-700 hover:scale-110 active:scale-95 transition-all duration-200">
+
+                                    <svg [lucideIcon]="icons.Trash" class="w-5 h-5"></svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </div>
+
+    @if(mostrarDetalle() && selectedProbi()) {
+    <div class="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center z-50 p-6">
+        <div
+            class="w-full max-w-4xl bg-gradient-to-b from-white to-blue-50 rounded-[32px] shadow-2xl border border-blue-100 overflow-hidden">
+            <div class="flex items-center justify-between px-10 py-8 border-b border-blue-100">
+                <div>
+                    <h3 class="text-4xl font-bold text-blue-950">
+                        Probi #{{ selectedProbi().id }}
+                    </h3>
+                    <p class="text-blue-600/70 text-lg mt-2">
+                        Información detallada del probi
+                    </p>
+                </div>
+                <div class="flex gap-3">
+                    @if(!editMode()){
+                    <button (click)="enableEdit()"
+                        class="px-5 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 hover:scale-105 active:scale-95 transition-all duration-200 shadow-md">
+                        Editar
+                    </button>
+                    }
+                    <button (click)="closeModal()"
+                        class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl text-blue-500 hover:bg-blue-100 hover:text-blue-700 hover:scale-110 active:scale-95 transition-all duration-300">
+                        ✕
+                    </button>
+                </div>
+            </div>
+            <div class="p-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white border border-blue-100 rounded-3xl p-6">
+                        <p class="text-blue-500 font-medium mb-2">
+                            Fecha
+                        </p>
+                        @if(editMode()){
+                        <input type="date" [(ngModel)]="selectedProbi().fecha"
+                            class="w-full border rounded-xl p-3 text-black">
+                        } @else {
+                        <p class="text-2xl font-bold text-blue-950">
+                            {{ selectedProbi().fecha }}
+                        </p>
+                        }
+                    </div>
+                    <div class="bg-white border border-blue-100 rounded-3xl p-6">
+                        <p class="text-blue-500 font-medium mb-2">
+                            ID Mención
+                        </p>
+                        <p class="text-2xl font-bold text-blue-950">
+                            {{ selectedProbi().id_mencion }}
+                        </p>
+                    </div>
+                    <div class="bg-white border border-blue-100 rounded-3xl p-6">
+                        <p class="text-blue-500 font-medium mb-2">
+                            ID Probi
+                        </p>
+                        <p class="text-2xl font-bold text-blue-950">
+                            {{ selectedProbi().id }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            @if(editMode()){
+            <div class="px-8 pb-8 flex justify-end gap-4">
+                <button (click)="cancelEdit()"
+                    class="px-6 py-3 rounded-xl bg-red-600 text-white font-medium hover:bg-red-700 hover:scale-105 active:scale-95 transition-all duration-200 shadow-md">
+                    Cancelar
+                </button>
+                <button (click)="saveProbi()"
+                    class="px-6 py-3 rounded-xl bg-green-600 text-white font-medium hover:bg-green-700 hover:scale-105 active:scale-95 transition-all duration-200 shadow-md">
+                    Guardar
+                </button>
+            </div>
+            }
+        </div>
+    </div>
+    }
