@@ -56,9 +56,9 @@ export class Attitudes implements OnInit {
   }
 
   private butonItems: Buttons[] = [
-    { label: 'Crear actitud', icon: LucideShieldAlert, roles: ['admin', 'directivo'] },
-    { label: 'Ver actitudes', icon: LucideSearch, roles: ['admin', 'directivo'] },
-    { label: 'Ver por alumno', icon: LucideSearch, roles: ['admin', 'directivo'] },
+    { label: 'Crear actitud', icon: LucideShieldAlert, roles: ['admin', 'directivo', 'profesor'] },
+    { label: 'Ver actitudes', icon: LucideSearch, roles: ['admin', 'directivo', 'profesor'] },
+    { label: 'Ver por alumno', icon: LucideSearch, roles: ['admin', 'directivo', 'profesor', 'alumno'] },
   ];
 
   filteredButtons = computed(() => {
@@ -79,14 +79,13 @@ export class Attitudes implements OnInit {
   alumnoSeleccionado = signal<number | null>(null);
   searchTerm = signal('');
 
-  //cruzar actitudes con el nombre del alumno
+  // cruzar actitudes con el nombre del alumno
   filteredActitudes = computed(() => {
     const term = this.searchTerm().toLowerCase();
     const allAttitudes = this.actitudes();
     const allStudents = this.alumnos();
 
     const enrichedAttitudes = allAttitudes.map(act => {
-      //cruzamos usando id_alumno o id_usuario según lo que devuelva tu backend
       const idEstudiante = act.id_alumno || act.id_usuario;
       const student = allStudents.find(s => Number(s.id) === Number(idEstudiante));
       
@@ -138,10 +137,41 @@ export class Attitudes implements OnInit {
 
   showStudentSelector() {
     this.ocultarTodo();
-    this.mostrarBusquedaAlumno.set(true);
-    this.cargarAlumnos();
     this.actitudes.set([]);
     this.isShowingAll.set(false);
+
+    const currentUser = this.user();
+
+    // Comprobamos si el usuario logueado es un alumno
+    if (currentUser?.role === 'alumno') {
+      this.mostrarBusquedaAlumno.set(false);
+      
+      if (currentUser.id) {
+        this.alumnoSeleccionado.set(currentUser.id);
+        
+        this.attitudeService.getAttituddesByStudent(currentUser.id).subscribe({
+          next: (data: any) => {
+            this.actitudes.set(data);
+            this.mostrarTabla.set(true);
+          },
+          error: (err) => {
+            if (err.status === 404) {
+              this.actitudes.set([]);
+              this.mostrarTabla.set(true);
+            } else {
+              console.error(err);
+              alert('Error cargando tus actitudes');
+            }
+          }
+        });
+        
+      } else {
+        alert('Error: No se pudo identificar tu ID de alumno.');
+      }
+    } else {
+        this.mostrarBusquedaAlumno.set(true);
+      this.cargarAlumnos();
+    }
   }
 
   loadAttitudes() {
