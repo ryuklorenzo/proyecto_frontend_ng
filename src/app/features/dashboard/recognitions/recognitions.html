@@ -79,19 +79,33 @@
                 </div>
 
                 <div>
-                    <label class="block mb-2 font-semibold">Profesor Emisor</label>
+                    <label class="block mb-2 font-semibold">
+                        Profesor Emisor
+                    </label>
+                    @if(user()?.role === 'profesor') {
+                    <div
+                        class="w-full border border-slate-700 bg-slate-800 text-slate-300 rounded-xl p-4 flex items-center gap-2">
+                        <svg [lucideIcon]="icons.UserCircle" class="w-5 h-5"></svg>
+                        {{ user()?.nombre }} {{ user()?.apellidos }} (Tú)
+                    </div>
+                    } @else {
                     <select formControlName="id_profesor"
                         class="w-full border border-slate-700 bg-slate-900 text-white rounded-xl p-4">
-                        <option [ngValue]="null" disabled selected class="bg-slate-500 text-white">Selecciona un
-                            profesor...</option>
+                        <option [ngValue]="null" disabled selected>
+                            Selecciona un profesor...
+                        </option>
                         @for(profesor of profesores(); track profesor.id){
-                        <option [value]="profesor.id" class="bg-slate-900 text-white">
-                            {{ profesor.nombre }} {{ profesor.apellidos }} (ID: {{ profesor.id }})
+                        <option [value]="profesor.id">
+                            {{ profesor.nombre }} {{ profesor.apellidos }}
                         </option>
                         }
                     </select>
-                    @if(hasErrorForm('id_profesor')){ <p class="text-red-500 text-sm mt-2">El profesor es obligatorio.
-                    </p> }
+                    @if(hasErrorForm('id_profesor')){
+                    <p class="text-red-500 text-sm mt-2">
+                        Seleccionar profesor es obligatorio.
+                    </p>
+                    }
+                    }
                 </div>
             </div>
 
