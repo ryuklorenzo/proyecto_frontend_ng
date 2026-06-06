@@ -8,7 +8,6 @@ export type UserRole = 'admin' | 'directivo' | 'profesor' | 'alumno';
 export interface User {
   id: number;
   nombre: string;
-  apellidos: string;
   activo: boolean;
   role: UserRole;
 }
@@ -16,6 +15,7 @@ export interface User {
 export interface AuthResponse {
   access_token: string;
   role: string;
+  id: number;
 }
 
 @Injectable({
@@ -76,7 +76,7 @@ export class AuthService {
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
         })
       );
-      // console.log(response)
+      console.log(response)
 
       if (!response.access_token) {
         console.error('La respuesta no contiene access_token');
@@ -85,23 +85,13 @@ export class AuthService {
 
       const userRole = this.detectUserRole(response.role);
 
-      // const alumno = this.detectUserRole("alumno");
-      // const profe = this.detectUserRole("profesor");
-      // const directivo = this.detectUserRole("directivo");
-      // const admin = this.detectUserRole("admin");
 
       const userData: User = {
-        id: 1,
+        id: response.id,
         nombre: username,
-        apellidos: '',
         activo: true,
-        role: userRole, //asi tendrá que ser
+        role: userRole, 
 
-        //TESTEO
-        // role: alumno,
-        // role: profe,
-        // role: directivo,
-        // role: admin,
       };
 
       this.token.set(response.access_token);
