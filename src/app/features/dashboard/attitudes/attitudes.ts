@@ -56,9 +56,9 @@ export class Attitudes implements OnInit {
   }
 
   private butonItems: Buttons[] = [
-    { label: 'Crear actitud', icon: LucideShieldAlert, roles: ['admin', 'directivo'] },
-    { label: 'Ver actitudes', icon: LucideSearch, roles: ['admin', 'directivo'] },
-    { label: 'Ver por alumno', icon: LucideSearch, roles: ['admin', 'directivo'] },
+    { label: 'Crear actitud', icon: LucideShieldAlert, roles: ['admin', 'directivo', 'profesor'] },
+    { label: 'Ver actitudes', icon: LucideSearch, roles: ['admin', 'directivo', 'profesor'] },
+    { label: 'Ver por alumno', icon: LucideSearch, roles: ['admin', 'directivo', 'profesor', 'alumno'] },
   ];
 
   filteredButtons = computed(() => {
