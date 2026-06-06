@@ -146,21 +146,117 @@
     }
 
     @if(isProfesor()) {
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6">
-            <p class="text-slate-400">
-                Mis Cursos
-            </p>
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 hover:border-blue-500 hover:-translate-y-1 transition-all">
+            <div class="flex justify-between items-center">
+                <div>
+                    <p class="text-slate-400">Tareas creadas</p>
+                    <h2 class="text-5xl font-bold text-white mt-3">
+                        {{ totalTareas() }}
+                    </h2>
+                </div>
+                <div class="w-20 h-20 rounded-3xl bg-blue-500/10 flex items-center justify-center">
+                    <svg [lucideIcon]="icons.BookOpen" class="w-10 h-10 text-blue-500"></svg>
+                </div>
+            </div>
         </div>
-        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6">
-            <p class="text-slate-400">
-                Mis Tareas
-            </p>
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 hover:border-orange-500 hover:-translate-y-1 transition-all">
+            <div class="flex justify-between items-center">
+                <div>
+                    <p class="text-slate-400">Pendientes</p>
+                    <h2 class="text-5xl font-bold text-white mt-3">
+                        {{ tareasPendientes() }}
+                    </h2>
+                </div>
+                <div class="w-20 h-20 rounded-3xl bg-orange-500/10 flex items-center justify-center">
+                    <svg [lucideIcon]="icons.Calendar" class="w-10 h-10 text-orange-500"></svg>
+                </div>
+            </div>
         </div>
-        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6">
-            <p class="text-slate-400">
-                Amonestaciones
-            </p>
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 hover:border-red-500 hover:-translate-y-1 transition-all">
+            <div class="flex justify-between items-center">
+                <div>
+                    <p class="text-slate-400">Amonestaciones</p>
+                    <h2 class="text-5xl font-bold text-white mt-3">
+                        {{ totalAmonestaciones() }}
+                    </h2>
+                </div>
+                <div class="w-20 h-20 rounded-3xl bg-red-500/10 flex items-center justify-center text-4xl">
+                    ⚠️
+                </div>
+            </div>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 hover:border-emerald-500 hover:-translate-y-1 transition-all">
+            <div class="flex justify-between items-center">
+                <div>
+                    <p class="text-slate-400">Reconocimientos</p>
+                    <h2 class="text-5xl font-bold text-white mt-3">
+                        {{ totalReconocimientos() }}
+                    </h2>
+                </div>
+                <div class="w-20 h-20 rounded-3xl bg-emerald-500/10 flex items-center justify-center text-4xl">
+                    🏆
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-8 mt-8">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-8">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-2xl font-bold text-white">
+                    Últimas tareas
+                </h3>
+                <span class="px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 text-sm">
+                    {{ ultimasTareas().length }}
+                </span>
+            </div>
+            <div class="space-y-4">
+                @for(tarea of ultimasTareas(); track tarea.id){
+                <div class="p-5 rounded-2xl bg-slate-800 border border-slate-700 hover:border-blue-500 transition-all">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="font-semibold text-white">
+                                {{ tarea.descripcion }}
+                            </p>
+                        </div>
+                        <span class="px-3 py-1 rounded-full text-xs font-semibold" [class]="tarea.estado === 'COMPLETADA'
+                        ? 'bg-emerald-500/10 text-emerald-400'
+                        : 'bg-orange-500/10 text-orange-400'">
+                            {{ tarea.estado }}
+                        </span>
+                    </div>
+                </div>
+                }
+            </div>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-8">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-2xl font-bold text-white">
+                    Últimas amonestaciones
+                </h3>
+                <span class="px-3 py-1 rounded-full bg-red-500/10 text-red-400 text-sm">
+                    {{ ultimasAmonestaciones().length }}
+                </span>
+            </div>
+            <div class="space-y-4">
+                @for(amonestacion of ultimasAmonestaciones(); track amonestacion.id){
+                <div class="p-5 rounded-2xl bg-slate-800 border border-slate-700 hover:border-red-500 transition-all">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <p class="font-semibold text-white">
+                                {{ amonestacion.descripcion }}
+                            </p>
+                            <p class="text-sm text-slate-400 mt-2">
+                                Nivel {{ amonestacion.nivel }}
+                            </p>
+                        </div>
+                        <span class="px-3 py-1 rounded-full bg-red-500/10 text-red-400 text-xs font-semibold">
+                            {{ amonestacion.nivel }}
+                        </span>
+                    </div>
+                </div>
+                }
+            </div>
         </div>
     </div>
     }
@@ -187,59 +283,73 @@
 
     @if(mostrarPerfil()) {
     <div class="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-6">
-        <div class="w-full max-w-4xl bg-slate-900 border border-slate-700 rounded-3xl overflow-hidden shadow-2xl">
-            <div class="flex justify-between items-center p-8 border-b border-slate-700">
-                <div>
-                    <h2 class="text-3xl font-bold text-white">
-                        Mi perfil
-                    </h2>
-                    <p class="text-slate-400 mt-2">
-                        Información de tu cuenta
-                    </p>
+        <div
+            class="w-full max-w-5xl overflow-hidden rounded-[32px] border border-slate-700 bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950 shadow-2xl">
+            <div class="relative p-10 border-b border-slate-700">
+                <div class="absolute top-0 right-0 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl"></div>
+                <div class="flex items-center justify-between relative">
+                    <div class="flex items-center gap-6">
+                        <div
+                            class="w-24 h-24 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-4xl font-bold text-white shadow-lg">
+                            {{ user()?.nombre?.charAt(0) }}
+                        </div>
+                        <div>
+                            <h2 class="text-5xl font-bold text-white">
+                                Mi perfil
+                            </h2>
+                            <p class="text-slate-400 text-xl mt-2">
+                                Información de tu cuenta
+                            </p>
+                        </div>
+                    </div>
+                    <button (click)="closeProfile()"
+                        class="w-14 h-14 rounded-2xl bg-slate-800/60 hover:bg-slate-700 text-white text-2xl transition-all">
+                        ✕
+                    </button>
                 </div>
-                <button (click)="closeProfile()" class="w-12 h-12 rounded-xl hover:bg-slate-800 text-white text-xl">
-                    ✕
-                </button>
             </div>
-            <div class="p-8">
-                <div class="grid md:grid-cols-2 gap-6">
-                    <div class="bg-slate-800 rounded-2xl p-5">
-                        <p class="text-slate-400 text-sm">
+            <div class="p-10">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div
+                        class="bg-slate-800/60 border border-slate-700 rounded-3xl p-6 hover:border-blue-500 transition-all">
+                        <p class="text-slate-400 text-sm uppercase tracking-wider">
                             Nombre
                         </p>
-                        <p class="text-xl font-bold text-white mt-2">
+                        <p class="text-3xl font-bold text-white mt-3">
                             {{ user()?.nombre }}
                         </p>
                     </div>
-                    <div class="bg-slate-800 rounded-2xl p-5">
-                        <p class="text-slate-400 text-sm">
+                    <div
+                        class="bg-slate-800/60 border border-slate-700 rounded-3xl p-6 hover:border-blue-500 transition-all">
+                        <p class="text-slate-400 text-sm uppercase tracking-wider">
                             Apellidos
                         </p>
-                        <p class="text-xl font-bold text-white mt-2">
+                        <p class="text-3xl font-bold text-white mt-3">
                             {{ user()?.apellidos }}
                         </p>
                     </div>
-                    <div class="bg-slate-800 rounded-2xl p-5">
-                        <p class="text-slate-400 text-sm">
+                    <div
+                        class="bg-slate-800/60 border border-slate-700 rounded-3xl p-6 hover:border-blue-500 transition-all">
+                        <p class="text-slate-400 text-sm uppercase tracking-wider">
                             Rol
                         </p>
-                        <p class="text-xl font-bold text-white mt-2">
+                        <p class="text-3xl font-bold text-blue-400 mt-3">
                             {{ user()?.role }}
                         </p>
                     </div>
-                    <div class="bg-slate-800 rounded-2xl p-5">
-                        <p class="text-slate-400 text-sm">
+                    <div
+                        class="bg-slate-800/60 border border-slate-700 rounded-3xl p-6 hover:border-blue-500 transition-all">
+                        <p class="text-slate-400 text-sm uppercase tracking-wider">
                             ID Usuario
                         </p>
-                        <p class="text-xl font-bold text-white mt-2">
-                            {{ user()?.id }}
+                        <p class="text-3xl font-bold text-white mt-3">
+                            #{{ user()?.id }}
                         </p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
     }
 
 </div>

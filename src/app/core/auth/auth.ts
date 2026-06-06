@@ -77,6 +77,7 @@ export class AuthService {
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
         })
       );
+      //console.log("LOGIN RESPONSE", response);
       console.log(response)
 
       if (!response.access_token) {

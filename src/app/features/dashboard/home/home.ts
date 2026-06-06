@@ -12,11 +12,14 @@ import {
   LucideCalendar
 } from '@lucide/angular';
 import { Router } from '@angular/router';
+import { Students } from '../students/students';
+import { TaskService } from '../../../core/services/tasks/task';
+import { ReprimandService } from '../../../core/services/reprimands/reprimand';
+import { RecognitionService } from '../../../core/services/recognitions/recognition';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  // CORRECCIÓN: Quitamos LucideAngularModule y dejamos LucideDynamicIcon igual que en el sidebar
   imports: [LucideDynamicIcon],
   templateUrl: './home.html'
 })
@@ -36,7 +39,9 @@ export class Home {
   isProfesor = computed(() => this.user()?.role === 'profesor');
   isAlumno = computed(() => this.user()?.role === 'alumno');
   ultimosAlumnos = signal<any[]>([]);
-
+  private taskService = inject(TaskService);
+  private reprimandService = inject(ReprimandService);
+  private recognitionService = inject(RecognitionService);
   private studentService = inject(StudentService);
   private teacherService = inject(TeacherService);
   private courseService = inject(CourseService);
@@ -46,10 +51,22 @@ export class Home {
   totalProfesores = signal(0);
   totalCursos = signal(0);
   totalHorarios = signal(0);
+  misAlumnos = signal(0);
+  totalTareas = signal(0);
+  tareasPendientes = signal(0);
+  totalAmonestaciones = signal(0);
+  totalReconocimientos = signal(0);
+  ultimasTareas = signal<any[]>([]);
+  ultimasAmonestaciones = signal<any[]>([]);
 
   constructor() {
-    this.loadStats();
-    this.loadLastStudents();
+    if (this.isAdmin()) {
+      this.loadStats();
+      this.loadLastStudents();
+    }
+    if (this.isProfesor()) {
+      this.loadProfesorDashboard();
+    }
   }
 
   openProfile() {
@@ -115,6 +132,39 @@ export class Home {
           .sort((a, b) => b.id - a.id)
           .slice(0, 5);
         this.ultimosAlumnos.set(ultimos);
+      }
+    });
+  }
+
+  loadProfesorDashboard() {
+    const profesorId = this.user()?.id;
+    if (!profesorId) return;
+    this.taskService.getTasksByTeacher(profesorId).subscribe({
+      next: (tasks: any) => {
+        this.totalTareas.set(tasks.length);
+        this.tareasPendientes.set(
+          tasks.filter((t: any) =>
+            t.estado?.toUpperCase() !== 'COMPLETADA'
+          ).length
+        );
+        this.ultimasTareas.set(
+          [...tasks].reverse().slice(0, 5)
+        );
+      }
+    });
+    this.reprimandService.getReprimands().subscribe({
+      next: (reprimands: any) => {
+        this.totalAmonestaciones.set(reprimands.length);
+        this.ultimasAmonestaciones.set(
+          [...reprimands]
+            .reverse()
+            .slice(0, 5)
+        );
+      }
+    });
+    this.recognitionService.getRecognitions().subscribe({
+      next: (recognitions: any) => {
+        this.totalReconocimientos.set(recognitions.length);
       }
     });
   }
