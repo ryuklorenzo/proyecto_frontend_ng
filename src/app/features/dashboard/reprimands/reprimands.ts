@@ -67,7 +67,6 @@ export class Reprimands {
     { label: 'Ver amonestaciones del alumno', icon: LucideSearch, roles: ['admin', 'directivo', 'profesor', 'alumno'] },
   ];
 
-  // 2. Filtramos la lista según el rol del usuario (igual que en el sidebar)
   filteredButtons = computed(() => {
     const currentUser = this.user();
     if (!currentUser) return [];
@@ -115,7 +114,6 @@ export class Reprimands {
       return;
     }
     const value = this.reprimandForm.value;
-    //console.log('FORM VALUE', value);
     const body = {
       amonestacion: { nivel: value.nivel },
       actitud: {
@@ -124,7 +122,6 @@ export class Reprimands {
         tipo: value.tipo
       }
     };
-    //console.log('BODY', body);
     this.reprimandService.createReprimand(value.idAlumno, value.idProfesor, body).subscribe({
       next: () => {
         alert('Amonestación creada correctamente');
@@ -144,7 +141,6 @@ export class Reprimands {
   loadReprimands() {
     this.reprimandService.getReprimands().subscribe({
       next: (data: any) => {
-        //console.log(data);
         console.log('AMONESTACIONES ALUMNO', data);
         this.reprimands.set(data);
         this.mostrarFormulario.set(false);
@@ -164,10 +160,8 @@ export class Reprimands {
       },
       error: (err) => {
         if (err.status === 404) {
-          // Vaciamos la lista y mostramos la tabla
           this.reprimands.set([]);
           this.mostrarTabla.set(true);
-          // ¡Hemos quitado el alert!
         } else {
           console.error(err);
           alert('Error cargando amonestaciones del alumno');
