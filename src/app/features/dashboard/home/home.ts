@@ -58,6 +58,9 @@ export class Home {
   totalReconocimientos = signal(0);
   ultimasTareas = signal<any[]>([]);
   ultimasAmonestaciones = signal<any[]>([]);
+  ultimosReconocimientos = signal<any[]>([]);
+  misTareas = signal<any[]>([]);
+  misAmonestaciones = signal<any[]>([]);
 
   constructor() {
     if (this.isAdmin()) {
@@ -66,6 +69,9 @@ export class Home {
     }
     if (this.isProfesor()) {
       this.loadProfesorDashboard();
+    }
+    if (this.isAlumno()) {
+      this.loadAlumnoDashboard();
     }
   }
 
@@ -165,6 +171,34 @@ export class Home {
     this.recognitionService.getRecognitions().subscribe({
       next: (recognitions: any) => {
         this.totalReconocimientos.set(recognitions.length);
+      }
+    });
+  }
+
+  loadAlumnoDashboard() {
+    const alumnoId = this.user()?.id;
+    if (!alumnoId) return;
+    this.taskService.getTasksByStudent(alumnoId).subscribe({
+      next: (tasks: any) => {
+        this.misTareas.set(tasks);
+        this.ultimasTareas.set(
+          [...tasks]
+            .reverse()
+            .slice(0, 5)
+        );
+      }
+    });
+    this.reprimandService.getReprimandByStudent(alumnoId).subscribe({
+      next: (reprimands: any) => {
+        this.misAmonestaciones.set(reprimands);
+        this.ultimasAmonestaciones.set(
+          [...reprimands]
+            .reverse()
+            .slice(0, 5)
+        );
+      },
+      error: () => {
+        this.ultimasAmonestaciones.set([]);
       }
     });
   }
