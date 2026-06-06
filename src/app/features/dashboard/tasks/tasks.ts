@@ -1,4 +1,4 @@
-import { Component, inject, computed, signal } from '@angular/core';
+import { Component, inject, computed, signal, effect } from '@angular/core';
 import { AuthService, UserRole } from '../../../core/auth/auth';
 import {
   LucideClipboardList,
@@ -100,19 +100,53 @@ export class Tasks {
     idAlumno: [null, Validators.required]
   });
 
+  constructor() {
+    effect(() => {
+      if (this.authService.isAuthenticated()) {
+        this.cargarDatosBase();
+      }
+    });
+  }
+
+  cargarDatosBase() {
+    this.studentService.getStudents().subscribe({
+      next: (data: any) => {
+        const lista = Array.isArray(data) ? data : [];
+        this.alumnos.set(lista);
+      },
+      error: (err) => console.error('Error cargando alumnos:', err)
+    });
+
+    this.teacherService.getTeachers().subscribe({
+      next: (data: any) => {
+        const lista = Array.isArray(data) ? data : [];
+        this.profesores.set(lista);
+      },
+      error: (err) => console.error('Error cargando profesores:', err)
+    });
+  }
+
   toggleCrearTarea() {
     this.mostrarTabla.set(false);
     this.mostrarBusquedaAlumno.set(false);
     this.mostrarBusquedaProfesor.set(false);
     this.mostrarFormulario.set(true);
 
-    // Cargar listas para los desplegables de Crear Tarea
-    this.studentService.getStudents().subscribe({
-      next: (data: any) => this.alumnos.set(data)
-    });
-    this.teacherService.getTeachers().subscribe({
-      next: (data: any) => this.profesores.set(data)
-    });
+    this.cargarDatosBase();
+
+    const currentUser = this.user();
+    
+    //ponemos el id directamente al form
+    if (currentUser?.role === 'profesor' && currentUser.id) {
+      this.taskForm.patchValue({
+        idProfesor: currentUser.id
+      });
+    } else {
+      // Si no es profesor, dejamos campo limpio
+      this.taskForm.patchValue({
+        idProfesor: null
+      });
+    }
   }
 
   createTask() {
@@ -127,6 +161,7 @@ export class Tasks {
       descripcion: formValue.descripcion,
       estado: formValue.estado
     };
+    
     this.taskService.createTask(
       formValue.idProfesor,
       formValue.idAlumno,
@@ -199,11 +234,23 @@ export class Tasks {
     this.mostrarFormulario.set(false);
     this.mostrarTabla.set(false);
     this.mostrarBusquedaProfesor.set(false);
-    this.mostrarBusquedaAlumno.set(true);
 
-    this.studentService.getStudents().subscribe({
-      next: (data: any) => this.alumnos.set(data)
-    });
+    const currentUser = this.user();
+
+    // Comprobamos si es un alumno
+    if (currentUser?.role === 'alumno') {
+      this.mostrarBusquedaAlumno.set(false);
+      
+      if (currentUser.id) {
+        this.alumnoSeleccionado.set(currentUser.id);
+        this.loadStudentTasks(currentUser.id); // Cargamos sus tareas directamente
+      } else {
+        alert('Error: No se pudo identificar tu ID de alumno.');
+      }
+    } else {
+      this.mostrarBusquedaAlumno.set(true);
+      this.cargarDatosBase();
+    }
   }
 
   buscarTareasAlumno() {
@@ -222,11 +269,26 @@ export class Tasks {
     this.mostrarFormulario.set(false);
     this.mostrarTabla.set(false);
     this.mostrarBusquedaAlumno.set(false);
-    this.mostrarBusquedaProfesor.set(true);
+    this.mostrarBusquedaProfesor.set(false);
 
-    this.teacherService.getTeachers().subscribe({
-      next: (data: any) => this.profesores.set(data)
-    });
+    const currentUser = this.user();
+
+    // Comprobamos si el usuario logueado es un profesor
+    if (currentUser?.role === 'profesor') {
+      this.mostrarBusquedaAlumno.set(false); // Ocultamos el buscador de profesor
+      
+      if (currentUser.id) {
+        this.profesorSeleccionado.set(currentUser.id);
+        this.loadTeachersTasks(currentUser.id); // Cargamos sus tareas directamente
+      } else {
+        alert('Error: No se pudo identificar tu ID de alumno.');
+      }
+    } else {
+      // Para cualquier otro rol, mostramos el buscador con la lista de alumnos
+      this.mostrarBusquedaProfesor.set(true);
+      this.cargarDatosBase();
+    }
+
   }
 
   buscarTareasProfesor() {
