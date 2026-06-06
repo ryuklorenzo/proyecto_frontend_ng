@@ -71,7 +71,7 @@ export class Recognitions implements OnInit {
       icon: LucideBadgeCheck,
       roles: ['admin', 'directivo', 'profesor'],
     },
-    { label: 'Ver por actitud', icon: LucideSearch, roles: ['admin', 'directivo', 'profesor'] },
+    { label: 'Ver por actitud', icon: LucideSearch, roles: ['admin', 'directivo', 'profesor', 'alumno'] },
   ];
 
   filteredButtons = computed(() => {

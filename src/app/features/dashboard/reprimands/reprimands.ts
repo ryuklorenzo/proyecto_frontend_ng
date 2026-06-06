@@ -64,7 +64,7 @@ export class Reprimands {
   private butonItems: Buttons[] = [
     { label: 'Crear amonestacion', icon: LucideTriangleAlert, roles: ['admin', 'directivo', 'profesor'] },
     { label: 'Ver amonestaciones', icon: LucideShieldAlert, roles: ['admin', 'directivo'] },
-    { label: 'Ver amonestaciones del alumno', icon: LucideSearch, roles: ['admin', 'directivo', 'profesor'] },
+    { label: 'Ver amonestaciones del alumno', icon: LucideSearch, roles: ['admin', 'directivo', 'profesor', 'alumno'] },
   ];
 
   // 2. Filtramos la lista según el rol del usuario (igual que en el sidebar)
