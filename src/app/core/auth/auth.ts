@@ -8,6 +8,7 @@ export type UserRole = 'admin' | 'directivo' | 'profesor' | 'alumno';
 export interface User {
   id: number;
   nombre: string;
+  apellidos: string;
   activo: boolean;
   role: UserRole;
 }
@@ -89,6 +90,7 @@ export class AuthService {
       const userData: User = {
         id: response.id,
         nombre: username,
+        apellidos: "",
         activo: true,
         role: userRole, 
 
