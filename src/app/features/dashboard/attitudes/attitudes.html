@@ -154,10 +154,12 @@
                                     class="w-12 h-12 rounded-xl bg-blue-600 text-white flex items-center justify-center hover:bg-blue-700 hover:scale-110 active:scale-95 transition-all duration-200" title="Ver detalle">
                                     <svg [lucideIcon]="icons.Eye" class="w-5 h-5"></svg>
                                 </button>
-                                <button (click)="deleteAttitude(actitud)"
+                                @if (user()!.role !== "alumno"){
+                                    <button (click)="deleteAttitude(actitud)"
                                     class="w-12 h-12 rounded-xl bg-red-600 text-white flex items-center justify-center hover:bg-red-700 hover:scale-110 active:scale-95 transition-all duration-200" title="Eliminar">
                                     <svg [lucideIcon]="icons.Trash" class="w-5 h-5"></svg>
                                 </button>
+                                }
                             </div>
                         </td>
                     </tr>
