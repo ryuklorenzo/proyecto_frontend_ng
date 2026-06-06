@@ -1,4 +1,4 @@
-import { Component, inject, computed, signal } from '@angular/core';
+import { Component, inject, computed, signal, effect } from '@angular/core';
 import { AuthService, UserRole } from '../../../core/auth/auth';
 import {
   LucideClipboardList,
@@ -96,16 +96,50 @@ export class Reprimands {
     tipo: ['', Validators.required]
   });
 
+  constructor() {
+    effect(() => {
+      if (this.authService.isAuthenticated()) {
+        this.cargarDatosBase();
+      }
+    });
+  }
+
+  cargarDatosBase() {
+    this.studentService.getStudents().subscribe({
+      next: (data: any) => {
+        const lista = Array.isArray(data) ? data : [];
+        this.alumnos.set(lista);
+      },
+      error: (err) => console.error('Error cargando alumnos:', err)
+    });
+
+    this.teacherService.getTeachers().subscribe({
+      next: (data: any) => {
+        const lista = Array.isArray(data) ? data : [];
+        this.profesores.set(lista);
+      },
+      error: (err) => console.error('Error cargando profesores:', err)
+    });
+  }
+
   toggleCrearAmonestacion() {
     this.mostrarTabla.set(false);
     this.mostrarBusquedaAlumno.set(false);
     this.mostrarFormulario.set(true);
-    this.studentService.getStudents().subscribe({
-      next: (data: any) => this.alumnos.set(data)
-    });
-    this.teacherService.getTeachers().subscribe({
-      next: (data: any) => this.profesores.set(data)
-    });
+    
+    this.cargarDatosBase();
+
+    const currentUser = this.user();
+    
+    if (currentUser?.role === 'profesor' && currentUser.id) {
+      this.reprimandForm.patchValue({
+        idProfesor: currentUser.id
+      });
+    } else {
+      this.reprimandForm.patchValue({
+        idProfesor: null
+      });
+    }
   }
 
   createReprimand() {
@@ -126,7 +160,8 @@ export class Reprimands {
       next: () => {
         alert('Amonestación creada correctamente');
         this.reprimandForm.reset({
-          fecha: new Date().toISOString().split('T')[0]
+          fecha: new Date().toISOString().split('T')[0],
+          idProfesor: this.user()?.role === 'profesor' ? this.user()?.id : null 
         });
 
       },
@@ -173,10 +208,22 @@ export class Reprimands {
   showStudentSelector() {
     this.mostrarFormulario.set(false);
     this.mostrarTabla.set(false);
-    this.mostrarBusquedaAlumno.set(true);
-    this.studentService.getStudents().subscribe({
-      next: (data: any) => this.alumnos.set(data)
-    });
+
+    const currentUser = this.user();
+
+    if (currentUser?.role === 'alumno') {
+      this.mostrarBusquedaAlumno.set(false); 
+      
+      if (currentUser.id) {
+        this.alumnoSeleccionado.set(currentUser.id);
+        this.loadStudentReprimands(currentUser.id); 
+      } else {
+        alert('Error: No se pudo identificar tu ID de alumno.');
+      }
+    } else {
+      this.mostrarBusquedaAlumno.set(true);
+      this.cargarDatosBase();
+    }
   }
 
   buscarAmonestacionesAlumno() {
