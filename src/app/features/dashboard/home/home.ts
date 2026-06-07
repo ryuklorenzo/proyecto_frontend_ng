@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal, effect } from '@angular/core'; 
+import { Component, computed, inject, signal, effect } from '@angular/core';
 import { AuthService } from '../../../core/auth/auth';
 import { StudentService } from '../../../core/services/students/student';
 import { TeacherService } from '../../../core/services/teachers/teacher';
@@ -17,6 +17,8 @@ import { Students } from '../students/students';
 import { TaskService } from '../../../core/services/tasks/task';
 import { ReprimandService } from '../../../core/services/reprimands/reprimand';
 import { RecognitionService } from '../../../core/services/recognitions/recognition';
+import { RecordService } from '../../../core/services/records/record';
+import { PreviService } from '../../../core/services/previ/previ';
 
 @Component({
   selector: 'app-home',
@@ -48,6 +50,8 @@ export class Home {
   private teacherService = inject(TeacherService);
   private courseService = inject(CourseService);
   private scheduleService = inject(ScheduleService);
+  private recordService = inject(RecordService);
+  private previService = inject(PreviService);
   private router = inject(Router);
   totalAlumnos = signal(0);
   totalProfesores = signal(0);
@@ -66,6 +70,13 @@ export class Home {
   mostrarDetalle = signal(false);
   detalleSeleccionado = signal<any>(null);
   tipoDetalle = signal<'tarea' | 'amonestacion' | null>(null);
+  totalExpedientes = signal(0);
+  totalPrevis = signal(0);
+  ultimosExpedientes = signal<any[]>([]);
+  ultimasPrevis = signal<any[]>([]);
+  mostrarDetalleDirectivo = signal(false);
+  tipoDetalleDirectivo = signal<'expediente' | 'previ' | null>(null);
+  detalleDirectivo = signal<any>(null);
 
   constructor() {
     effect(() => {
@@ -74,13 +85,15 @@ export class Home {
       const profe = this.isProfesor();
       const alumno = this.isAlumno();
 
-      if (admin || directivo) {
+      if (admin) {
         this.loadStats();
         this.loadLastStudents();
       } else if (profe) {
         this.loadProfesorDashboard();
       } else if (alumno) {
         this.loadAlumnoDashboard();
+      } else if (directivo) {
+        this.loadDirectivoDashboard();
       }
     }, { allowSignalWrites: true });
   }
@@ -214,14 +227,14 @@ export class Home {
   }
 
   viewTask(task: any) {
-    console.log("TAREA", task);
+    //console.log("TAREA", task);
     this.detalleSeleccionado.set(task);
     this.tipoDetalle.set('tarea');
     this.mostrarDetalle.set(true);
   }
 
   viewReprimand(reprimand: any) {
-    console.log("AMONESTACION", reprimand);
+    //console.log("AMONESTACION", reprimand);
     this.detalleSeleccionado.set(reprimand);
     this.tipoDetalle.set('amonestacion');
     this.mostrarDetalle.set(true);
@@ -246,4 +259,65 @@ export class Home {
   confirmLogout() {
     this.authService.logout();
   }
+
+  loadDirectivoDashboard() {
+    //console.log('DIRECTIVO DASHBOARD');
+    const directivoId = this.user()?.id;
+    if (!directivoId) return;
+    this.recordService.getRecordsByExecutive(directivoId).subscribe({
+      next: (data: any) => {
+        const records = Array.isArray(data) ? data : [];
+        console.log('EXPEDIENTES', records);
+        this.totalExpedientes.set(records.length);
+        this.ultimosExpedientes.set(
+          [...records]
+            .reverse()
+            .slice(0, 5)
+        );
+      }
+    });
+    this.previService.getPrevisByDirectivo(directivoId).subscribe({
+      next: (data: any) => {
+        const previs = Array.isArray(data) ? data : [];
+        //console.log('PREVIS', previs);
+        this.totalPrevis.set(previs.length);
+        this.ultimasPrevis.set(
+          [...previs]
+            .reverse()
+            .slice(0, 5)
+        );
+      }
+    });
+
+    this.reprimandService.getReprimands().subscribe({
+      next: (reprimands: any) => {
+        this.totalAmonestaciones.set(reprimands.length);
+      }
+    });
+
+    this.recognitionService.getRecognitions().subscribe({
+      next: (recognitions: any) => {
+        this.totalReconocimientos.set(recognitions.length);
+      }
+    });
+  }
+
+  viewExpediente(expediente: any) {
+    this.detalleDirectivo.set(expediente);
+    this.tipoDetalleDirectivo.set('expediente');
+    this.mostrarDetalleDirectivo.set(true);
+  }
+
+  viewPrevi(previ: any) {
+    this.detalleDirectivo.set(previ);
+    this.tipoDetalleDirectivo.set('previ');
+    this.mostrarDetalleDirectivo.set(true);
+  }
+
+  closeDirectivoModal() {
+    this.mostrarDetalleDirectivo.set(false);
+    this.tipoDetalleDirectivo.set(null);
+    this.detalleDirectivo.set(null);
+  }
+
 }

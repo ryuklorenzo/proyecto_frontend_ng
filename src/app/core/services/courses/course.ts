@@ -12,9 +12,6 @@ export class CourseService {
      
 
     createCourse(idHorario: number, course: any) {
-
-        const  
-
         return this.http.post(
             `/api/courses/?id_horario=${idHorario}`,
             course,
