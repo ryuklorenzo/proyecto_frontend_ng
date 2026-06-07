@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, inject, computed } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService, UserRole } from '../../../core/auth/auth';
@@ -28,7 +28,7 @@ export class Sidebar {
 
   authService = inject(AuthService);
   user = this.authService.user; 
-  mostrarLogoutModal = false;
+  mostrarLogoutModal = signal(false);
 
   // Registro de iconos estáticos para usarlos en el template HTML
   icons = { 
@@ -74,7 +74,7 @@ export class Sidebar {
   }
 
   openLogoutModal() {
-    this.mostrarLogoutModal = true;
+    this.mostrarLogoutModal.set(true);
   }
 
   confirmLogout() {
@@ -82,6 +82,6 @@ export class Sidebar {
   }
 
   closeLogoutModal() {
-    this.mostrarLogoutModal = false;
+    this.mostrarLogoutModal.set(false);
   }
 }

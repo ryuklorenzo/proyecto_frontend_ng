@@ -65,26 +65,22 @@
             }
         </button>
     </div>
-
-    @if (mostrarLogoutModal) {
-    <div
-        class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 animate-in fade-in duration-300">
-        <div
-            class="bg-card rounded-3xl shadow-2xl p-8 w-full max-w-md animate-in zoom-in-95 slide-in-from-bottom-4 duration-300">
+    @if(mostrarLogoutModal()) {
+    <div class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+        <div class="bg-slate-900 rounded-3xl shadow-2xl p-8 w-full max-w-md border border-slate-700">
             <div class="text-center">
-                <div
-                    class="w-20 h-20 mx-auto rounded-full bg-red-100 flex items-center justify-center mb-6 hover:scale-110 transition-transform duration-300">
-                    <svg [lucideIcon]="icons.LogOut" class="w-10 h-10 text-red-600"></svg>
+                <div class="w-20 h-20 mx-auto rounded-full bg-red-500/10 flex items-center justify-center mb-6">
+                    <svg [lucideIcon]="icons.LogOut" class="w-10 h-10 text-red-500"></svg>
                 </div>
-                <h3 class="text-2xl font-bold m-3">
+                <h3 class="text-2xl font-bold text-white mb-3">
                     ¿Cerrar sesión?
                 </h3>
-                <p class="text-muted-foreground mb-8">
-                    Se cerrara tu sesión actual y volverás al panel de inicio de sesión
+                <p class="text-slate-400 mb-8">
+                    Se cerrará tu sesión actual y volverás al inicio de sesión.
                 </p>
                 <div class="flex gap-4">
                     <button (click)="closeLogoutModal()"
-                        class="flex-1 py-3 rounded-xl border border-border hover:bg-muted hover:scale-[1.02] active:scale-95 transition-all duration-200">
+                        class="flex-1 py-3 rounded-xl border border-slate-700 hover:bg-slate-800 text-white">
                         Cancelar
                     </button>
                     <button (click)="confirmLogout()"
@@ -96,6 +92,5 @@
         </div>
     </div>
     }
-
 </aside>
 }

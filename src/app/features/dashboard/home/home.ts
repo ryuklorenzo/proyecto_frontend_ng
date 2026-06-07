@@ -9,7 +9,8 @@ import {
   LucideGraduationCap,
   LucideUsers,
   LucideBookOpen,
-  LucideCalendar
+  LucideCalendar,
+  LucideLogOut
 } from '@lucide/angular';
 import { Router } from '@angular/router';
 import { Students } from '../students/students';
@@ -29,7 +30,8 @@ export class Home {
     GraduationCap: LucideGraduationCap,
     Users: LucideUsers,
     BookOpen: LucideBookOpen,
-    Calendar: LucideCalendar
+    Calendar: LucideCalendar,
+    LogOut: LucideLogOut
   };
   authService = inject(AuthService);
   user = this.authService.user;
@@ -61,6 +63,9 @@ export class Home {
   ultimosReconocimientos = signal<any[]>([]);
   misTareas = signal<any[]>([]);
   misAmonestaciones = signal<any[]>([]);
+  mostrarDetalle = signal(false);
+  detalleSeleccionado = signal<any>(null);
+  tipoDetalle = signal<'tarea' | 'amonestacion' | null>(null);
 
   constructor() {
     if (this.isAdmin()) {
@@ -201,5 +206,39 @@ export class Home {
         this.ultimasAmonestaciones.set([]);
       }
     });
+  }
+
+  viewTask(task: any) {
+    console.log("TAREA", task);
+    this.detalleSeleccionado.set(task);
+    this.tipoDetalle.set('tarea');
+    this.mostrarDetalle.set(true);
+  }
+
+  viewReprimand(reprimand: any) {
+    console.log("AMONESTACION", reprimand);
+    this.detalleSeleccionado.set(reprimand);
+    this.tipoDetalle.set('amonestacion');
+    this.mostrarDetalle.set(true);
+  }
+
+  closeModal() {
+    this.mostrarDetalle.set(false);
+    this.detalleSeleccionado.set(null);
+    this.tipoDetalle.set(null);
+  }
+
+  mostrarLogoutModal = signal(false);
+
+  openLogoutModal() {
+    this.mostrarLogoutModal.set(true);
+  }
+
+  closeLogoutModal() {
+    this.mostrarLogoutModal.set(false);
+  }
+
+  confirmLogout() {
+    this.authService.logout();
   }
 }
