@@ -52,7 +52,6 @@ export class AuthService {
   }
 
   private detectUserRole(role: string): UserRole {
-    //TODO cambiar esto de alguna manera saber que es, pero asi no
     const role_lowercase = role.toLowerCase();
     if (role_lowercase.includes('admin')){
       return 'admin';
@@ -77,7 +76,7 @@ export class AuthService {
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
         })
       );
-      //console.log("LOGIN RESPONSE", response);
+      
       console.log(response)
 
       if (!response.access_token) {
@@ -87,14 +86,12 @@ export class AuthService {
 
       const userRole = this.detectUserRole(response.role);
 
-
       const userData: User = {
         id: response.id,
         nombre: username,
         apellidos: "",
         activo: true,
         role: userRole, 
-
       };
 
       this.token.set(response.access_token);

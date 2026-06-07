@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, effect } from '@angular/core'; 
 import { AuthService } from '../../../core/auth/auth';
 import { StudentService } from '../../../core/services/students/student';
 import { TeacherService } from '../../../core/services/teachers/teacher';
@@ -68,16 +68,21 @@ export class Home {
   tipoDetalle = signal<'tarea' | 'amonestacion' | null>(null);
 
   constructor() {
-    if (this.isAdmin()) {
-      this.loadStats();
-      this.loadLastStudents();
-    }
-    if (this.isProfesor()) {
-      this.loadProfesorDashboard();
-    }
-    if (this.isAlumno()) {
-      this.loadAlumnoDashboard();
-    }
+    effect(() => {
+      const admin = this.isAdmin();
+      const directivo = this.isDirectivo();
+      const profe = this.isProfesor();
+      const alumno = this.isAlumno();
+
+      if (admin || directivo) {
+        this.loadStats();
+        this.loadLastStudents();
+      } else if (profe) {
+        this.loadProfesorDashboard();
+      } else if (alumno) {
+        this.loadAlumnoDashboard();
+      }
+    }, { allowSignalWrites: true });
   }
 
   openProfile() {

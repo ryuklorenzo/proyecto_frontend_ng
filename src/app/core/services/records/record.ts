@@ -9,7 +9,7 @@ export class RecordService {
 
     private http = inject(HttpClient);
     private authService = inject(AuthService);
-    token = this.authService.token();
+     
 
     createRecord(idDirectivo: number, idAlumno: number, record: any) {
         return this.http.post(
@@ -17,7 +17,7 @@ export class RecordService {
             record,
             {
                 headers: new HttpHeaders({
-                    Authorization: `Bearer ${this.token}`
+                    Authorization: `Bearer ${this.authService.token()}`
                 })
             }
         );
@@ -26,7 +26,7 @@ export class RecordService {
     getRecords() {
         return this.http.get('/api/records/', {
             headers: {
-                Authorization: `Bearer ${this.token}`
+                Authorization: `Bearer ${this.authService.token()}`
             }
         });
     }
@@ -36,7 +36,7 @@ export class RecordService {
             `/api/records/executives/${idDirectivo}`,
             {
                 headers: {
-                    Authorization: `Bearer ${this.token}`
+                    Authorization: `Bearer ${this.authService.token()}`
                 }
             }
         );
@@ -47,7 +47,7 @@ export class RecordService {
             `/api/records/students/${idAlumno}`,
             {
                 headers: {
-                    Authorization: `Bearer ${this.token}`
+                    Authorization: `Bearer ${this.authService.token()}`
                 }
             }
         );

@@ -9,7 +9,7 @@ export class ProbiService {
 
     private http = inject(HttpClient);
     private authService = inject(AuthService);
-    token = this.authService.token();
+     
 
     createProbi(idMencion: number, probi: any) {
         return this.http.post(
@@ -17,7 +17,7 @@ export class ProbiService {
             probi,
             {
                 headers: new HttpHeaders({
-                    Authorization: `Bearer ${this.token}`
+                    Authorization: `Bearer ${this.authService.token()}`
                 })
             }
         );
@@ -26,7 +26,7 @@ export class ProbiService {
     getProbis() {
         return this.http.get('/api/probis/', {
             headers: {
-                Authorization: `Bearer ${this.token}`
+                Authorization: `Bearer ${this.authService.token()}`
             }
         });
     }
@@ -36,7 +36,7 @@ export class ProbiService {
             `/api/probis/${id}`,
             {
                 headers: {
-                    Authorization: `Bearer ${this.token}`
+                    Authorization: `Bearer ${this.authService.token()}`
                 }
             }
         );
@@ -48,7 +48,7 @@ export class ProbiService {
             probi,
             {
                 headers: {
-                    Authorization: `Bearer ${this.token}`
+                    Authorization: `Bearer ${this.authService.token()}`
                 }
             }
         );
@@ -59,7 +59,7 @@ export class ProbiService {
             `/api/probis/${id}`,
             {
                 headers: {
-                    Authorization: `Bearer ${this.token}`
+                    Authorization: `Bearer ${this.authService.token()}`
                 }
             }
         );

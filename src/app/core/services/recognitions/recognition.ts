@@ -9,7 +9,7 @@ export class RecognitionService {
 
     private http = inject(HttpClient);
     private authService = inject(AuthService);
-    token = this.authService.token();
+     
 
     createRecognition(idAlumno: number, idProfesor: number, payload: any) {
         return this.http.post(
@@ -17,7 +17,7 @@ export class RecognitionService {
             payload,
             { 
                 headers: {
-                    Authorization: `Bearer ${this.token}` 
+                    Authorization: `Bearer ${this.authService.token()}` 
                 } 
             }
         );
@@ -26,7 +26,7 @@ export class RecognitionService {
     getRecognitions() {
         return this.http.get('/api/recognitions/', {
             headers: {
-                Authorization: `Bearer ${this.token}`
+                Authorization: `Bearer ${this.authService.token()}`
             }
         });
     }
@@ -36,7 +36,7 @@ export class RecognitionService {
             `/api/recognitions/${id}`,
             {
                 headers: {
-                    Authorization: `Bearer ${this.token}`
+                    Authorization: `Bearer ${this.authService.token()}`
                 }
             }
         );
@@ -47,7 +47,7 @@ export class RecognitionService {
             `/api/recognitions/attitudes/${idActitud}/`,
             {
                 headers: {
-                    Authorization: `Bearer ${this.token}`
+                    Authorization: `Bearer ${this.authService.token()}`
                 }
             }
         );
@@ -57,7 +57,7 @@ export class RecognitionService {
         return this.http.put(
             `/api/recognitions/${id}?id_actitud=${idActitud}`,
             payload,
-            { headers: { Authorization: `Bearer ${this.token}` } }
+            { headers: { Authorization: `Bearer ${this.authService.token()}` } }
         );
     }
     deleteRecognition(id: number) {
@@ -65,7 +65,7 @@ export class RecognitionService {
             `/api/recognitions /${id}`,
             {
                 headers: {
-                    Authorization: `Bearer ${this.token}`
+                    Authorization: `Bearer ${this.authService.token()}`
                 }
             }
         );

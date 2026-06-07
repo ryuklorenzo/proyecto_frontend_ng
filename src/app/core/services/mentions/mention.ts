@@ -9,7 +9,7 @@ export class MentionService {
 
     private http = inject(HttpClient);
     private authService = inject(AuthService);
-    token = this.authService.token();
+     
 
     createMention(idReconocimiento: number, mention: any) {
         return this.http.post(
@@ -17,7 +17,7 @@ export class MentionService {
             mention,
             {
                 headers: new HttpHeaders({
-                    Authorization: `Bearer ${this.token}`
+                    Authorization: `Bearer ${this.authService.token()}`
                 })
             }
         );
@@ -26,7 +26,7 @@ export class MentionService {
     getMentions() {
         return this.http.get('/api/mentions/', {
             headers: {
-                Authorization: `Bearer ${this.token}`
+                Authorization: `Bearer ${this.authService.token()}`
             }
         });
     }
@@ -36,7 +36,7 @@ export class MentionService {
             `/api/mentions/${id}`,
             {
                 headers: {
-                    Authorization: `Bearer ${this.token}`
+                    Authorization: `Bearer ${this.authService.token()}`
                 }
             }
         );
@@ -47,7 +47,7 @@ export class MentionService {
             `/api/mentions/recognitions/${idReconocimiento}`,
             {
                 headers: {
-                    Authorization: `Bearer ${this.token}`
+                    Authorization: `Bearer ${this.authService.token()}`
                 }
             }
         );
@@ -59,7 +59,7 @@ export class MentionService {
             mention,
             {
                 headers: {
-                    Authorization: `Bearer ${this.token}`
+                    Authorization: `Bearer ${this.authService.token()}`
                 }
             }
         );
@@ -70,7 +70,7 @@ export class MentionService {
             `/api/mentions/${id}`,
             {
                 headers: {
-                    Authorization: `Bearer ${this.token}`
+                    Authorization: `Bearer ${this.authService.token()}`
                 }
             }
         );
