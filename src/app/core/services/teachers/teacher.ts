@@ -9,7 +9,7 @@ export class TeacherService {
 
   private http = inject(HttpClient);
   private authService = inject(AuthService);
-   
+  
 
   createTeacher(teacher: any, idCurso: number) {
     return this.http.post(
