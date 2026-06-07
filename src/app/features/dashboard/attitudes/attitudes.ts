@@ -107,7 +107,7 @@ export class Attitudes {
   attitudeForm: FormGroup = this.fb.group({
     tipo: ['', Validators.required],
     descripcion: ['', Validators.required],
-    fecha: ['', Validators.required],
+    fecha: [new Date().toISOString().split('T')[0], Validators.required],
     id_alumno: [null, Validators.required]
   });
 
@@ -141,6 +141,10 @@ export class Attitudes {
     this.ocultarTodo();
     this.mostrarFormulario.set(true);
     this.cargarAlumnos();
+    this.attitudeForm.reset({
+      fecha: new Date().toISOString().split('T')[0],
+      id_alumno: null
+    });
   }
 
   showStudentSelector() {
@@ -219,7 +223,10 @@ export class Attitudes {
 
     this.attitudeService.createAttitude(formValue.id_alumno, dataToSave).subscribe({
       next: (response) => {
-        console.log(response);
+        this.attitudeForm.reset({ 
+          fecha: new Date().toISOString().split('T')[0],
+          id_alumno: null 
+        });
         this.attitudeForm.reset({ id_alumno: null });
         alert('Actitud creada correctamente');
       },
