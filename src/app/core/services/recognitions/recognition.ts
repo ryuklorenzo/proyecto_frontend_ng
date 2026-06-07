@@ -9,7 +9,7 @@ export class RecognitionService {
 
     private http = inject(HttpClient);
     private authService = inject(AuthService);
-     
+    
 
     createRecognition(idAlumno: number, idProfesor: number, payload: any) {
         return this.http.post(
@@ -62,7 +62,7 @@ export class RecognitionService {
     }
     deleteRecognition(id: number) {
         return this.http.delete(
-            `/api/recognitions /${id}`,
+            `/api/recognitions/${id}`,
             {
                 headers: {
                     Authorization: `Bearer ${this.authService.token()}`

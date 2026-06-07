@@ -1,4 +1,4 @@
-import { Component, inject, computed, signal, OnInit } from '@angular/core';
+import { Component, inject, computed, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -8,13 +8,11 @@ import {
   FormsModule,
 } from '@angular/forms';
 import { TableModule } from 'primeng/table';
-
 import { AuthService, UserRole } from '../../../core/auth/auth';
 import { AttitudeService } from '../../../core/services/attitudes/attitude';
 import { StudentService } from '../../../core/services/students/student';
 import { RecognitionService } from '../../../core/services/recognitions/recognition';
 import { TeacherService } from '../../../core/services/teachers/teacher';
-
 import {
   LucideAward,
   LucideBadgeCheck,
@@ -41,7 +39,7 @@ interface Buttons {
   templateUrl: './recognitions.html',
   styleUrl: './recognitions.css',
 })
-export class Recognitions implements OnInit {
+export class Recognitions {
   authService = inject(AuthService);
   private fb = inject(FormBuilder);
 
@@ -104,7 +102,6 @@ export class Recognitions implements OnInit {
 
     return allAttitudes.map((act) => {
       const idEstudiante = act.id_usuario || act.id_alumno;
-      // to number para evitar errores que daban
       const student = allStudents.find((s) => Number(s.id) === Number(idEstudiante));
       return {
         ...act,
@@ -121,11 +118,8 @@ export class Recognitions implements OnInit {
     const allProfs = this.profesores();
 
     const enriched = allRecs.map((rec) => {
-      //cruzamos la actitud para obtener el alumno
       const act = allAtts.find((a) => Number(a.id) === Number(rec.id_actitud));
 
-      //cruzamos el profesor usando el id_profesor del reconocimiento
-      //buscamos en la lista de profesores comparando con p.id o p.id_usuario
       const prof = allProfs.find(
         (p) =>
           Number(p.id) === Number(rec.id_profesor) ||
@@ -134,14 +128,12 @@ export class Recognitions implements OnInit {
 
       return {
         ...rec,
-        //nombre del alumno obtenido a través de la actitud
         nombre_alumno_completo:
           act && act.nombre_alumno_completo !== 'Desconocido'
             ? act.nombre_alumno_completo
             : 'Desconocido',
         id_alumno_real: act ? act.id_alumno_real : null,
 
-        //nombre del profesor obtenido del cruce
         nombre_profesor_completo: prof ? `${prof.nombre} ${prof.apellidos}` : 'Desconocido',
       };
     });
@@ -164,22 +156,24 @@ export class Recognitions implements OnInit {
     detalle: ['', Validators.required],
     actitud_tipo: ['', Validators.required],
     actitud_descripcion: ['', Validators.required],
-    actitud_fecha: ['', Validators.required],
+    actitud_fecha: [new Date().toISOString().split('T')[0], Validators.required], // Mantiene la fecha por defecto al iniciar
   });
 
-  ngOnInit() {
-    this.cargarDatosBase();
+  constructor() {
+    //para que no se buggen los desplegables
+    effect(() => {
+      if (this.authService.isAuthenticated()) {
+        this.cargarDatosBase();
+      }
+    });
   }
 
   cargarDatosBase() {
-    this.studentService.getStudents().subscribe({ next: (data: any) => this.alumnos.set(data) });
-    this.teacherService.getTeachers().subscribe({ next: (data: any) => this.profesores.set(data) });
-    this.attitudeService
-      .getAttitudes()
-      .subscribe({ next: (data: any) => this.actitudes.set(data) });
+    this.studentService.getStudents().subscribe({ next: (data: any) => this.alumnos.set(Array.isArray(data) ? data : []) });
+    this.teacherService.getTeachers().subscribe({ next: (data: any) => this.profesores.set(Array.isArray(data) ? data : []) });
+    this.attitudeService.getAttitudes().subscribe({ next: (data: any) => this.actitudes.set(Array.isArray(data) ? data : []) });
   }
 
-  // --- NAVEGACIÓN ---
   ocultarTodo() {
     this.mostrarFormulario.set(false);
     this.mostrarTabla.set(false);
@@ -191,7 +185,14 @@ export class Recognitions implements OnInit {
     this.ocultarTodo();
     this.mostrarFormulario.set(true);
     this.cargarDatosBase();
-    this.recognitionForm.reset();
+    
+    const currentUser = this.user();
+
+    //fecha actual y preasignamos el profesor
+    this.recognitionForm.reset({
+      actitud_fecha: new Date().toISOString().split('T')[0],
+      id_profesor: currentUser?.role === 'profesor' ? currentUser.id : null
+    });
   }
 
   showAttitudeSelector() {
@@ -268,7 +269,6 @@ export class Recognitions implements OnInit {
 
     const formValue = this.recognitionForm.value;
 
-    //asi lo espera el back, sino no tira
     const payload = {
       reconocimiento: {
         detalle: formValue.detalle,
@@ -285,7 +285,10 @@ export class Recognitions implements OnInit {
       .subscribe({
         next: () => {
           alert('Reconocimiento y Actitud creados correctamente');
-          this.recognitionForm.reset();
+          this.recognitionForm.reset({
+            actitud_fecha: new Date().toISOString().split('T')[0],
+            id_profesor: this.user()?.role === 'profesor' ? this.user()?.id : null
+          });
         },
         error: (err) => {
           console.error(err);
