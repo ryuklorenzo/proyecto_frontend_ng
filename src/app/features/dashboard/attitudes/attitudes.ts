@@ -1,8 +1,7 @@
-import { Component, computed, inject, signal, OnInit } from '@angular/core';
+import { Component, computed, inject, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
-
 import { AuthService, UserRole } from '../../../core/auth/auth';
 import { AttitudeService } from '../../../core/services/attitudes/attitude';
 import { StudentService } from '../../../core/services/students/student';
@@ -37,7 +36,7 @@ interface Buttons {
   templateUrl: './attitudes.html',
   styleUrl: './attitudes.css',
 })
-export class Attitudes implements OnInit {
+export class Attitudes {
   authService = inject(AuthService);
   private fb = inject(FormBuilder);
   private attitudeService = inject(AttitudeService);
@@ -112,13 +111,22 @@ export class Attitudes implements OnInit {
     id_alumno: [null, Validators.required]
   });
 
-  ngOnInit() {
-    this.cargarAlumnos();
+  constructor() {
+    //sin esto da CC y no se ejecuta antes
+    effect(() => {
+      if (this.authService.isAuthenticated()) {
+        this.cargarAlumnos();
+      }
+    });
   }
 
   cargarAlumnos() {
     this.studentService.getStudents().subscribe({
-      next: (data: any) => this.alumnos.set(data),
+      next: (data: any) => {
+        // Aseguramos que data es un array por si acaso
+        const lista = Array.isArray(data) ? data : [];
+        this.alumnos.set(lista);
+      },
       error: (err) => console.error('Error cargando alumnos', err)
     });
   }
@@ -169,7 +177,7 @@ export class Attitudes implements OnInit {
         alert('Error: No se pudo identificar tu ID de alumno.');
       }
     } else {
-        this.mostrarBusquedaAlumno.set(true);
+      this.mostrarBusquedaAlumno.set(true);
       this.cargarAlumnos();
     }
   }
