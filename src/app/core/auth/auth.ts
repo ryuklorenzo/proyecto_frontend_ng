@@ -17,6 +17,8 @@ export interface AuthResponse {
   access_token: string;
   role: string;
   id: number;
+  nombre: string;
+  apellidos: string;
 }
 
 @Injectable({
@@ -88,8 +90,8 @@ export class AuthService {
 
       const userData: User = {
         id: response.id,
-        nombre: username,
-        apellidos: "",
+        nombre: response.nombre,
+        apellidos: response.apellidos,
         activo: true,
         role: userRole, 
       };
