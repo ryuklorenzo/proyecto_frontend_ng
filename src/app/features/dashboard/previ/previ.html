@@ -46,22 +46,35 @@
 
     <div class="mt-10 bg-card border border-border rounded-3xl shadow-md p-8" [hidden]="!mostrarFormulario()">
         <h3 class="text-4xl font-bold mb-8">Crear Previ</h3>
-
         <form [formGroup]="previForm" (ngSubmit)="createPrevi()" class="grid gap-6">
-
             <div>
                 <label class="block mb-2 font-semibold">Directivo a Cargo</label>
+                @if(user()?.role === 'directivo') {
+                <div
+                    class="w-full border border-slate-700 bg-slate-800 text-slate-300 rounded-xl p-4 cursor-not-allowed flex items-center gap-2">
+                    <svg [lucideIcon]="icons.UserCircle" class="w-5 h-5"></svg>
+                    {{ user()?.nombre }} {{ user()?.apellidos }} (Tú)
+                </div>
+                } @else {
                 <select formControlName="idDirectivo"
                     class="w-full border border-slate-700 bg-slate-900 text-white rounded-xl p-4">
-                    <option [ngValue]="null" disabled selected class="bg-slate-900 text-white">Selecciona un
-                        directivo...</option>
+                    <option [ngValue]="null" disabled selected>
+                        Selecciona un directivo...
+                    </option>
                     @for(directivo of directivos(); track directivo.id){
-                    <option [value]="directivo.id" class="bg-slate-900 text-white">
-                        {{ directivo.nombre }} {{ directivo.apellidos }} - {{ directivo.cargo }} (ID: {{ directivo.id
-                        }})
+                    <option [value]="directivo.id">
+                        {{ directivo.nombre }}
+                        {{ directivo.apellidos }}
+                        - {{ directivo.cargo }}
                     </option>
                     }
                 </select>
+                @if(hasError('idDirectivo')){
+                <p class="text-red-500 text-sm mt-2">
+                    Obligatorio.
+                </p>
+                }
+                }
                 @if(hasError('idDirectivo')){ <p class="text-red-500 text-sm mt-2">Obligatorio.</p> }
             </div>
 

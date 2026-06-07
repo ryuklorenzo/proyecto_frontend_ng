@@ -20,8 +20,7 @@ import {
 
 import { TableModule } from 'primeng/table';
 
-// Asegúrate de que las rutas a tus servicios sean correctas
-import { RecordService } from '../../../core/services/records/record'; 
+import { RecordService } from '../../../core/services/records/record';
 import { StudentService } from '../../../core/services/students/student';
 import { ExecutiveService } from '../../../core/services/executives/executive';
 
@@ -50,7 +49,7 @@ export class Records {
   private recordService = inject(RecordService);
   private studentService = inject(StudentService);
   private executiveService = inject(ExecutiveService);
-  
+
   user = this.authService.user;
 
   icons = {
@@ -117,10 +116,22 @@ export class Records {
     this.studentService.getStudents().subscribe({
       next: (data: any) => this.alumnos.set(data)
     });
-    
+
     this.executiveService.getExecutives().subscribe({
       next: (data: any) => this.directivos.set(data)
     });
+
+    const currentUser = this.user();
+
+    if (currentUser?.role === 'directivo' && currentUser.id) {
+      this.recordForm.patchValue({
+        idDirectivo: currentUser.id
+      });
+    } else {
+      this.recordForm.patchValue({
+        idDirectivo: null
+      });
+    }
   }
 
   createRecord() {
@@ -164,7 +175,7 @@ export class Records {
     this.mostrarFormulario.set(false);
     this.mostrarBusquedaAlumno.set(false);
     this.mostrarBusquedaDirectivo.set(false);
-    
+
     this.recordService.getRecords().subscribe({
       next: (data: any) => {
         this.records.set(data);
@@ -247,11 +258,16 @@ export class Records {
     this.mostrarFormulario.set(false);
     this.mostrarTabla.set(false);
     this.mostrarBusquedaAlumno.set(false);
-    this.mostrarBusquedaDirectivo.set(true);
-
-    this.executiveService.getExecutives().subscribe({
-      next: (data: any) => this.directivos.set(data)
-    });
+    const currentUser = this.user();
+    if (currentUser?.role === 'directivo') {
+      this.directivoSeleccionado.set(currentUser.id);
+      this.loadExecutiveRecords(currentUser.id);
+    } else {
+      this.mostrarBusquedaDirectivo.set(true);
+      this.executiveService.getExecutives().subscribe({
+        next: (data: any) => this.directivos.set(data)
+      });
+    }
   }
 
   buscarExpedientesDirectivo() {

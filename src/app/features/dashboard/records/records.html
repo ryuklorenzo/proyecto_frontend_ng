@@ -14,8 +14,7 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
         @for (btn of filteredButtons(); track btn.label) {
-        <button
-            (click)="btn.label === 'Crear expediente' ? toggleCrearExpediente() : 
+        <button (click)="btn.label === 'Crear expediente' ? toggleCrearExpediente() : 
                      btn.label === 'Ver expedientes' ? loadAllRecords() : 
                      btn.label === 'Ver por alumno' ? showStudentSelector() : 
                      showExecutiveSelector()"
@@ -56,10 +55,11 @@
         </h3>
 
         <form [formGroup]="recordForm" (ngSubmit)="createRecord()" class="grid gap-6">
-            
+
             <div>
                 <label class="block mb-2 font-semibold">Estado</label>
-                <select formControlName="estado" class="w-full border border-slate-700 bg-slate-900 text-white rounded-xl p-4">
+                <select formControlName="estado"
+                    class="w-full border border-slate-700 bg-slate-900 text-white rounded-xl p-4">
                     <option value="Abierto" class="bg-slate-900 text-white">Abierto</option>
                     <option value="En trámite" class="bg-slate-900 text-white">En trámite</option>
                     <option value="Cerrado" class="bg-slate-900 text-white">Cerrado</option>
@@ -68,24 +68,43 @@
             </div>
 
             <div>
-                <label class="block mb-2 font-semibold">Directivo a Cargo</label>
-                <select formControlName="idDirectivo" class="w-full border border-slate-700 bg-slate-900 text-white rounded-xl p-4">
-                    <option [ngValue]="null" disabled selected class="bg-slate-900 text-white">Selecciona un directivo...</option>
+                <label class="block mb-2 font-semibold">
+                    Directivo a Cargo
+                </label>
+                @if(user()?.role === 'directivo') {
+                <div
+                    class="w-full border border-slate-700 bg-slate-800 text-slate-300 rounded-xl p-4 cursor-not-allowed flex items-center gap-2">
+                    <svg [lucideIcon]="icons.UserCircle" class="w-5 h-5"></svg>
+                    {{ user()?.nombre }} {{ user()?.apellidos }} (Tú)
+                </div>
+                } @else {
+                <select formControlName="idDirectivo"
+                    class="w-full border border-slate-700 bg-slate-900 text-white rounded-xl p-4">
+                    <option [ngValue]="null" disabled selected>
+                        Selecciona un directivo...
+                    </option>
                     @for(directivo of directivos(); track directivo.id){
-                    <option [value]="directivo.id" class="bg-slate-900 text-white">
-                        {{ directivo.nombre }} {{ directivo.apellidos }} - {{ directivo.cargo }}
+                    <option [value]="directivo.id">
+                        {{ directivo.nombre }}
+                        {{ directivo.apellidos }}
+                        - {{ directivo.cargo }}
                     </option>
                     }
                 </select>
                 @if(hasError('idDirectivo')){
-                <p class="text-red-500 text-sm mt-2">Obligatorio.</p>
+                <p class="text-red-500 text-sm mt-2">
+                    Obligatorio.
+                </p>
+                }
                 }
             </div>
 
             <div>
                 <label class="block mb-2 font-semibold">Alumno Implicado</label>
-                <select formControlName="idAlumno" class="w-full border border-slate-700 bg-slate-900 text-white rounded-xl p-4">
-                    <option [ngValue]="null" disabled selected class="bg-slate-900 text-white">Selecciona un alumno...</option>
+                <select formControlName="idAlumno"
+                    class="w-full border border-slate-700 bg-slate-900 text-white rounded-xl p-4">
+                    <option [ngValue]="null" disabled selected class="bg-slate-900 text-white">Selecciona un alumno...
+                    </option>
                     @for(alumno of alumnos(); track alumno.id){
                     <option [value]="alumno.id" class="bg-slate-900 text-white">
                         {{ alumno.nombre }} {{ alumno.apellidos }} (ID: {{alumno.id}})
@@ -126,7 +145,7 @@
     <div class="mt-10 bg-card border border-border rounded-3xl shadow-md p-8" [hidden]="!mostrarBusquedaDirectivo()">
         <h3 class="text-3xl font-bold mb-6">Seleccionar Directivo</h3>
         <div class="space-y-4">
-            <select class="w-full border border-slate-700 bg-slate-900 text-white rounded-xl p-4" 
+            <select class="w-full border border-slate-700 bg-slate-900 text-white rounded-xl p-4"
                 [value]="directivoSeleccionado()" (change)="directivoSeleccionado.set(+$any($event.target).value)">
                 <option value="" class="bg-slate-900 text-white">Selecciona un directivo...</option>
                 @for(directivo of directivos(); track directivo.id){
@@ -149,7 +168,8 @@
             </div>
             <div class="p-8 border-b border-border">
                 <input [value]="searchTerm()" (input)="searchTerm.set($any($event.target).value)"
-                    placeholder="Filtrar por estado, nombre de alumno o directivo..." class="w-full border rounded-lg p-3">
+                    placeholder="Filtrar por estado, nombre de alumno o directivo..."
+                    class="w-full border rounded-lg p-3">
             </div>
 
             <p-table [value]="filteredRecords()" [paginator]="true" [rows]="5" styleClass="p-datatable-striped">
@@ -199,15 +219,16 @@
 
     @if(mostrarDetalle() && selectedRecord()) {
     <div class="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center z-50 p-6">
-        <div class="w-full max-w-4xl bg-gradient-to-b from-white to-blue-50 rounded-[32px] shadow-2xl border border-blue-100 overflow-hidden">
+        <div
+            class="w-full max-w-4xl bg-gradient-to-b from-white to-blue-50 rounded-[32px] shadow-2xl border border-blue-100 overflow-hidden">
             <div class="flex items-center justify-between px-10 py-8 border-b border-blue-100">
                 <div>
                     <h3 class="text-4xl font-bold text-blue-950">
                         Expediente #{{ selectedRecord().id }}
                     </h3>
-                    
+
                     <div class="text-blue-600/70 text-lg mt-3 flex items-center gap-3">
-                        Estado actual: 
+                        Estado actual:
                         @if(selectedRecord().estado === 'Abierto' || selectedRecord().estado === 'En trámite'){
                         <span class="px-4 py-1.5 rounded-xl bg-yellow-100 text-yellow-700 font-bold text-sm">
                             ↻ {{ selectedRecord().estado }}
@@ -229,7 +250,7 @@
                     ✕
                 </button>
             </div>
-            
+
             <div class="p-8">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="bg-white border border-blue-100 rounded-3xl p-6">
@@ -239,7 +260,7 @@
                         </p>
                         <p class="text-sm text-slate-500 mt-1">ID Usuario: {{ selectedRecord().id_alumno }}</p>
                     </div>
-                    
+
                     <div class="bg-white border border-blue-100 rounded-3xl p-6">
                         <p class="text-blue-500 font-medium mb-2">Directivo a Cargo</p>
                         <p class="text-xl font-bold text-blue-950">
