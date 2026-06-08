@@ -9,7 +9,6 @@ export class TaskService {
 
     private http = inject(HttpClient);
     private authService = inject(AuthService);
-     
 
     createTask(idProfesor: number, idAlumno: number, task: any) {
         return this.http.post(

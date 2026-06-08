@@ -1,15 +1,12 @@
-import { Component, inject, computed, signal, OnInit } from '@angular/core';
+import { Component, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
-
 import { AuthService, UserRole } from '../../../core/auth/auth';
 import { TeacherService } from '../../../core/services/teachers/teacher';
 import {
   LucideGraduationCap,
   LucideUsers,
-  LucideUserSearch,
-  LucideUserX,
   LucideLogOut,
   LucideChevronLeft,
   LucideChevronRight,
@@ -142,8 +139,7 @@ export class Teachers {
     };
 
     this.teacherService.createTeacher(teacherData, formValue.idCurso).subscribe({
-      next: (response) => {
-        console.log(response);
+      next: () => {
         this.teacherForm.reset({ idCurso: 1 });
         alert('Profesor creado correctamente');
       },

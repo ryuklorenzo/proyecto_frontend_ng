@@ -1,10 +1,8 @@
 import { Component, inject, computed, signal } from '@angular/core';
 import { AuthService, UserRole } from '../../../core/auth/auth';
-
 import {
   LucideStar,
   LucideSparkles,
-  LucideSearch,
   LucidePencil,
   LucideTrash2,
   LucideLogOut,
@@ -13,9 +11,7 @@ import {
   LucideUserCircle,
   LucideDynamicIcon,
 } from '@lucide/angular';
-
 import { CommonModule } from '@angular/common';
-
 import {
   FormBuilder,
   FormGroup,
@@ -23,10 +19,11 @@ import {
   ReactiveFormsModule,
   FormsModule
 } from '@angular/forms';
-
 import { TableModule } from 'primeng/table';
+import { forkJoin } from 'rxjs';
 import { ProbiService } from '../../../core/services/probi/probi';
 import { MentionService } from '../../../core/services/mentions/mention';
+import { RecognitionService } from '../../../core/services/recognitions/recognition';
 
 interface Buttons {
   label: string;
@@ -52,6 +49,7 @@ export class Probi {
   authService = inject(AuthService);
   private probiService = inject(ProbiService);
   private mentionService = inject(MentionService);
+  private recognitionService = inject(RecognitionService);
   private fb = inject(FormBuilder);
   user = this.authService.user;
   icons = {
@@ -68,7 +66,6 @@ export class Probi {
     { label: 'Ver probis', icon: LucideSparkles, roles: ['admin', 'directivo', 'profesor'] },
   ];
 
-  // 2. Filtramos la lista según el rol del usuario (igual que en el sidebar)
   filteredButtons = computed(() => {
     const currentUser = this.user();
     if (!currentUser) return [];
@@ -85,7 +82,7 @@ export class Probi {
   searchTerm = signal('');
   probiForm: FormGroup = this.fb.group({
     id_mencion: [null, Validators.required],
-    fecha: ['', Validators.required]
+    fecha: [new Date().toISOString().split('T')[0], Validators.required]
   });
 
   filteredProbis = computed(() => {
@@ -97,17 +94,34 @@ export class Probi {
     return allProbis.filter(probi =>
       probi.fecha?.toLowerCase().includes(term) ||
       probi.id_mencion?.toString().includes(term) ||
-      probi.id?.toString().includes(term)
+      probi.id?.toString().includes(term) ||
+      probi.detalle_reconocimiento?.toLowerCase().includes(term)
     );
   });
 
   toggleCrearProbi() {
     this.mostrarTabla.set(false);
     this.mostrarFormulario.set(true);
-    this.mentionService.getMentions().subscribe({
+    this.probiForm.reset({
+      fecha: new Date().toISOString().split('T')[0],
+      id_mencion: null
+    });
+    
+    forkJoin({
+      menciones: this.mentionService.getMentions(),
+      reconocimientos: this.recognitionService.getRecognitions()
+    }).subscribe({
       next: (data: any) => {
-        this.menciones.set(data);
-      }
+        const mencionesConDetalle = data.menciones.map((m: any) => {
+          const rec = data.reconocimientos.find((r: any) => r.id == m.id_reconocimiento);
+          return {
+            ...m,
+            detalle_reconocimiento: rec ? rec.detalle : 'Sin detalle asociado'
+          };
+        });
+        this.menciones.set(mencionesConDetalle);
+      },
+      error: (err) => console.error('Error cruzando datos', err)
     });
   }
 
@@ -126,7 +140,10 @@ export class Probi {
     ).subscribe({
       next: () => {
         alert('Probi creado correctamente');
-        this.probiForm.reset();
+        this.probiForm.reset({
+          fecha: new Date().toISOString().split('T')[0],
+          id_mencion: null
+        });
       },
       error: (err) => {
         console.error(err);
@@ -135,13 +152,34 @@ export class Probi {
   }
 
   loadProbis() {
-    this.probiService.getProbis().subscribe({
+    forkJoin({
+      probis: this.probiService.getProbis(),
+      menciones: this.mentionService.getMentions(),
+      reconocimientos: this.recognitionService.getRecognitions()
+    }).subscribe({
       next: (data: any) => {
-        console.log('PROBIS:', data);
-        this.probis.set(data);
+        const probisCruzados = data.probis.map((probi: any) => {
+          const mencion = data.menciones.find((m: any) => m.id == probi.id_mencion);
+          let detalle_reconocimiento = 'Mención sin reconocimiento';
+          
+          if (mencion) {
+            const rec = data.reconocimientos.find((r: any) => r.id == mencion.id_reconocimiento);
+            if (rec) {
+              detalle_reconocimiento = rec.detalle;
+            }
+          }
+
+          return {
+            ...probi,
+            detalle_reconocimiento
+          };
+        });
+
+        this.probis.set(probisCruzados);
         this.mostrarFormulario.set(false);
         this.mostrarTabla.set(true);
-      }
+      },
+      error: (err) => console.error('Error cargando probis cruzados', err)
     });
   }
 
@@ -157,7 +195,6 @@ export class Probi {
 
   saveProbi() {
     const probi = this.selectedProbi();
-    console.log('GUARDANDO', probi);
     this.probiService.updateProbi(
       probi.id,
       probi.id_mencion,
@@ -187,6 +224,7 @@ export class Probi {
     }
     this.probiService.deleteProbi(probi.id).subscribe({
       next: () => {
+        alert('Se ha borrado correctamente la probi');
         this.loadProbis();
       }
     });

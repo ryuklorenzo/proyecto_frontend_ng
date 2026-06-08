@@ -204,83 +204,82 @@
     </div>
 
     @if(mostrarDetalle() && selectedPrevi()) {
-    <div class="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center z-50 p-6">
-        <div
-            class="w-full max-w-4xl bg-gradient-to-b from-white to-blue-50 rounded-[32px] shadow-2xl border border-blue-100 overflow-hidden">
-            <div class="flex items-center justify-between px-10 py-8 border-b border-blue-100">
+    <div class="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center z-50 p-4">
+        <div class="w-full max-w-3xl bg-gradient-to-b from-white to-blue-50 rounded-3xl shadow-2xl border border-blue-100 overflow-hidden">
+            
+            <div class="flex items-center justify-between px-6 py-5 border-b border-blue-100 bg-white">
                 <div>
-                    <h3 class="text-4xl font-bold text-blue-950">
+                    <h3 class="text-2xl font-bold text-blue-950">
                         Previ #{{ selectedPrevi().id }}
                     </h3>
-                    <p class="text-blue-600/70 text-lg mt-2">
-                        {{ editMode() ? 'Editando la medida preventiva' : 'Información de la medida preventiva' }}
+                    <p class="text-blue-600/70 text-sm mt-1">
+                        Información detallada del previ
                     </p>
                 </div>
-                <div class="flex gap-3">
+                <div class="flex gap-2">
                     @if(!editMode()){
                     <button (click)="enableEdit()"
-                        class="px-5 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700">
+                        class="px-4 py-2 bg-blue-600 text-white text-sm rounded-xl hover:bg-blue-700 hover:scale-105 active:scale-95 transition-all duration-200 shadow-md">
                         Editar
                     </button>
                     }
                     <button (click)="closeModal()"
-                        class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl text-blue-500 hover:bg-blue-100 hover:text-blue-700 transition-all duration-300">
+                        class="w-10 h-10 rounded-xl flex items-center justify-center text-xl text-blue-500 hover:bg-blue-100 hover:text-blue-700 hover:scale-110 active:scale-95 transition-all duration-300">
                         ✕
                     </button>
                 </div>
             </div>
 
-            <div class="p-8">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-white border border-blue-100 rounded-3xl p-6">
-                        <p class="text-blue-500 font-medium mb-2">Expediente / Alumno Implicado</p>
-                        <p class="text-xl font-bold text-blue-950">
-                            Expediente ID: #{{ selectedPrevi().id_expediente }}
+            <div class="p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    
+                    <div class="bg-white border border-blue-100 rounded-2xl p-4">
+                        <p class="text-blue-500 font-medium text-sm mb-1">Alumno Implicado</p>
+                        <p class="text-lg font-bold text-blue-950">
+                            {{ selectedPrevi().nombre_alumno_completo }}
                         </p>
-                        <p class="text-sm text-slate-500 mt-1">Alumno: {{ selectedPrevi().nombre_alumno_completo }} (ID:
-                            {{ selectedPrevi().id_alumno_real }})</p>
+                        <p class="text-xs text-slate-500 mt-1">ID Alumno: {{ selectedPrevi().id_alumno_real }}</p>
                     </div>
 
-                    <div class="bg-white border border-blue-100 rounded-3xl p-6">
-                        <p class="text-blue-500 font-medium mb-2">Directivo a Cargo</p>
-                        <p class="text-xl font-bold text-blue-950">
+                    <div class="bg-white border border-blue-100 rounded-2xl p-4">
+                        <p class="text-blue-500 font-medium text-sm mb-1">Directivo Autor</p>
+                        <p class="text-lg font-bold text-blue-950">
                             {{ selectedPrevi().nombre_directivo_completo }}
                         </p>
-                        <p class="text-sm text-slate-500 mt-1">
-                            Cargo: {{ selectedPrevi().cargo_directivo }} | ID: {{ selectedPrevi().id_directivo }}
-                        </p>
+                        <p class="text-xs text-slate-500 mt-1">Cargo: {{ selectedPrevi().cargo_directivo }}</p>
                     </div>
 
-                    <div class="bg-white border border-blue-100 rounded-3xl p-6">
-                        <p class="text-blue-500 font-medium mb-2">Fecha</p>
+                    <div class="bg-white border border-blue-100 rounded-2xl p-4">
+                        <p class="text-blue-500 font-medium text-sm mb-1">Fecha</p>
                         @if(editMode()){
                         <input type="date" [(ngModel)]="selectedPrevi().fecha"
-                            class="w-full border rounded-xl p-3 text-black bg-white">
+                            class="w-full border rounded-xl p-2 text-sm text-black bg-white focus:ring-2 focus:ring-blue-500 outline-none">
                         } @else {
-                        <p class="text-xl font-bold text-blue-950">{{ selectedPrevi().fecha }}</p>
+                        <p class="text-lg font-bold text-blue-950">{{ selectedPrevi().fecha }}</p>
                         }
                     </div>
 
-                    <div class="md:col-span-2 bg-white border border-blue-100 rounded-3xl p-6">
-                        <p class="text-blue-500 font-medium mb-2">Detalle</p>
+                    <div class="md:col-span-2 bg-white border border-blue-100 rounded-2xl p-4">
+                        <p class="text-blue-500 font-medium text-sm mb-1">Detalle</p>
                         @if(editMode()){
-                        <textarea rows="4" [(ngModel)]="selectedPrevi().detalle"
-                            class="w-full border rounded-xl p-3 text-black bg-white"></textarea>
+                        <textarea rows="3" [(ngModel)]="selectedPrevi().detalle"
+                            class="w-full border rounded-xl p-2 text-sm text-black bg-white focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
                         } @else {
-                        <p class="text-xl font-bold text-blue-950">{{ selectedPrevi().detalle }}</p>
+                        <p class="text-lg font-bold text-blue-950 leading-tight">{{ selectedPrevi().detalle }}</p>
                         }
                     </div>
+
                 </div>
             </div>
 
             @if(editMode()){
-            <div class="px-8 pb-8 flex justify-end gap-4">
+            <div class="px-6 pb-5 flex justify-end gap-3 bg-transparent">
                 <button (click)="cancelEdit()"
-                    class="px-6 py-3 rounded-xl bg-red-600 text-white font-medium hover:bg-red-700 hover:scale-105 active:scale-95 transition-all duration-200 shadow-md">
+                    class="px-5 py-2 rounded-xl bg-red-600 text-white text-sm font-medium hover:bg-red-700 hover:scale-105 active:scale-95 transition-all duration-200 shadow-md">
                     Cancelar
                 </button>
                 <button (click)="savePrevi()"
-                    class="px-6 py-3 rounded-xl bg-green-600 text-white font-medium hover:bg-green-700 hover:scale-105 active:scale-95 transition-all duration-200 shadow-md">
+                    class="px-5 py-2 rounded-xl bg-green-600 text-white text-sm font-medium hover:bg-green-700 hover:scale-105 active:scale-95 transition-all duration-200 shadow-md">
                     Guardar
                 </button>
             </div>

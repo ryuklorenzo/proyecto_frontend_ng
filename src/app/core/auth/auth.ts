@@ -79,8 +79,6 @@ export class AuthService {
         })
       );
       
-      console.log(response)
-
       if (!response.access_token) {
         console.error('La respuesta no contiene access_token');
         return false;
@@ -102,9 +100,6 @@ export class AuthService {
       localStorage.setItem('access_token', response.access_token);
       localStorage.setItem('user', JSON.stringify(userData));
 
-      console.log('Login exitoso');
-      console.log(response.access_token);
-      console.log(response.role);
       return true;
     } catch (error) {
       console.error('Login error:', error);

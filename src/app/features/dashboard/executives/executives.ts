@@ -123,8 +123,7 @@ export class Executives {
     };
 
     this.executiveService.createExecutive(executiveData.id_profesor, executiveData.cargo).subscribe({
-      next: (response) => {
-        console.log(response);
+      next: () => {
         this.executiveForm.reset({ idCurso: 1 });
         alert('Directivo asignado correctamente');
       },

@@ -12,7 +12,7 @@ import {
   LucideCalendar,
   LucideLogOut
 } from '@lucide/angular';
-import { RouterLink } from '@angular/router'; // <-- Importamos RouterLink
+import { RouterLink } from '@angular/router';
 import { TaskService } from '../../../core/services/tasks/task';
 import { ReprimandService } from '../../../core/services/reprimands/reprimand';
 import { RecognitionService } from '../../../core/services/recognitions/recognition';
@@ -240,7 +240,6 @@ export class Home {
     this.recordService.getRecordsByExecutive(directivoId).subscribe({
       next: (data: any) => {
         const records = Array.isArray(data) ? data : [];
-        console.log('EXPEDIENTES', records);
         this.totalExpedientes.set(records.length);
         this.ultimosExpedientes.set(
           [...records]

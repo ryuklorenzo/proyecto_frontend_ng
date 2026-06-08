@@ -9,7 +9,6 @@ export class ExecutiveService {
 
   private http = inject(HttpClient);
   private authService = inject(AuthService);
-   
 
   createExecutive(idProfesor: number, cargo: string) {
     return this.http.post(

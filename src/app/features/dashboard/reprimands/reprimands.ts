@@ -1,9 +1,6 @@
 import { Component, inject, computed, signal, effect } from '@angular/core';
 import { AuthService, UserRole } from '../../../core/auth/auth';
 import {
-  LucideClipboardList,
-  LucideUsers,
-  LucideUser,
   LucideSearch,
   LucideShieldAlert,
   LucideTriangleAlert,
@@ -22,7 +19,6 @@ import {
   Validators,
   ReactiveFormsModule
 } from '@angular/forms';
-
 import { TableModule } from 'primeng/table';
 import { ReprimandService } from '../../../core/services/reprimands/reprimand';
 import { StudentService } from '../../../core/services/students/student';
@@ -171,7 +167,6 @@ export class Reprimands {
       },
       error: (error) => {
         console.error(error);
-        console.log('ERROR BACKEND', error.error);
         alert('Error creando amonestación');
       }
     });
@@ -180,7 +175,6 @@ export class Reprimands {
   loadReprimands() {
     this.reprimandService.getReprimands().subscribe({
       next: (data: any) => {
-        console.log('AMONESTACIONES ALUMNO', data);
         this.reprimands.set(data);
         this.mostrarFormulario.set(false);
         this.mostrarBusquedaAlumno.set(false);

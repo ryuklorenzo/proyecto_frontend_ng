@@ -30,7 +30,6 @@ export class Sidebar {
   user = this.authService.user; 
   mostrarLogoutModal = signal(false);
 
-  // Registro de iconos estáticos para usarlos en el template HTML
   icons = { 
     ChevronLeft: LucideChevronLeft,
     ChevronRight: LucideChevronRight,
@@ -38,7 +37,6 @@ export class Sidebar {
     LogOut: LucideLogOut
   };
 
-  //TODO verificar permisos de cada campo
   private navItems: NavItem[] = [
     { href: '/dashboard', label: 'Inicio', icon: LucideHome, roles: ['admin', 'directivo', 'profesor', 'alumno'] },
     { href: '/dashboard/courses', label: 'Cursos', icon: LucideBookOpen, roles: ['admin'] },
@@ -54,7 +52,7 @@ export class Sidebar {
     { href: '/dashboard/recognitions', label: 'Reconocimientos', icon: LucideClipboardList, roles: ['admin', 'directivo', 'profesor' ,'alumno'] },
     { href: '/dashboard/mentions', label: 'Menciones', icon: LucideClipboardList, roles: ['admin', 'directivo'] },
     { href: '/dashboard/probi', label: 'Probi', icon: LucideClipboardList, roles: ['admin', 'directivo'] },
-    { href: '/dashboard/aula-convivencia', label: 'Aula_convivencia', icon: LucideClipboardList, roles: ['admin', 'directivo'] },
+    { href: '/dashboard/classroom_coexistence', label: 'Aula_convivencia', icon: LucideClipboardList, roles: ['admin', 'directivo'] },
   ];
 
   filteredNavItems = computed(() => {

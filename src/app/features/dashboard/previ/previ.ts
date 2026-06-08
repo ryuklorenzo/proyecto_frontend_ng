@@ -20,10 +20,7 @@ import {
   ReactiveFormsModule,
   FormsModule
 } from '@angular/forms';
-
 import { TableModule } from 'primeng/table';
-
-// Servicios
 import { PreviService } from '../../../core/services/previ/previ';
 import { RecordService } from '../../../core/services/records/record';
 import { ExecutiveService } from '../../../core/services/executives/executive';
@@ -82,7 +79,6 @@ export class Previ implements OnInit {
     return this.butonItems.filter((btn) => btn.roles.includes(currentUser.role));
   });
 
-  // Signals de estado visual
   mostrarFormulario = signal(false);
   mostrarTabla = signal(false);
   mostrarDetalle = signal(false);
@@ -90,7 +86,6 @@ export class Previ implements OnInit {
   mostrarBusquedaDirectivo = signal(false);
   editMode = signal(false);
 
-  // Signals de datos base
   previs = signal<any[]>([]);
   selectedPrevi = signal<any>(null);
   searchTerm = signal('');
@@ -128,7 +123,7 @@ export class Previ implements OnInit {
     });
   });
 
-  // Cruzar el Previ con Directivos y ExpedientesDetallados para la Tabla
+  // Cruzar el previ con directivos y expedientesDetallados para la Tabla
   filteredPrevis = computed(() => {
     const term = this.searchTerm().toLowerCase();
     const records = this.expedientesDetallados();
@@ -159,7 +154,7 @@ export class Previ implements OnInit {
 
   previForm: FormGroup = this.fb.group({
     detalle: ['', Validators.required],
-    fecha: ['', Validators.required],
+    fecha: [new Date().toISOString().split('T')[0], Validators.required],
     idDirectivo: [null, Validators.required],
     idExpediente: [null, Validators.required]
   });
@@ -171,15 +166,13 @@ export class Previ implements OnInit {
     this.mostrarFormulario.set(true);
     this.cargarDatosBase();
     const currentUser = this.user();
-    if (currentUser?.role === 'directivo' && currentUser.id) {
-      this.previForm.patchValue({
-        idDirectivo: currentUser.id
-      });
-    } else {
-      this.previForm.patchValue({
-        idDirectivo: null
-      });
-    }
+    
+    this.previForm.reset({
+      detalle: '',
+      fecha: new Date().toISOString().split('T')[0],
+      idDirectivo: currentUser?.role === 'directivo' && currentUser.id ? currentUser.id : null,
+      idExpediente: null
+    });
   }
 
   createPrevi() {
@@ -195,9 +188,14 @@ export class Previ implements OnInit {
     };
 
     this.previService.createPrevi(formValue.idDirectivo, formValue.idExpediente, previData).subscribe({
-      next: (response) => {
-        console.log(response);
-        this.previForm.reset({ idDirectivo: null, idExpediente: null });
+      next: () => {
+        const currentUser = this.user();
+        this.previForm.reset({ 
+          detalle: '',
+          fecha: new Date().toISOString().split('T')[0],
+          idDirectivo: currentUser?.role === 'directivo' && currentUser.id ? currentUser.id : null,
+          idExpediente: null 
+        });
         alert('Previ creado correctamente');
       },
       error: (error) => {
