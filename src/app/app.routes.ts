@@ -13,7 +13,7 @@ import { Reprimands } from './features/dashboard/reprimands/reprimands';
 import { Recognitions } from './features/dashboard/recognitions/recognitions';
 import { Probi } from './features/dashboard/probi/probi';
 import { Previ } from './features/dashboard/previ/previ';
-import { AulaConvivencia } from './features/dashboard/aula-convivencia/aula-convivencia';
+import { Classroom_coexistence } from './features/dashboard/classroom_coexistence/classroom_coexistence';
 import { Mentions } from './features/dashboard/mentions/mentions';
 import { Attitudes } from './features/dashboard/attitudes/attitudes';
 
@@ -42,7 +42,7 @@ export const routes: Routes = [
       {path: 'recognitions',component: Recognitions,},
       {path: 'probi',component: Probi,},
       {path: 'previ',component: Previ,},
-      {path: 'classroom_coexistence',component: AulaConvivencia,},
+      {path: 'classroom_coexistence',component: Classroom_coexistence,},
       {path: 'mentions',component: Mentions,},
       {path: 'attitudes',component: Attitudes,},
     ],

@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AulaConvivencia } from './aula-convivencia';
+import { AulaConvivencia } from './classroom_coexistence';
 
 describe('AulaConvivencia', () => {
   let component: AulaConvivencia;

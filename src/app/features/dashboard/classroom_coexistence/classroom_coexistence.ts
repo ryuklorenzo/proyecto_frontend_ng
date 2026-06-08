@@ -22,7 +22,7 @@ import {
   FormsModule
 } from '@angular/forms';
 import { TableModule } from 'primeng/table';
-import { ClassroomService } from '../../../core/services/aula-convivencia/aula-convivencia';
+import { ClassroomService } from '../../../core/services/classroom_coexistence/classroom_coexistence';
 import { ScheduleService } from '../../../core/services/schedules/schedule';
 import { StudentService } from '../../../core/services/students/student';
 
@@ -33,7 +33,7 @@ interface Buttons {
 }
 
 @Component({
-  selector: 'app-aula-convivencia',
+  selector: 'app-classroom_coexistence',
   standalone: true,
   imports: [
     LucideDynamicIcon,
@@ -42,10 +42,10 @@ interface Buttons {
     FormsModule,
     TableModule
   ],
-  templateUrl: './aula-convivencia.html',
-  styleUrl: './aula-convivencia.css',
+  templateUrl: './classroom_coexistence.html',
+  styleUrl: './classroom_coexistence.css',
 })
-export class AulaConvivencia implements OnInit {
+export class Classroom_coexistence implements OnInit {
 
   authService = inject(AuthService);
   private classroomService = inject(ClassroomService);
