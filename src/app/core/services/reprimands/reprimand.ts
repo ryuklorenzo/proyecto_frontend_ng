@@ -9,7 +9,6 @@ export class ReprimandService {
 
     private http = inject(HttpClient);
     private authService = inject(AuthService);
-     
 
     createReprimand(idAlumno: number, idProfesor: number, reprimand: any) {
         return this.http.post(
@@ -43,9 +42,8 @@ export class ReprimandService {
     }
 
     getReprimandByStudent(idAlumno: number) {
-        //console.log('TOKEN:', this.token);
         return this.http.get(
-            `/api/reprimands/students/${idAlumno}`,
+            `/api/reprimands/students/${idAlumno}/`,
             {
                 headers: {
                     Authorization: `Bearer ${this.authService.token()}`

@@ -9,10 +9,8 @@ export class AttitudeService {
 
     private http = inject(HttpClient);
     private authService = inject(AuthService);
-     
 
     createAttitude(idAlumno: number, attitude: any) {
-
         return this.http.post(
             `/api/attitudes/?id_alumno=${idAlumno}`,
             attitude,
@@ -48,7 +46,7 @@ export class AttitudeService {
 
     deleteAttitude(id: number) {
         return this.http.delete(
-            `/api/attitudes/${id}`,
+            `/api/attitudes/${id}/`,
             {
                 headers: {
                     Authorization: `Bearer ${this.authService.token()}`

@@ -9,7 +9,6 @@ export class ScheduleService {
 
     private http = inject(HttpClient);
     private authService = inject(AuthService);
-     
 
     createSchedule(schedule: any) {
         return this.http.post(
@@ -45,7 +44,7 @@ export class ScheduleService {
 
     deleteSchedule(id: number) {
         return this.http.delete(
-            `/api/schedules /${id}/`,
+            `/api/schedules/${id}/`,
             {
                 headers: {
                     Authorization: `Bearer ${this.authService.token()}`

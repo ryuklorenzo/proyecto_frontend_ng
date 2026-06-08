@@ -9,7 +9,6 @@ export class ClassroomService {
 
     private http = inject(HttpClient);
     private authService = inject(AuthService);
-     
 
     createClassroom(idHorario: number, classroom: any) {
         return this.http.post(
@@ -33,7 +32,7 @@ export class ClassroomService {
 
     getClassroomById(id: number) {
         return this.http.get(
-            `/api/aula_convivencia/${id}`,
+            `/api/aula_convivencia/${id}/`,
             {
                 headers: {
                     Authorization: `Bearer ${this.authService.token()}`
@@ -56,7 +55,7 @@ export class ClassroomService {
 
     deleteClassroom(id: number) {
         return this.http.delete(
-            `/api/aula_convivencia/${id}`,
+            `/api/aula_convivencia/${id}/`,
             {
                 headers: {
                     Authorization: `Bearer ${this.authService.token()}`
@@ -67,7 +66,7 @@ export class ClassroomService {
 
     assignStudents(data: any) {
         return this.http.post(
-            '/api/aula_convivencia/assign-students',
+            '/api/aula_convivencia/assign-students/',
             data,
             {
                 headers: {
@@ -79,7 +78,7 @@ export class ClassroomService {
 
     getStudentsByClassroom(idAula: number) {
         return this.http.get(
-            `/api/aula_convivencia/${idAula}/students`,
+            `/api/aula_convivencia/${idAula}/students/`,
             {
                 headers: {
                     Authorization: `Bearer ${this.authService.token()}`
@@ -90,7 +89,7 @@ export class ClassroomService {
 
     removeStudent(idAula: number, idAlumno: number) {
         return this.http.delete(
-            `/api/aula_convivencia/${idAula}/students/${idAlumno}`,
+            `/api/aula_convivencia/${idAula}/students/${idAlumno}/ `,
             {
                 headers: {
                     Authorization: `Bearer ${this.authService.token()}`

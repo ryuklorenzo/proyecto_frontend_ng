@@ -9,7 +9,6 @@ export class ProbiService {
 
     private http = inject(HttpClient);
     private authService = inject(AuthService);
-     
 
     createProbi(idMencion: number, probi: any) {
         return this.http.post(
@@ -33,7 +32,7 @@ export class ProbiService {
 
     getProbiById(id: number) {
         return this.http.get(
-            `/api/probis/${id}`,
+            `/api/probis/${id}/`,
             {
                 headers: {
                     Authorization: `Bearer ${this.authService.token()}`
@@ -44,7 +43,7 @@ export class ProbiService {
 
     updateProbi(id: number, id_mencion: number, probi: any) {
         return this.http.put(
-            `/api/probis/${id}?id_mencion=${id_mencion}`,
+            `/api/probis/${id}/?id_mencion=${id_mencion}`,
             probi,
             {
                 headers: {
@@ -56,7 +55,7 @@ export class ProbiService {
 
     deleteProbi(id: number) {
         return this.http.delete(
-            `/api/probis/${id}`,
+            `/api/probis/${id}/`,
             {
                 headers: {
                     Authorization: `Bearer ${this.authService.token()}`

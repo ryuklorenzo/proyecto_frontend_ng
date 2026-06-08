@@ -9,7 +9,6 @@ export class MentionService {
 
     private http = inject(HttpClient);
     private authService = inject(AuthService);
-     
 
     createMention(idReconocimiento: number, mention: any) {
         return this.http.post(
@@ -33,7 +32,7 @@ export class MentionService {
 
     getMentionById(id: number) {
         return this.http.get(
-            `/api/mentions/${id}`,
+            `/api/mentions/${id}/`,
             {
                 headers: {
                     Authorization: `Bearer ${this.authService.token()}`
@@ -44,7 +43,7 @@ export class MentionService {
 
     getMentionsByRecognition(idReconocimiento: number) {
         return this.http.get(
-            `/api/mentions/recognitions/${idReconocimiento}`,
+            `/api/mentions/recognitions/${idReconocimiento}/`,
             {
                 headers: {
                     Authorization: `Bearer ${this.authService.token()}`
@@ -55,7 +54,7 @@ export class MentionService {
 
     updateMention(id: number, id_reconocimiento: number, mention: any) {
         return this.http.put(
-            `/api/mentions/${id}?id_reconocimiento=${id_reconocimiento}`,
+            `/api/mentions/${id}/?id_reconocimiento=${id_reconocimiento}`,
             mention,
             {
                 headers: {
@@ -67,7 +66,7 @@ export class MentionService {
 
     deleteMention(id: number) {
         return this.http.delete(
-            `/api/mentions/${id}`,
+            `/api/mentions/${id}/`,
             {
                 headers: {
                     Authorization: `Bearer ${this.authService.token()}`

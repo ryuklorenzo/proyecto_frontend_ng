@@ -9,7 +9,6 @@ export class CourseService {
 
     private http = inject(HttpClient);
     private authService = inject(AuthService);
-     
 
     createCourse(idHorario: number, course: any) {
         return this.http.post(
