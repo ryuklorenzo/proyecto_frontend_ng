@@ -49,18 +49,20 @@
 
         <form [formGroup]="mentionForm" (ngSubmit)="createMention()" class="grid gap-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                
+
                 <div>
                     <label class="block mb-2 font-semibold">Fecha de Mención</label>
                     <input type="date" formControlName="fecha" class="w-full border rounded-xl p-4">
-                    @if(hasErrorForm(mentionForm, 'fecha')){ <p class="text-red-500 text-sm mt-2">La fecha es obligatoria.</p> }
+                    @if(hasErrorForm(mentionForm, 'fecha')){ <p class="text-red-500 text-sm mt-2">La fecha es
+                        obligatoria.</p> }
                 </div>
 
                 <div>
                     <label class="block mb-2 font-semibold">Reconocimiento Asociado</label>
                     <select formControlName="id_reconocimiento"
                         class="w-full border border-slate-700 bg-slate-900 text-white rounded-xl p-4">
-                        <option [ngValue]="null" disabled selected class="bg-slate-900 text-white">Selecciona un reconocimiento...</option>
+                        <option [ngValue]="null" disabled selected class="bg-slate-900 text-white">Selecciona un
+                            reconocimiento...</option>
 
                         @for(rec of reconocimientos(); track rec.id){
                         <option [value]="rec.id" class="bg-slate-900 text-white">
@@ -68,7 +70,8 @@
                         </option>
                         }
                     </select>
-                    @if(hasErrorForm(mentionForm, 'id_reconocimiento')){ <p class="text-red-500 text-sm mt-2">Debes seleccionar un reconocimiento.</p> }
+                    @if(hasErrorForm(mentionForm, 'id_reconocimiento')){ <p class="text-red-500 text-sm mt-2">Debes
+                        seleccionar un reconocimiento.</p> }
                 </div>
 
             </div>
@@ -82,17 +85,20 @@
 
     <div class="mt-10 bg-card border border-border rounded-3xl shadow-md p-8" [hidden]="!mostrarPorReconocimiento()">
         <h3 class="text-4xl font-bold mb-8">Buscar por Reconocimiento</h3>
-        <p class="text-muted-foreground mb-6">Selecciona una mención para ver a qué alumno corresponde el reconocimiento.</p>
+        <p class="text-muted-foreground mb-6">Selecciona una mención para ver a qué alumno corresponde el
+            reconocimiento.</p>
 
         <form [formGroup]="searchByRecForm" (ngSubmit)="searchMentionByReconocimiento()" class="grid gap-6">
             <div>
                 <label class="block mb-2 font-semibold">Mención - Alumno</label>
                 <select formControlName="id_mencion_estudiante"
                     class="w-full border border-slate-700 bg-slate-900 text-white rounded-xl p-4">
-                    <option [ngValue]="null" disabled selected class="bg-slate-900 text-white">Selecciona un reconocimiento...</option>
+                    <option [ngValue]="null" disabled selected class="bg-slate-900 text-white">Selecciona un
+                        reconocimiento...</option>
                     @for(item of mentionsWithStudents(); track item.id){
                     <option [value]="item.id" class="bg-slate-900 text-white">
-                        Reconocimiento ID{{ item.id_reconocimiento }} - {{ item.nombre_completo_alumno }} ID{{ item.id_alumno }}
+                        Reconocimiento ID{{ item.id_reconocimiento }} - {{ item.nombre_completo_alumno }} ID{{
+                        item.id_alumno }}
                     </option>
                     }
                 </select>
@@ -126,11 +132,11 @@
                         <td class="font-bold pl-8">#{{ mention.id }}</td>
                         <td class="font-medium">{{ mention.fecha }}</td>
                         <td>
-                            <div class="font-semibold text-blue-900">ID: {{ mention.id_reconocimiento }}</div>
+                            <div class="font-semibold text-blue-400">ID: {{ mention.id_reconocimiento }}</div>
                             <div class="text-sm text-slate-500">{{ mention.detalle_reconocimiento }}</div>
                         </td>
                         <td>
-                            <div class="font-semibold text-green-700">{{ mention.tipo_actitud }}</div>
+                            <div class="font-semibold text-green-400">{{ mention.tipo_actitud }}</div>
                             <div class="text-sm text-slate-500">{{ mention.descripcion_actitud }}</div>
                         </td>
                         <td class="text-center pr-8">
@@ -153,8 +159,9 @@
 
     @if(mostrarDetalle() && selectedMention()) {
     <div class="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center z-50 p-4">
-        <div class="w-full max-w-3xl bg-gradient-to-b from-white to-blue-50 rounded-3xl shadow-2xl border border-blue-100 overflow-hidden">
-            
+        <div
+            class="w-full max-w-3xl bg-gradient-to-b from-white to-blue-50 rounded-3xl shadow-2xl border border-blue-100 overflow-hidden">
+
             <div class="flex items-center justify-between px-6 py-5 border-b border-blue-100 bg-white">
                 <div>
                     <h3 class="text-2xl font-bold text-blue-950">
@@ -172,10 +179,13 @@
 
             <div class="p-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    
-                    <div class="bg-white border border-blue-100 rounded-2xl p-4 shadow-sm">
-                        <p class="text-blue-500 font-medium text-sm mb-1">Fecha de Mención</p>
-                        <p class="text-lg font-bold text-blue-950">{{ selectedMention()!.fecha }}</p>
+
+                    <div class="bg-white border border-blue-200 rounded-2xl p-4 shadow-sm">
+                        <label class="block text-blue-500 font-medium text-sm mb-1" for="editFecha">
+                            Fecha de Mención
+                        </label>
+                        <input type="date" id="editFecha" [(ngModel)]="selectedMention()!.fecha"
+                            class="w-full text-lg font-bold text-blue-950 bg-transparent border-b border-blue-200 focus:border-blue-500 outline-none p-1">
                     </div>
 
                     <div class="bg-white border border-blue-100 rounded-2xl p-4 shadow-sm">

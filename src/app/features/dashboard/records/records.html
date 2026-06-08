@@ -201,7 +201,7 @@
                             </span>
                             } @else {
                             <span class="px-4 py-2 rounded-xl bg-red-100 text-red-700 font-semibold">
-                                <svg [lucideIcon]="icons.UserX" class="w-5 h-5 text-red-100"></svg> {{ record.estado }}
+                                ✘ {{ record.estado }}
                             </span>
                             }
                         </td>
@@ -239,7 +239,7 @@
                         </span>
                         } @else {
                         <span class="px-4 py-1.5 rounded-xl bg-red-100 text-red-700 font-bold text-sm">
-                            <svg [lucideIcon]="icons.UserX" class="w-5 h-5 text-red-100"></svg> {{ selectedRecord().estado }}
+                            ✘ {{ selectedRecord().estado }}
                         </span>
                         }
                     </div>

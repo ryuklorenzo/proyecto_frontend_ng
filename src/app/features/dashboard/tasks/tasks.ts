@@ -3,7 +3,6 @@ import { AuthService, UserRole } from '../../../core/auth/auth';
 import {
   LucideClipboardList,
   LucideUsers,
-  LucideUser,
   LucideLogOut,
   LucideChevronLeft,
   LucideChevronRight,

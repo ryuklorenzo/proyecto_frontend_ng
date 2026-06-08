@@ -13,6 +13,7 @@ import {
   LucideUserCircle,
   LucideDynamicIcon,
   LucideEye,
+  LucideUserX,
 } from '@lucide/angular';
 import { CourseService } from '../../../core/services/courses/course';
 import { ActivatedRoute } from '@angular/router';

@@ -2,9 +2,7 @@ import { Component, inject, computed, signal } from '@angular/core';
 import { AuthService, UserRole } from '../../../core/auth/auth';
 import { TableModule } from 'primeng/table';
 import {
-  LucideHome, LucideUsers, LucideGraduationCap, LucideBookOpen, LucideCalendar,
-  LucideClipboardList, LucideTriangleAlert, LucideFileText, LucideBuilding,
-  LucideLogOut, LucideChevronLeft, LucideChevronRight, LucideUserCircle, 
+  LucideUsers, LucideLogOut, LucideChevronLeft, LucideChevronRight, LucideUserCircle, 
   LucideDynamicIcon, LucideEye, LucideUserX
 } from '@lucide/angular';
 import { CommonModule } from '@angular/common';
