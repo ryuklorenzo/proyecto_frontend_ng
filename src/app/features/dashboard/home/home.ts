@@ -12,8 +12,7 @@ import {
   LucideCalendar,
   LucideLogOut
 } from '@lucide/angular';
-import { Router } from '@angular/router';
-import { Students } from '../students/students';
+import { RouterLink } from '@angular/router'; // <-- Importamos RouterLink
 import { TaskService } from '../../../core/services/tasks/task';
 import { ReprimandService } from '../../../core/services/reprimands/reprimand';
 import { RecognitionService } from '../../../core/services/recognitions/recognition';
@@ -23,7 +22,7 @@ import { PreviService } from '../../../core/services/previ/previ';
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [LucideDynamicIcon],
+  imports: [LucideDynamicIcon, RouterLink], 
   templateUrl: './home.html'
 })
 
@@ -43,6 +42,7 @@ export class Home {
   isProfesor = computed(() => this.user()?.role === 'profesor');
   isAlumno = computed(() => this.user()?.role === 'alumno');
   ultimosAlumnos = signal<any[]>([]);
+  
   private taskService = inject(TaskService);
   private reprimandService = inject(ReprimandService);
   private recognitionService = inject(RecognitionService);
@@ -52,7 +52,7 @@ export class Home {
   private scheduleService = inject(ScheduleService);
   private recordService = inject(RecordService);
   private previService = inject(PreviService);
-  private router = inject(Router);
+  
   totalAlumnos = signal(0);
   totalProfesores = signal(0);
   totalCursos = signal(0);
@@ -69,7 +69,7 @@ export class Home {
   misAmonestaciones = signal<any[]>([]);
   mostrarDetalle = signal(false);
   detalleSeleccionado = signal<any>(null);
-  tipoDetalle = signal<'tarea' | 'amonestacion' | null>(null);
+  tipoDetalle = signal<'tarea' | 'amonestacion' | 'alumno' | null>(null);
   totalExpedientes = signal(0);
   totalPrevis = signal(0);
   ultimosExpedientes = signal<any[]>([]);
@@ -95,7 +95,7 @@ export class Home {
       } else if (directivo) {
         this.loadDirectivoDashboard();
       }
-    }, { allowSignalWrites: true });
+    });
   }
 
   openProfile() {
@@ -121,36 +121,6 @@ export class Home {
 
     this.scheduleService.getSchedules().subscribe({
       next: (data: any) => this.totalHorarios.set(data.length)
-    });
-
-  }
-
-  goToStudents() {
-    this.router.navigate(['/dashboard/students'], {
-      queryParams: {
-        view: 'list'
-      }
-    });
-  }
-  goToTeachers() {
-    this.router.navigate(['/dashboard/teachers'], {
-      queryParams: {
-        view: 'list'
-      }
-    });
-  }
-  goToCourses() {
-    this.router.navigate(['/dashboard/courses'], {
-      queryParams: {
-        view: 'list'
-      }
-    });
-  }
-  goToSchedules() {
-    this.router.navigate(['/dashboard/schedules'], {
-      queryParams: {
-        view: 'list'
-      }
     });
   }
 
@@ -227,16 +197,20 @@ export class Home {
   }
 
   viewTask(task: any) {
-    //console.log("TAREA", task);
     this.detalleSeleccionado.set(task);
     this.tipoDetalle.set('tarea');
     this.mostrarDetalle.set(true);
   }
 
   viewReprimand(reprimand: any) {
-    //console.log("AMONESTACION", reprimand);
     this.detalleSeleccionado.set(reprimand);
     this.tipoDetalle.set('amonestacion');
+    this.mostrarDetalle.set(true);
+  }
+
+  viewAlumno(alumno: any) {
+    this.detalleSeleccionado.set(alumno);
+    this.tipoDetalle.set('alumno');
     this.mostrarDetalle.set(true);
   }
 
@@ -261,7 +235,6 @@ export class Home {
   }
 
   loadDirectivoDashboard() {
-    //console.log('DIRECTIVO DASHBOARD');
     const directivoId = this.user()?.id;
     if (!directivoId) return;
     this.recordService.getRecordsByExecutive(directivoId).subscribe({
@@ -279,7 +252,6 @@ export class Home {
     this.previService.getPrevisByDirectivo(directivoId).subscribe({
       next: (data: any) => {
         const previs = Array.isArray(data) ? data : [];
-        //console.log('PREVIS', previs);
         this.totalPrevis.set(previs.length);
         this.ultimasPrevis.set(
           [...previs]
@@ -319,5 +291,4 @@ export class Home {
     this.tipoDetalleDirectivo.set(null);
     this.detalleDirectivo.set(null);
   }
-
 }
