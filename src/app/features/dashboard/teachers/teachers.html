@@ -209,12 +209,12 @@
 
                                 <button (click)="viewTeacher(teacher)"
                                     class="w-12 h-12 rounded-xl bg-blue-600 text-white flex items-center justify-center hover:bg-blue-700 transition-colors">
-                                    👁
+                                    <svg [lucideIcon]="icons.Eye" class="w-5 h-5 text-white-600"></svg>
                                 </button>
                                 @if(teacher.activo){
                                 <button (click)="bajaTeacher(teacher)"
                                     class="w-12 h-12 rounded-xl bg-red-600 text-white flex items-center justify-center hover:bg-red-700 transition-colors">
-                                    🚫
+                                    <svg [lucideIcon]="icons.UserX" class="w-5 h-5 text-red-100"></svg>
                                 </button>
                                 }
                             </div>

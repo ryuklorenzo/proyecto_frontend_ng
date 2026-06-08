@@ -12,6 +12,8 @@ import {
   LucideChevronRight,
   LucideUserCircle,
   LucideDynamicIcon,
+  LucideEye,
+  LucideUserX
 } from '@lucide/angular';
 import { CommonModule } from '@angular/common';
 import {
@@ -58,7 +60,9 @@ export class Reprimands {
     ChevronRight: LucideChevronRight,
     UserCircle: LucideUserCircle,
     LogOut: LucideLogOut,
-    Search: LucideSearch
+    Search: LucideSearch,
+    Eye: LucideEye,
+    UserX: LucideUserX
   }
 
   private butonItems: Buttons[] = [

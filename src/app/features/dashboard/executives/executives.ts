@@ -5,7 +5,7 @@ import {
   LucideHome, LucideUsers, LucideGraduationCap, LucideBookOpen, LucideCalendar,
   LucideClipboardList, LucideTriangleAlert, LucideFileText, LucideBuilding,
   LucideLogOut, LucideChevronLeft, LucideChevronRight, LucideUserCircle, 
-  LucideDynamicIcon,  
+  LucideDynamicIcon, LucideEye, LucideUserX
 } from '@lucide/angular';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -36,7 +36,9 @@ export class Executives {
     ChevronLeft: LucideChevronLeft,
     ChevronRight: LucideChevronRight,
     UserCircle: LucideUserCircle,
-    LogOut: LucideLogOut
+    LogOut: LucideLogOut,
+    Eye: LucideEye,
+    UserX: LucideUserX
   };
 
   private butonItems: Buttons[] = [

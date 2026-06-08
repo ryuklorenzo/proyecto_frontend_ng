@@ -556,6 +556,45 @@
                     </p>
                 </div>
                 }
+                @if(tipoDetalle() === 'alumno') {
+                <div class="bg-slate-800 rounded-2xl p-6">
+                    <p class="text-slate-400 mb-2">Nombre completo</p>
+                    <p class="text-white text-xl font-bold">
+                        {{ detalleSeleccionado()?.nombre }}
+                        {{ detalleSeleccionado()?.apellidos }}
+                    </p>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-slate-800 rounded-2xl p-6">
+                        <p class="text-slate-400 mb-2">ID</p>
+                        <p class="text-blue-400 font-bold">
+                            #{{ detalleSeleccionado()?.id }}
+                        </p>
+                    </div>
+                    <div class="bg-slate-800 rounded-2xl p-6">
+                        <p class="text-slate-400 mb-2">Rol</p>
+                        <p class="text-white">
+                            Alumno
+                        </p>
+                    </div>
+                </div>
+                @if(detalleSeleccionado()?.email) {
+                <div class="bg-slate-800 rounded-2xl p-6">
+                    <p class="text-slate-400 mb-2">Email</p>
+                    <p class="text-white">
+                        {{ detalleSeleccionado()?.email }}
+                    </p>
+                </div>
+                }
+                @if(detalleSeleccionado()?.curso) {
+                <div class="bg-slate-800 rounded-2xl p-6">
+                    <p class="text-slate-400 mb-2">Curso</p>
+                    <p class="text-white">
+                        {{ detalleSeleccionado()?.curso }}
+                    </p>
+                </div>
+                }
+                }
             </div>
         </div>
     </div>

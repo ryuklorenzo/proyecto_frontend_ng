@@ -15,6 +15,7 @@ import {
   LucideChevronRight,
   LucideUserCircle,
   LucideDynamicIcon,
+  LucideEye,
 } from '@lucide/angular';
 import { CourseService } from '../../../core/services/courses/course';
 import { ActivatedRoute } from '@angular/router';
@@ -50,7 +51,9 @@ export class Teachers {
     ChevronLeft: LucideChevronLeft,
     ChevronRight: LucideChevronRight,
     UserCircle: LucideUserCircle,
-    LogOut: LucideLogOut
+    LogOut: LucideLogOut,
+    Eye: LucideEye,
+    UserX: LucideUserX
   };
 
   private butonItems: Buttons[] = [

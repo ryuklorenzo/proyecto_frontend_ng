@@ -9,6 +9,7 @@ import {
   LucideChevronRight,
   LucideUserCircle,
   LucideDynamicIcon,
+  LucideEye,
 } from '@lucide/angular';
 import { CommonModule } from '@angular/common';
 import {
@@ -54,7 +55,8 @@ export class Tasks {
     ChevronLeft: LucideChevronLeft,
     ChevronRight: LucideChevronRight,
     UserCircle: LucideUserCircle,
-    LogOut: LucideLogOut
+    LogOut: LucideLogOut,
+    Eye: LucideEye,
   }
 
   private butonItems: Buttons[] = [
