@@ -152,68 +152,59 @@
     </div>
 
     @if(mostrarDetalle() && selectedMention()) {
-    <div class="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center z-50 p-6">
-        <div
-            class="w-full max-w-4xl bg-gradient-to-b from-white to-blue-50 rounded-[32px] shadow-2xl border border-blue-100 overflow-hidden">
-            <div class="flex items-center justify-between px-10 py-8 border-b border-blue-100">
+    <div class="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center z-50 p-4">
+        <div class="w-full max-w-3xl bg-gradient-to-b from-white to-blue-50 rounded-3xl shadow-2xl border border-blue-100 overflow-hidden">
+            
+            <div class="flex items-center justify-between px-6 py-5 border-b border-blue-100 bg-white">
                 <div>
-                    <h3 class="text-4xl font-bold text-blue-950">
+                    <h3 class="text-2xl font-bold text-blue-950">
                         Mención #{{ selectedMention()!.id }}
                     </h3>
-                    <p class="text-blue-600/70 text-lg mt-2">
-                        Edición y detalle de la mención registrada
+                    <p class="text-blue-600/70 text-sm mt-1">
+                        Información detallada de la mención
                     </p>
                 </div>
                 <button (click)="closeModal()"
-                    class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl text-blue-500 hover:bg-blue-100 hover:text-blue-700 transition-all duration-300">
+                    class="w-10 h-10 rounded-xl flex items-center justify-center text-xl text-blue-500 hover:bg-blue-100 hover:text-blue-700 hover:scale-110 active:scale-95 transition-all duration-300">
                     ✕
                 </button>
             </div>
 
-            <div class="p-8">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-                    <div class="md:col-span-2 bg-white border border-blue-100 rounded-3xl p-6 shadow-sm">
-                        <p class="text-blue-500 font-medium text-base mb-2">Alumno Asociado</p>
-                        <input type="text" [value]="selectedMention()!.nombre_completo_alumno" readonly
-                            class="w-full border-none py-2 bg-transparent text-2xl font-bold text-blue-950 opacity-70 cursor-not-allowed outline-none">
+            <div class="p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    
+                    <div class="bg-white border border-blue-100 rounded-2xl p-4 shadow-sm">
+                        <p class="text-blue-500 font-medium text-sm mb-1">Fecha de Mención</p>
+                        <p class="text-lg font-bold text-blue-950">{{ selectedMention()!.fecha }}</p>
                     </div>
 
-                    <div
-                        class="bg-white border border-blue-100 rounded-3xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
-                        <p class="text-blue-500 font-medium text-base mb-2">Fecha Mención</p>
-                        <input type="date" [(ngModel)]="selectedMention()!.fecha"
-                            class="w-full border-b border-slate-300 py-2 focus:border-blue-500 focus:outline-none bg-transparent text-xl font-bold text-blue-950">
+                    <div class="bg-white border border-blue-100 rounded-2xl p-4 shadow-sm">
+                        <p class="text-blue-500 font-medium text-sm mb-1">Alumno Reconocido</p>
+                        <p class="text-lg font-bold text-blue-950">{{ selectedMention()!.nombre_completo_alumno }}</p>
                     </div>
 
-                    <div class="bg-white border border-blue-100 rounded-3xl p-6 shadow-sm">
-                        <p class="text-blue-500 font-medium text-base mb-2">Tipo de Actitud</p>
-                        <input type="text" [value]="selectedMention()!.tipo_actitud" readonly
-                            class="w-full border-none py-2 bg-transparent text-xl font-bold text-blue-950 opacity-70 cursor-not-allowed outline-none">
-                    </div>
-
-                    <div class="md:col-span-2 bg-white border border-blue-100 rounded-3xl p-6 shadow-sm">
-                        <p class="text-blue-500 font-medium text-base mb-2">Detalle de Reconocimiento</p>
+                    <div class="md:col-span-2 bg-white border border-blue-100 rounded-2xl p-4 shadow-sm">
+                        <p class="text-blue-500 font-medium text-sm mb-1">Detalle de Reconocimiento</p>
                         <textarea [value]="selectedMention()!.detalle_reconocimiento" rows="2" readonly
-                            class="w-full border-none py-2 bg-transparent text-xl font-bold text-blue-950 resize-none opacity-70 cursor-not-allowed outline-none"></textarea>
+                            class="w-full border-none py-1 bg-transparent text-lg font-bold text-blue-950 resize-none opacity-70 cursor-not-allowed outline-none"></textarea>
                     </div>
 
-                    <div class="md:col-span-2 bg-white border border-blue-100 rounded-3xl p-6 shadow-sm">
-                        <p class="text-blue-500 font-medium text-base mb-2">Descripción de Actitud</p>
+                    <div class="md:col-span-2 bg-white border border-blue-100 rounded-2xl p-4 shadow-sm">
+                        <p class="text-blue-500 font-medium text-sm mb-1">Descripción de Actitud</p>
                         <textarea [value]="selectedMention()!.descripcion_actitud" rows="2" readonly
-                            class="w-full border-none py-2 bg-transparent text-xl font-bold text-blue-950 resize-none opacity-70 cursor-not-allowed outline-none"></textarea>
+                            class="w-full border-none py-1 bg-transparent text-lg font-bold text-blue-950 resize-none opacity-70 cursor-not-allowed outline-none"></textarea>
                     </div>
 
                 </div>
             </div>
 
-            <div class="px-10 pb-8 flex justify-end gap-4">
+            <div class="px-6 pb-5 flex justify-end gap-3 bg-transparent">
                 <button (click)="closeModal()"
-                    class="px-6 py-3 rounded-xl bg-slate-500 text-white font-medium hover:bg-slate-600 transition-all duration-200">
+                    class="px-5 py-2 rounded-xl bg-slate-500 text-white text-sm font-medium hover:bg-slate-600 transition-all duration-200">
                     Cancelar
                 </button>
                 <button (click)="saveMention()"
-                    class="px-6 py-3 rounded-xl bg-blue-600 text-white font-medium hover:bg-blue-700 transition-all duration-200 shadow-md">
+                    class="px-5 py-2 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-all duration-200 shadow-md">
                     Guardar Cambios
                 </button>
             </div>
