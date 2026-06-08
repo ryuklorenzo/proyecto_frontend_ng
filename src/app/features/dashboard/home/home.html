@@ -489,39 +489,71 @@
         <div class="w-full max-w-2xl rounded-3xl border border-slate-700 bg-slate-900 p-8 shadow-2xl">
             <div class="flex justify-between items-center mb-8">
                 <h2 class="text-3xl font-bold text-white">
-                    @if(tipoDetalle() === 'tarea') { 📚 Detalle de tarea }
-                    @if(tipoDetalle() === 'amonestacion') { ⚠️ Detalle de amonestación }
-                    @if(tipoDetalle() === 'alumno') { 🎓 Detalle de alumno } </h2>
+                    @if(tipoDetalle() === 'tarea') {
+                    📚 Detalle de tarea
+                    }
+                    @if(tipoDetalle() === 'amonestacion') {
+                    ⚠️ Detalle de amonestación
+                    }
+                    @if(tipoDetalle() === 'alumno') {
+                    🎓 Detalle de alumno
+                    }
+                </h2>
                 <button (click)="closeModal()" class="w-12 h-12 rounded-xl bg-slate-800 hover:bg-slate-700 text-white">
                     ✕
                 </button>
             </div>
-            
-            <div class="space-y-6">
-                @if(tipoDetalle() === 'tarea') { ... }
-                @if(tipoDetalle() === 'amonestacion') { ... }
 
-                @if(tipoDetalle() === 'alumno') {
+            <div class="space-y-6">
+
+                @if(tipoDetalle() === 'tarea') {
                 <div class="bg-slate-800 rounded-2xl p-6">
-                    <p class="text-slate-400 mb-2">Nombre completo del Alumno</p>
-                    <p class="text-white text-xl font-bold">
-                        {{ detalleSeleccionado()?.nombre }} {{ detalleSeleccionado()?.apellidos }}
+                    <p class="text-slate-400 mb-2">Descripción</p>
+                    <p class="text-white text-lg">
+                        {{ detalleSeleccionado()?.descripcion }}
+                    </p>
+                </div>
+                <div class="bg-slate-800 rounded-2xl p-6">
+                    <p class="text-slate-400 mb-2">Estado</p>
+                    <p class="text-white">
+                        {{ detalleSeleccionado()?.estado }}
+                    </p>
+                </div>
+                }
+
+                @if(tipoDetalle() === 'amonestacion') {
+                <div class="bg-slate-800 rounded-2xl p-6">
+                    <p class="text-slate-400 mb-2">Nivel</p>
+                    <p class="text-red-400 text-xl font-bold">
+                        {{ detalleSeleccionado()?.nivel }}
+                    </p>
+                </div>
+                <div class="bg-slate-800 rounded-2xl p-6">
+                    <p class="text-slate-400 mb-2">Descripción</p>
+                    <p class="text-white">
+                        {{ detalleSeleccionado()?.actitud_descripcion }}
                     </p>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div class="bg-slate-800 rounded-2xl p-6">
-                        <p class="text-slate-400 mb-2">ID de Usuario</p>
-                        <p class="text-white font-semibold">
-                            #{{ detalleSeleccionado()?.id }}
+                        <p class="text-slate-400 mb-2">Tipo</p>
+                        <p class="text-white">
+                            {{ detalleSeleccionado()?.actitud_tipo }}
                         </p>
                     </div>
                     <div class="bg-slate-800 rounded-2xl p-6">
-                        <p class="text-slate-400 mb-2">Estado de la cuenta</p>
-                        <span class="px-3 py-1 rounded-xl font-bold text-sm uppercase inline-block mt-1"
-                            [class]="detalleSeleccionado()?.activo ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'">
-                            {{ detalleSeleccionado()?.activo ? 'Activo' : 'Inactivo' }}
-                        </span>
+                        <p class="text-slate-400 mb-2">Fecha</p>
+                        <p class="text-white">
+                            {{ detalleSeleccionado()?.actitud_fecha }}
+                        </p>
                     </div>
+                </div>
+                <div class="bg-slate-800 rounded-2xl p-6">
+                    <p class="text-slate-400 mb-2">Profesor</p>
+                    <p class="text-white font-semibold">
+                        {{ detalleSeleccionado()?.profesor_nombre }}
+                        {{ detalleSeleccionado()?.profesor_apellido }}
+                    </p>
                 </div>
                 }
             </div>
