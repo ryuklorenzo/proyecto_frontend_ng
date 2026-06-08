@@ -156,7 +156,7 @@ export class Recognitions {
     detalle: ['', Validators.required],
     actitud_tipo: ['', Validators.required],
     actitud_descripcion: ['', Validators.required],
-    actitud_fecha: [new Date().toISOString().split('T')[0], Validators.required], // Mantiene la fecha por defecto al iniciar
+    actitud_fecha: [new Date().toISOString().split('T')[0], Validators.required], //mantiene la fecha por defecto al iniciar
   });
 
   constructor() {

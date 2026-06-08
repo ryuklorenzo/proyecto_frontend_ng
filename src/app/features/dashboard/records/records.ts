@@ -17,9 +17,7 @@ import {
   Validators,
   ReactiveFormsModule
 } from '@angular/forms';
-
 import { TableModule } from 'primeng/table';
-
 import { RecordService } from '../../../core/services/records/record';
 import { StudentService } from '../../../core/services/students/student';
 import { ExecutiveService } from '../../../core/services/executives/executive';
@@ -72,14 +70,12 @@ export class Records {
     return this.butonItems.filter((btn) => btn.roles.includes(currentUser.role));
   });
 
-  // Signals de estado visual
   mostrarFormulario = signal(false);
   mostrarTabla = signal(false);
   mostrarDetalle = signal(false);
   mostrarBusquedaAlumno = signal(false);
   mostrarBusquedaDirectivo = signal(false);
 
-  // Signals de datos
   records = signal<any[]>([]);
   selectedRecord = signal<any>(null);
   searchTerm = signal('');
@@ -146,16 +142,12 @@ export class Records {
       estado: formValue.estado
     };
 
-    // Suponemos que tu RecordService tiene este método:
-    // createRecord(idDirectivo: number, idAlumno: number, record: any)
     this.recordService.createRecord(
       formValue.idDirectivo,
       formValue.idAlumno,
       record
     ).subscribe({
-      next: (response) => {
-        console.log(response);
-
+      next: () => {
         this.recordForm.reset({
           estado: 'Abierto',
           idDirectivo: null,

@@ -17,7 +17,6 @@ import {
   Validators,
   ReactiveFormsModule
 } from '@angular/forms';
-
 import { TableModule } from 'primeng/table';
 import { TaskService } from '../../../core/services/tasks/task';
 import { StudentService } from '../../../core/services/students/student';
@@ -133,9 +132,7 @@ export class Tasks {
     this.mostrarFormulario.set(true);
 
     this.cargarDatosBase();
-
     const currentUser = this.user();
-    
     //ponemos el id directamente al form
     if (currentUser?.role === 'profesor' && currentUser.id) {
       this.taskForm.patchValue({
@@ -167,9 +164,7 @@ export class Tasks {
       formValue.idAlumno,
       taskData
     ).subscribe({
-      next: (response) => {
-        console.log(response);
-
+      next: () => {
         this.taskForm.reset({
           estado: 'PENDIENTE',
           idProfesor: null,
@@ -273,18 +268,17 @@ export class Tasks {
 
     const currentUser = this.user();
 
-    // Comprobamos si el usuario logueado es un profesor
+    //comprobamos si el usuario logueado es un profesor
     if (currentUser?.role === 'profesor') {
-      this.mostrarBusquedaAlumno.set(false); // Ocultamos el buscador de profesor
+      this.mostrarBusquedaAlumno.set(false); //ocultamos el buscador de profesor
       
       if (currentUser.id) {
         this.profesorSeleccionado.set(currentUser.id);
-        this.loadTeachersTasks(currentUser.id); // Cargamos sus tareas directamente
+        this.loadTeachersTasks(currentUser.id); //cargamos sus tareas directamente
       } else {
         alert('Error: No se pudo identificar tu ID de alumno.');
       }
     } else {
-      // Para cualquier otro rol, mostramos el buscador con la lista de alumnos
       this.mostrarBusquedaProfesor.set(true);
       this.cargarDatosBase();
     }

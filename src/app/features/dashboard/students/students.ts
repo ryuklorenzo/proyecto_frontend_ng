@@ -1,4 +1,4 @@
-import { Component, inject, computed, signal, OnInit } from '@angular/core';
+import { Component, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
@@ -139,8 +139,7 @@ export class Students {
     };
 
     this.studentService.createStudent(studentData, formValue.idCurso).subscribe({
-      next: (response) => {
-        console.log(response);
+      next: () => {
         //reseteamos el estado
         this.studentForm.reset({ idCurso: 1 });
         alert('Alumno creado correctamente');
@@ -182,7 +181,6 @@ export class Students {
     this.selectedStudent.set(null);
   }
 
-  // Método auxiliar para la vista HTML para comprobar si un campo tiene error
   hasError(controlName: string, errorName: string = 'required') {
     const control = this.studentForm.get(controlName);
     return control?.hasError(errorName) && control?.touched;

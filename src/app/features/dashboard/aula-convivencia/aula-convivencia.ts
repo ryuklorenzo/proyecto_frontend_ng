@@ -22,7 +22,6 @@ import {
   ReactiveFormsModule,
   FormsModule
 } from '@angular/forms';
-
 import { TableModule } from 'primeng/table';
 import { ClassroomService } from '../../../core/services/aula-convivencia/aula-convivencia';
 import { ScheduleService } from '../../../core/services/schedules/schedule';
@@ -79,14 +78,12 @@ export class AulaConvivencia implements OnInit {
     return this.butonItems.filter((btn) => btn.roles.includes(currentUser.role));
   });
 
-  // Vistas
   mostrarFormulario = signal(false);
   mostrarTabla = signal(false);
   mostrarAsignar = signal(false);
   mostrarVerAlumnos = signal(false);
   mostrarDetalle = signal(false);
 
-  // Datos
   aulas = signal<any[]>([]);
   horarios = signal<any[]>([]);
   alumnos = signal<any[]>([]);
@@ -149,7 +146,7 @@ export class AulaConvivencia implements OnInit {
 
   classroomForm: FormGroup = this.fb.group({
     nombre: ['', Validators.required],
-    fecha: ['', Validators.required],
+    fecha: [new Date().toISOString().split('T')[0], Validators.required],
     id_horario: [null, Validators.required]
   });
 
@@ -180,6 +177,11 @@ export class AulaConvivencia implements OnInit {
     this.ocultarTodo();
     this.mostrarFormulario.set(true);
     this.cargarDatosBase();
+    this.classroomForm.reset({
+      nombre: '',
+      fecha: new Date().toISOString().split('T')[0],
+      id_horario: null
+    });
   }
 
   loadClassrooms() {
@@ -247,12 +249,14 @@ export class AulaConvivencia implements OnInit {
       nombre: formValue.nombre,
       fecha: formValue.fecha
     };
-    console.log(classroomData)
 
     this.classroomService.createClassroom(formValue.id_horario, classroomData).subscribe({
-      next: (response) => {
-        console.log(response);
-        this.classroomForm.reset({ id_horario: null });
+      next: () => {
+        this.classroomForm.reset({ 
+          nombre: '',
+          fecha: new Date().toISOString().split('T')[0],
+          id_horario: null 
+        });
         alert('Aula de convivencia creada correctamente');
         this.cargarDatosBase();
       },
@@ -275,8 +279,6 @@ export class AulaConvivencia implements OnInit {
       nombre: this.selectedClassroom().nombre,
       fecha: this.selectedClassroom().fecha
     };
-    
-    console.log("Enviando PUT con:", dataToSave, "y id_horario:", idHorarioSeleccionado);
 
     this.classroomService.updateClassroom(
       this.selectedClassroom().id, 

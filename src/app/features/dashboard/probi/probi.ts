@@ -1,6 +1,5 @@
 import { Component, inject, computed, signal } from '@angular/core';
 import { AuthService, UserRole } from '../../../core/auth/auth';
-
 import {
   LucideStar,
   LucideSparkles,
@@ -13,9 +12,7 @@ import {
   LucideUserCircle,
   LucideDynamicIcon,
 } from '@lucide/angular';
-
 import { CommonModule } from '@angular/common';
-
 import {
   FormBuilder,
   FormGroup,
@@ -23,7 +20,6 @@ import {
   ReactiveFormsModule,
   FormsModule
 } from '@angular/forms';
-
 import { TableModule } from 'primeng/table';
 import { ProbiService } from '../../../core/services/probi/probi';
 import { MentionService } from '../../../core/services/mentions/mention';
@@ -68,7 +64,6 @@ export class Probi {
     { label: 'Ver probis', icon: LucideSparkles, roles: ['admin', 'directivo', 'profesor'] },
   ];
 
-  // 2. Filtramos la lista según el rol del usuario (igual que en el sidebar)
   filteredButtons = computed(() => {
     const currentUser = this.user();
     if (!currentUser) return [];
@@ -85,7 +80,7 @@ export class Probi {
   searchTerm = signal('');
   probiForm: FormGroup = this.fb.group({
     id_mencion: [null, Validators.required],
-    fecha: ['', Validators.required]
+    fecha: [new Date().toISOString().split('T')[0], Validators.required]
   });
 
   filteredProbis = computed(() => {
@@ -104,6 +99,10 @@ export class Probi {
   toggleCrearProbi() {
     this.mostrarTabla.set(false);
     this.mostrarFormulario.set(true);
+    this.probiForm.reset({
+      fecha: new Date().toISOString().split('T')[0],
+      id_mencion: null
+    });
     this.mentionService.getMentions().subscribe({
       next: (data: any) => {
         this.menciones.set(data);
@@ -126,7 +125,10 @@ export class Probi {
     ).subscribe({
       next: () => {
         alert('Probi creado correctamente');
-        this.probiForm.reset();
+        this.probiForm.reset({
+          fecha: new Date().toISOString().split('T')[0],
+          id_mencion: null
+        });
       },
       error: (err) => {
         console.error(err);
@@ -137,7 +139,6 @@ export class Probi {
   loadProbis() {
     this.probiService.getProbis().subscribe({
       next: (data: any) => {
-        console.log('PROBIS:', data);
         this.probis.set(data);
         this.mostrarFormulario.set(false);
         this.mostrarTabla.set(true);
@@ -157,7 +158,6 @@ export class Probi {
 
   saveProbi() {
     const probi = this.selectedProbi();
-    console.log('GUARDANDO', probi);
     this.probiService.updateProbi(
       probi.id,
       probi.id_mencion,

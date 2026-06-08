@@ -16,10 +16,7 @@ import {
   ReactiveFormsModule
 } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-
 import { TableModule } from 'primeng/table';
-
-// Importamos los servicios de cursos y horarios
 import { CourseService } from '../../../core/services/courses/course';
 import { ScheduleService } from '../../../core/services/schedules/schedule';
 
@@ -100,7 +97,7 @@ export class Courses {
     this.mostrarTabla.set(false);
     this.mostrarFormulario.set(true);
 
-    // Cargamos la lista de horarios para el desplegable
+    //lista de horarios para el desplegable
     this.scheduleService.getSchedules().subscribe({
       next: (data: any) => this.horarios.set(data),
       error: (err) => console.error('Error cargando horarios', err)
@@ -135,8 +132,7 @@ export class Courses {
     };
 
     this.courseService.createCourse(formValue.id_horario, courseData).subscribe({
-      next: (response) => {
-        console.log(response);
+      next: () => {
         this.courseForm.reset({ id_horario: null });
         alert('Curso creado correctamente');
       },

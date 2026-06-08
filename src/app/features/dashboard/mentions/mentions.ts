@@ -99,7 +99,7 @@ export class Mentions {
 
   constructor() {
     this.mentionForm = this.fb.group({
-      fecha: ['', Validators.required],
+      fecha: [new Date().toISOString().split('T')[0], Validators.required],
       id_reconocimiento: [null, Validators.required]
     });
 
@@ -112,7 +112,10 @@ export class Mentions {
     this.mostrarFormulario.set(true);
     this.mostrarTabla.set(false);
     this.mostrarPorReconocimiento.set(false);
-    this.mentionForm.reset();
+    this.mentionForm.reset({
+      fecha: new Date().toISOString().split('T')[0],
+      id_reconocimiento: null
+    });
 
     forkJoin({
       reconocimientos: this.recognitionService.getRecognitions(), 
@@ -227,7 +230,7 @@ export class Mentions {
           };
         });
 
-        // Guardamos los cruces hechos
+        //guardamos los cruces hechos
         this.mentionsWithStudents.set(mencionesCruzadas);
       },
       error: (err: any) => console.error('Error cruzando datos para el desplegable', err)
@@ -242,7 +245,10 @@ export class Mentions {
       this.mentionService.createMention(idReconocimiento, formValue).subscribe({
         next: (res: any) => {
           alert('¡Mención creada correctamente!');
-          this.mentionForm.reset();
+          this.mentionForm.reset({
+            fecha: new Date().toISOString().split('T')[0],
+            id_reconocimiento: null
+          });
         },
         error: (err: any) => {
           console.error('Error al crear mención', err);
