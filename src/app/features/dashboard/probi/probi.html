@@ -42,6 +42,7 @@
         </div>
         }
     </div>
+    
     <div class="mt-10 bg-card border border-border rounded-3xl shadow-md p-8" [hidden]="!mostrarFormulario()">
         <h3 class="text-4xl font-bold mb-8">
             Crear Probi
@@ -58,7 +59,7 @@
                     </option>
                     @for(mencion of menciones(); track mencion.id){
                     <option [value]="mencion.id">
-                        {{ mencion.descripcion }} (ID: {{ mencion.id }})
+                        {{ mencion.detalle_reconocimiento }} - Fecha: {{ mencion.fecha }} (Mención ID: {{ mencion.id }})
                     </option>
                     }
                 </select>
@@ -88,15 +89,18 @@
                 <ng-template pTemplate="header">
                     <tr>
                         <th>ID</th>
-                        <th>ID Mención</th>
+                        <th>Detalle del Reconocimiento</th>
                         <th>Fecha</th>
                         <th>Acciones</th>
                     </tr>
                 </ng-template>
                 <ng-template pTemplate="body" let-probi>
                     <tr>
-                        <td>{{ probi.id }}</td>
-                        <td>{{ probi.id_mencion }}</td>
+                        <td class="font-bold">#{{ probi.id }}</td>
+                        <td>
+                            <p class="font-semibold">{{ probi.detalle_reconocimiento }}</p>
+                            <span class="text-xs text-slate-500">Mención ID: {{ probi.id_mencion }}</span>
+                        </td>
                         <td>{{ probi.fecha }}</td>
                         <td>
                             <div class="flex gap-3">
@@ -145,6 +149,16 @@
             </div>
             <div class="p-8">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white border border-blue-100 rounded-3xl p-6 md:col-span-2">
+                        <p class="text-blue-500 font-medium mb-2">
+                            Detalle del Reconocimiento Asociado
+                        </p>
+                        <p class="text-2xl font-bold text-blue-950">
+                            {{ selectedProbi().detalle_reconocimiento }}
+                        </p>
+                        <p class="text-sm text-slate-500 mt-1">Mención ID: {{ selectedProbi().id_mencion }}</p>
+                    </div>
+                    
                     <div class="bg-white border border-blue-100 rounded-3xl p-6">
                         <p class="text-blue-500 font-medium mb-2">
                             Fecha
@@ -158,20 +172,13 @@
                         </p>
                         }
                     </div>
-                    <div class="bg-white border border-blue-100 rounded-3xl p-6">
-                        <p class="text-blue-500 font-medium mb-2">
-                            ID Mención
-                        </p>
-                        <p class="text-2xl font-bold text-blue-950">
-                            {{ selectedProbi().id_mencion }}
-                        </p>
-                    </div>
+                    
                     <div class="bg-white border border-blue-100 rounded-3xl p-6">
                         <p class="text-blue-500 font-medium mb-2">
                             ID Probi
                         </p>
                         <p class="text-2xl font-bold text-blue-950">
-                            {{ selectedProbi().id }}
+                            #{{ selectedProbi().id }}
                         </p>
                     </div>
                 </div>
@@ -191,3 +198,4 @@
         </div>
     </div>
     }
+</div>
