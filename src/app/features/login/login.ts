@@ -45,7 +45,7 @@ export class Login {
     if (success) {
       this.router.navigate(['/dashboard']);
     } else {
-      this.error.set('Usuario o contraseña incorrectos');
+      this.error.set('Usuario o contraseña incorrectos / el usuario está suspendido');
     }
   }
 }
