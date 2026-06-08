@@ -7,7 +7,6 @@ import {
   LucideTrash2,
   LucideUserPlus,
   LucideUser,
-  LucideUserMinus,
   LucideChevronLeft,
   LucideChevronRight,
   LucideUserCircle,
