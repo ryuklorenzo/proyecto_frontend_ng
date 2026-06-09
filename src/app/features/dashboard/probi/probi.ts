@@ -114,10 +114,11 @@ export class Probi {
       next: (data: any) => {
         const mencionesConDetalle = data.menciones.map((m: any) => {
           const rec = data.reconocimientos.find((r: any) => r.id == m.id_reconocimiento);
+          //reconocimiento asociado a la mencion
           return {
             ...m,
             detalle_reconocimiento: rec ? rec.detalle : 'Sin detalle asociado'
-          };
+          };//datos cruzados
         });
         this.menciones.set(mencionesConDetalle);
       },
@@ -160,11 +161,14 @@ export class Probi {
       next: (data: any) => {
         const probisCruzados = data.probis.map((probi: any) => {
           const mencion = data.menciones.find((m: any) => m.id == probi.id_mencion);
+          //mencion asociada
           let detalle_reconocimiento = 'Mención sin reconocimiento';
           
           if (mencion) {
+            //reconocimiento asociado
             const rec = data.reconocimientos.find((r: any) => r.id == mencion.id_reconocimiento);
             if (rec) {
+              //cogemos el detalle
               detalle_reconocimiento = rec.detalle;
             }
           }
@@ -172,7 +176,7 @@ export class Probi {
           return {
             ...probi,
             detalle_reconocimiento
-          };
+          };//datos cruzados
         });
 
         this.probis.set(probisCruzados);

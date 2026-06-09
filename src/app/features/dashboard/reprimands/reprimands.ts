@@ -106,6 +106,7 @@ export class Reprimands {
 
   cargarDatosBase() {
     this.studentService.getStudents().subscribe({
+      //desplegable alumnos
       next: (data: any) => {
         const lista = Array.isArray(data) ? data : [];
         this.alumnos.set(lista);
@@ -114,6 +115,7 @@ export class Reprimands {
     });
 
     this.teacherService.getTeachers().subscribe({
+      //desplegable profesor
       next: (data: any) => {
         const lista = Array.isArray(data) ? data : [];
         this.profesores.set(lista);
@@ -128,7 +130,6 @@ export class Reprimands {
     this.mostrarFormulario.set(true);
     
     this.cargarDatosBase();
-
     const currentUser = this.user();
     
     if (currentUser?.role === 'profesor' && currentUser.id) {
@@ -148,6 +149,7 @@ export class Reprimands {
       return;
     }
     const value = this.reprimandForm.value;
+    //asi lo espera el back
     const body = {
       amonestacion: { nivel: value.nivel },
       actitud: {
@@ -185,7 +187,6 @@ export class Reprimands {
 
   loadStudentReprimands(idAlumno: number) {
     this.mostrarFormulario.set(false);
-    
     this.reprimandService.getReprimandByStudent(idAlumno).subscribe({
       next: (data: any) => {
         this.reprimands.set(data);
@@ -208,7 +209,6 @@ export class Reprimands {
     this.mostrarTabla.set(false);
 
     const currentUser = this.user();
-
     if (currentUser?.role === 'alumno') {
       this.mostrarBusquedaAlumno.set(false); 
       

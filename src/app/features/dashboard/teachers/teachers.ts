@@ -78,7 +78,6 @@ export class Teachers {
   filteredTeachers = computed(() => {
     const term = this.searchTerm().toLowerCase();
     const allTeachers = this.teachers();
-
     if (!term) return allTeachers;
 
     return allTeachers.filter(teacher =>
