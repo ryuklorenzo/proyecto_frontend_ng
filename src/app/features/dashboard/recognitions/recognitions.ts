@@ -118,13 +118,14 @@ export class Recognitions {
     const allProfs = this.profesores();
 
     const enriched = allRecs.map((rec) => {
+      //mapea los reconocimientos
       const act = allAtts.find((a) => Number(a.id) === Number(rec.id_actitud));
-
+      //busca la actitud del reconocimiento
       const prof = allProfs.find(
         (p) =>
           Number(p.id) === Number(rec.id_profesor) ||
           Number(p.id_usuario) === Number(rec.id_profesor),
-      );
+      );//busca por id profesor o de usuario
 
       return {
         ...rec,
@@ -133,9 +134,8 @@ export class Recognitions {
             ? act.nombre_alumno_completo
             : 'Desconocido',
         id_alumno_real: act ? act.id_alumno_real : null,
-
         nombre_profesor_completo: prof ? `${prof.nombre} ${prof.apellidos}` : 'Desconocido',
-      };
+      };//datos cruzados
     });
 
     if (!term) return enriched;
@@ -147,7 +147,7 @@ export class Recognitions {
         rec.nombre_profesor_completo?.toLowerCase().includes(term) ||
         rec.actitud_tipo?.toLowerCase().includes(term) ||
         rec.id?.toString().includes(term),
-    );
+    );//filtra con los datos
   });
 
   recognitionForm: FormGroup = this.fb.group({
@@ -185,7 +185,6 @@ export class Recognitions {
     this.ocultarTodo();
     this.mostrarFormulario.set(true);
     this.cargarDatosBase();
-    
     const currentUser = this.user();
 
     //fecha actual y preasignamos el profesor
@@ -266,9 +265,8 @@ export class Recognitions {
       this.recognitionForm.markAllAsTouched();
       return;
     }
-
     const formValue = this.recognitionForm.value;
-
+    //asi lo espera el back
     const payload = {
       reconocimiento: {
         detalle: formValue.detalle,

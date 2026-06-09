@@ -3,7 +3,6 @@ import { AuthService, UserRole } from '../../../core/auth/auth';
 import {
   LucideClipboardList,
   LucideUsers,
-  LucideUser,
   LucideLogOut,
   LucideChevronLeft,
   LucideChevronRight,
@@ -111,6 +110,7 @@ export class Tasks {
 
   cargarDatosBase() {
     this.studentService.getStudents().subscribe({
+      //desplegable alumno
       next: (data: any) => {
         const lista = Array.isArray(data) ? data : [];
         this.alumnos.set(lista);
@@ -119,6 +119,7 @@ export class Tasks {
     });
 
     this.teacherService.getTeachers().subscribe({
+      //desplegable profesor
       next: (data: any) => {
         const lista = Array.isArray(data) ? data : [];
         this.profesores.set(lista);
@@ -155,7 +156,6 @@ export class Tasks {
     }
 
     const formValue = this.taskForm.value;
-
     const taskData = {
       descripcion: formValue.descripcion,
       estado: formValue.estado
@@ -185,7 +185,6 @@ export class Tasks {
   loadStudentTasks(idAlumno: number) {
     this.mostrarFormulario.set(false);
     this.mostrarTabla.set(true);
-
     this.taskService.getTasksByStudent(idAlumno).subscribe({
       next: (data: any) => {
         this.tasks.set(data);
@@ -233,7 +232,6 @@ export class Tasks {
     this.mostrarBusquedaProfesor.set(false);
 
     const currentUser = this.user();
-
     // Comprobamos si es un alumno
     if (currentUser?.role === 'alumno') {
       this.mostrarBusquedaAlumno.set(false);
@@ -252,12 +250,10 @@ export class Tasks {
 
   buscarTareasAlumno() {
     const idAlumno = this.alumnoSeleccionado();
-
     if (!idAlumno) {
       alert('Selecciona un alumno');
       return;
     }
-
     this.loadStudentTasks(idAlumno);
     this.mostrarBusquedaAlumno.set(false);
   }
@@ -273,7 +269,6 @@ export class Tasks {
     //comprobamos si el usuario logueado es un profesor
     if (currentUser?.role === 'profesor') {
       this.mostrarBusquedaAlumno.set(false); //ocultamos el buscador de profesor
-      
       if (currentUser.id) {
         this.profesorSeleccionado.set(currentUser.id);
         this.loadTeachersTasks(currentUser.id); //cargamos sus tareas directamente
@@ -289,12 +284,10 @@ export class Tasks {
 
   buscarTareasProfesor() {
     const idProfesor = this.profesorSeleccionado();
-
     if (!idProfesor) {
       alert('Selecciona un profesor');
       return;
     }
-
     this.loadTeachersTasks(idProfesor);
     this.mostrarBusquedaProfesor.set(false);
   }

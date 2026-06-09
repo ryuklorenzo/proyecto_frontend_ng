@@ -122,7 +122,6 @@ export class Records {
     });
 
     const currentUser = this.user();
-
     if (currentUser?.role === 'directivo' && currentUser.id) {
       this.recordForm.patchValue({
         idDirectivo: currentUser.id
@@ -141,7 +140,6 @@ export class Records {
     }
 
     const formValue = this.recordForm.value;
-
     const record = {
       estado: formValue.estado
     };

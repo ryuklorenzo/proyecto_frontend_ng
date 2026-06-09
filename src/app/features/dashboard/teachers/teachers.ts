@@ -13,6 +13,7 @@ import {
   LucideUserCircle,
   LucideDynamicIcon,
   LucideEye,
+  LucideUserX,
 } from '@lucide/angular';
 import { CourseService } from '../../../core/services/courses/course';
 import { ActivatedRoute } from '@angular/router';
@@ -77,7 +78,6 @@ export class Teachers {
   filteredTeachers = computed(() => {
     const term = this.searchTerm().toLowerCase();
     const allTeachers = this.teachers();
-
     if (!term) return allTeachers;
 
     return allTeachers.filter(teacher =>

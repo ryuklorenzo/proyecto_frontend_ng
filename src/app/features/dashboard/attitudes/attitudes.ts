@@ -85,25 +85,27 @@ export class Attitudes {
     const allStudents = this.alumnos();
 
     const enrichedAttitudes = allAttitudes.map(act => {
-      const idEstudiante = act.id_alumno || act.id_usuario;
+      const idEstudiante = act.id_alumno || act.id_usuario; //busca por id_alumno o por id_usuario
       const student = allStudents.find(s => Number(s.id) === Number(idEstudiante));
       
       return {
         ...act,
         nombre_alumno_completo: student ? `${student.nombre} ${student.apellidos}` : 'Desconocido'
       };
+      // si lo encuentra devuelve nombre y apellidos
     });
 
-    if (!term) return enrichedAttitudes;
-    
+    if (!term) return enrichedAttitudes; 
+    //si no hay busqueda, devuelve solo las enriquecidas
     return enrichedAttitudes.filter((act: any) =>
-      act.tipo?.toLowerCase().includes(term) ||
-      act.descripcion?.toLowerCase().includes(term) ||
-      act.fecha?.includes(term) ||
-      act.nombre_alumno_completo?.toLowerCase().includes(term)
+      act.tipo?.toLowerCase().includes(term) || //tipo actitud
+      act.descripcion?.toLowerCase().includes(term) || //descripcion de actitud
+      act.fecha?.includes(term) || //fecha actitud
+      act.nombre_alumno_completo?.toLowerCase().includes(term) //nombre estudiante completo
     );
   });
 
+  //form
   attitudeForm: FormGroup = this.fb.group({
     tipo: ['', Validators.required],
     descripcion: ['', Validators.required],
@@ -132,6 +134,7 @@ export class Attitudes {
   }
 
   ocultarTodo() {
+    //no tiene misterio
     this.mostrarFormulario.set(false);
     this.mostrarBusquedaAlumno.set(false);
     this.mostrarTabla.set(false);
@@ -211,16 +214,19 @@ export class Attitudes {
   createAttitude() {
     if (this.attitudeForm.invalid) {
       this.attitudeForm.markAllAsTouched();
+      //simplemente recordarle que tiene que rellenarlo entero
       return;
     }
 
     const formValue = this.attitudeForm.value;
+    //datos a enviar
     const dataToSave = {
       tipo: formValue.tipo,
       descripcion: formValue.descripcion,
       fecha: formValue.fecha
     };
 
+    //llamada api
     this.attitudeService.createAttitude(formValue.id_alumno, dataToSave).subscribe({
       next: (response) => {
         this.attitudeForm.reset({ 
