@@ -1,4 +1,6 @@
 import { Routes } from '@angular/router';
+import { roleGuard } from './core/guards/auth.guard'; 
+
 import { DashboardLayout } from './features/dashboard/dashboard-layout/dashboard-layout';
 import { Home } from './features/dashboard/home/home';
 import { Students } from './features/dashboard/students/students';
@@ -18,38 +20,29 @@ import { Mentions } from './features/dashboard/mentions/mentions';
 import { Attitudes } from './features/dashboard/attitudes/attitudes';
 
 export const routes: Routes = [
-  {
-    path: '',
-    component: Login
-  },
-
+  { path: '', component: Login },
   {
     path: 'dashboard',
-    component: DashboardLayout, //layout actúa de padre
+    component: DashboardLayout,
+    canActivate: [roleGuard],
+    data: { expectedRoles: ['admin', 'directivo', 'profesor', 'alumno'] },
     children: [
-      {
-        path: '',
-        component: Home,
-        },
-      {path: 'students',component: Students,},
-      {path: 'teachers',component: Teachers,},
-      {path: 'executives',component: Executives,},
-      {path: 'courses',component: Courses,},
-      {path: 'schedules',component: Schedules,},
-      {path: 'records',component: Records,},
-      {path: 'tasks',component: Tasks,},
-      {path: 'reprimands',component: Reprimands,},
-      {path: 'recognitions',component: Recognitions,},
-      {path: 'probi',component: Probi,},
-      {path: 'previ',component: Previ,},
-      {path: 'classroom_coexistence',component: Classroom_coexistence,},
-      {path: 'mentions',component: Mentions,},
-      {path: 'attitudes',component: Attitudes,},
+      { path: '', component: Home },
+      { path: 'students', component: Students, canActivate: [roleGuard], data: { expectedRoles: ['directivo', 'admin'] } },
+      { path: 'teachers', component: Teachers, canActivate: [roleGuard], data: { expectedRoles: ['directivo', 'admin'] } },
+      { path: 'executives', component: Executives, canActivate: [roleGuard], data: { expectedRoles: ['directivo', 'admin'] } },
+      { path: 'courses', component: Courses, canActivate: [roleGuard], data: { expectedRoles: ['admin'] } },
+      { path: 'schedules', component: Schedules, canActivate: [roleGuard], data: { expectedRoles: ['admin'] } },
+      { path: 'records', component: Records, canActivate: [roleGuard], data: { expectedRoles: ['directivo', 'admin'] } },
+      { path: 'tasks', component: Tasks, canActivate: [roleGuard], data: { expectedRoles: ['profesor', 'directivo', 'admin'] } },
+      { path: 'reprimands', component: Reprimands, canActivate: [roleGuard], data: { expectedRoles: ['profesor', 'directivo', 'admin'] } },
+      { path: 'recognitions', component: Recognitions, canActivate: [roleGuard], data: { expectedRoles: ['profesor', 'directivo', 'admin'] } },
+      { path: 'probi', component: Probi, canActivate: [roleGuard], data: { expectedRoles: ['directivo', 'admin'] } },
+      { path: 'previ', component: Previ, canActivate: [roleGuard], data: { expectedRoles: ['directivo', 'admin'] } },
+      { path: 'classroom_coexistence', component: Classroom_coexistence, canActivate: [roleGuard], data: { expectedRoles: ['directivo', 'admin'] } },
+      { path: 'mentions', component: Mentions, canActivate: [roleGuard], data: { expectedRoles: ['directivo', 'admin'] } },
+      { path: 'attitudes', component: Attitudes, canActivate: [roleGuard], data: { expectedRoles: ['profesor', 'directivo', 'admin'] } },
     ],
   },
-
-  {
-    path: '**',
-    redirectTo: '',
-  },
+  { path: '**', redirectTo: '' },
 ];
