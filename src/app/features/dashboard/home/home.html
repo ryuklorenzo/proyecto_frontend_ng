@@ -1,3 +1,4 @@
+<!-- Cabecera principal del dashboard, pudes ver tus datos -->
 <div class="space-y-8">
     <div
         class="relative overflow-hidden rounded-3xl border border-slate-800 bg-gradient-to-r from-slate-950 via-slate-900 to-blue-950 p-10">
@@ -14,6 +15,7 @@
                     Resumen general de la plataforma escolar
                 </p>
             </div>
+            <!-- Aqui es el botón para ver el perfil -->
             <button (click)="openProfile()"
                 class="px-8 py-4 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-lg shadow-blue-600/30 transition-all">
                 👤 Mi Perfil
@@ -21,6 +23,7 @@
         </div>
     </div>
 
+    <!-- Dashboard de admin -->
     @if(isAdmin()) {
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
 
@@ -129,6 +132,7 @@
         </div>
     </div>}
 
+    <!-- Dashboard de directivo -->
     @if(isDirectivo()) {
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
 
@@ -248,6 +252,7 @@
     </div>
     }
 
+    <!-- Dashboard de profesor -->
     @if(isProfesor()) {
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
         <a [routerLink]="['/dashboard/tasks']"
@@ -358,6 +363,7 @@
     </div>
     }
 
+    <!-- Dashboard de alumno -->
     @if(isAlumno()) {
     <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
         <div class="bg-slate-900 border border-slate-800 rounded-3xl p-8">
@@ -413,6 +419,7 @@
     </div>
     }
 
+    <!-- Este es el modal de detalles, sirve para ver info del perfil -->
     @if(mostrarPerfil()) {
     <div class="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-6">
         <div
@@ -484,6 +491,7 @@
     </div>
     }
 
+    <!-- Este es el modal de detalles, sirve para ver info de tareas, amonestaciones y alumnos -->
     @if(mostrarDetalle()) {
     <div class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
         <div class="w-full max-w-2xl rounded-3xl border border-slate-700 bg-slate-900 p-8 shadow-2xl">
@@ -506,6 +514,7 @@
 
             <div class="space-y-6">
 
+                <!-- Detalle de tarea -->
                 @if(tipoDetalle() === 'tarea') {
                 <div class="bg-slate-800 rounded-2xl p-6">
                     <p class="text-slate-400 mb-2">Descripción</p>
@@ -521,6 +530,7 @@
                 </div>
                 }
 
+                <!-- Detalle de amonestación -->
                 @if(tipoDetalle() === 'amonestacion') {
                 <div class="bg-slate-800 rounded-2xl p-6">
                     <p class="text-slate-400 mb-2">Nivel</p>
@@ -556,6 +566,8 @@
                     </p>
                 </div>
                 }
+
+                <!-- Detalle de alumno -->
                 @if(tipoDetalle() === 'alumno') {
                 <div class="bg-slate-800 rounded-2xl p-6">
                     <p class="text-slate-400 mb-2">Nombre completo</p>
@@ -600,19 +612,10 @@
     </div>
     }
 
+    <!-- Este es el botón para cerrar sesión -->
     @if(isAlumno()) {
     <div class="fixed bottom-6 left-6 z-50">
-        <button (click)="mostrarLogoutModal.set(true)" class="group flex items-center gap-3
-                    px-4 py-3 rounded-xl
-                    bg-sidebar text-sidebar-foreground
-                    border border-sidebar-accent
-                    hover:bg-red-500
-                    hover:text-white
-                    hover:shadow-lg
-                    hover:shadow-red-500/30
-                    hover:translate-x-1
-                    active:scale-95
-                    transition-all duration-300">
+        <button (click)="mostrarLogoutModal.set(true)" class="group flex items-center gap-3 px-4 py-3 rounded-xl bg-sidebar text-sidebar-foreground border border-sidebar-accent hover:bg-red-500 hover:text-white hover:shadow-lg hover:shadow-red-500/30 hover:translate-x-1 active:scale-95 transition-all duration-300">
             <svg [lucideIcon]="icons.LogOut"
                 class="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1">
             </svg>
@@ -621,6 +624,7 @@
     </div>
     }
 
+    <!-- El modal de cerrar sesión -->
     @if(mostrarLogoutModal()) {
     <div class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
         <div class="bg-slate-900 rounded-3xl shadow-2xl p-8 w-full max-w-md border border-slate-700">
@@ -649,6 +653,7 @@
     </div>
     }
 
+    <!-- Para mostrar detalles de directivo, es decir de previ y espediente -->
     @if(mostrarDetalleDirectivo()) {
     <div class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
         <div class="w-full max-w-2xl rounded-3xl border border-slate-700 bg-slate-900 p-8 shadow-2xl">
