@@ -1,14 +1,14 @@
-import { Component, inject, computed, signal } from '@angular/core';
+import { Component, inject, computed, signal, effect } from '@angular/core';
 import { AuthService, UserRole } from '../../../core/auth/auth';
 import {
   LucideClipboardList,
   LucideUsers,
-  LucideUser,
   LucideLogOut,
   LucideChevronLeft,
   LucideChevronRight,
   LucideUserCircle,
   LucideDynamicIcon,
+  LucideEye,
 } from '@lucide/angular';
 import { CommonModule } from '@angular/common';
 import {
@@ -17,7 +17,6 @@ import {
   Validators,
   ReactiveFormsModule
 } from '@angular/forms';
-
 import { TableModule } from 'primeng/table';
 import { TaskService } from '../../../core/services/tasks/task';
 import { StudentService } from '../../../core/services/students/student';
@@ -54,7 +53,8 @@ export class Tasks {
     ChevronLeft: LucideChevronLeft,
     ChevronRight: LucideChevronRight,
     UserCircle: LucideUserCircle,
-    LogOut: LucideLogOut
+    LogOut: LucideLogOut,
+    Eye: LucideEye,
   }
 
   private butonItems: Buttons[] = [
@@ -100,19 +100,53 @@ export class Tasks {
     idAlumno: [null, Validators.required]
   });
 
+  constructor() {
+    effect(() => {
+      if (this.authService.isAuthenticated()) {
+        this.cargarDatosBase();
+      }
+    });
+  }
+
+  cargarDatosBase() {
+    this.studentService.getStudents().subscribe({
+      //desplegable alumno
+      next: (data: any) => {
+        const lista = Array.isArray(data) ? data : [];
+        this.alumnos.set(lista);
+      },
+      error: (err) => console.error('Error cargando alumnos:', err)
+    });
+
+    this.teacherService.getTeachers().subscribe({
+      //desplegable profesor
+      next: (data: any) => {
+        const lista = Array.isArray(data) ? data : [];
+        this.profesores.set(lista);
+      },
+      error: (err) => console.error('Error cargando profesores:', err)
+    });
+  }
+
   toggleCrearTarea() {
     this.mostrarTabla.set(false);
     this.mostrarBusquedaAlumno.set(false);
     this.mostrarBusquedaProfesor.set(false);
     this.mostrarFormulario.set(true);
 
-    // Cargar listas para los desplegables de Crear Tarea
-    this.studentService.getStudents().subscribe({
-      next: (data: any) => this.alumnos.set(data)
-    });
-    this.teacherService.getTeachers().subscribe({
-      next: (data: any) => this.profesores.set(data)
-    });
+    this.cargarDatosBase();
+    const currentUser = this.user();
+    //ponemos el id directamente al form
+    if (currentUser?.role === 'profesor' && currentUser.id) {
+      this.taskForm.patchValue({
+        idProfesor: currentUser.id
+      });
+    } else {
+      // Si no es profesor, dejamos campo limpio
+      this.taskForm.patchValue({
+        idProfesor: null
+      });
+    }
   }
 
   createTask() {
@@ -122,19 +156,17 @@ export class Tasks {
     }
 
     const formValue = this.taskForm.value;
-
     const taskData = {
       descripcion: formValue.descripcion,
       estado: formValue.estado
     };
+    
     this.taskService.createTask(
       formValue.idProfesor,
       formValue.idAlumno,
       taskData
     ).subscribe({
-      next: (response) => {
-        console.log(response);
-
+      next: () => {
         this.taskForm.reset({
           estado: 'PENDIENTE',
           idProfesor: null,
@@ -153,7 +185,6 @@ export class Tasks {
   loadStudentTasks(idAlumno: number) {
     this.mostrarFormulario.set(false);
     this.mostrarTabla.set(true);
-
     this.taskService.getTasksByStudent(idAlumno).subscribe({
       next: (data: any) => {
         this.tasks.set(data);
@@ -199,21 +230,30 @@ export class Tasks {
     this.mostrarFormulario.set(false);
     this.mostrarTabla.set(false);
     this.mostrarBusquedaProfesor.set(false);
-    this.mostrarBusquedaAlumno.set(true);
 
-    this.studentService.getStudents().subscribe({
-      next: (data: any) => this.alumnos.set(data)
-    });
+    const currentUser = this.user();
+    // Comprobamos si es un alumno
+    if (currentUser?.role === 'alumno') {
+      this.mostrarBusquedaAlumno.set(false);
+      
+      if (currentUser.id) {
+        this.alumnoSeleccionado.set(currentUser.id);
+        this.loadStudentTasks(currentUser.id); // Cargamos sus tareas directamente
+      } else {
+        alert('Error: No se pudo identificar tu ID de alumno.');
+      }
+    } else {
+      this.mostrarBusquedaAlumno.set(true);
+      this.cargarDatosBase();
+    }
   }
 
   buscarTareasAlumno() {
     const idAlumno = this.alumnoSeleccionado();
-
     if (!idAlumno) {
       alert('Selecciona un alumno');
       return;
     }
-
     this.loadStudentTasks(idAlumno);
     this.mostrarBusquedaAlumno.set(false);
   }
@@ -222,21 +262,32 @@ export class Tasks {
     this.mostrarFormulario.set(false);
     this.mostrarTabla.set(false);
     this.mostrarBusquedaAlumno.set(false);
-    this.mostrarBusquedaProfesor.set(true);
+    this.mostrarBusquedaProfesor.set(false);
 
-    this.teacherService.getTeachers().subscribe({
-      next: (data: any) => this.profesores.set(data)
-    });
+    const currentUser = this.user();
+
+    //comprobamos si el usuario logueado es un profesor
+    if (currentUser?.role === 'profesor') {
+      this.mostrarBusquedaAlumno.set(false); //ocultamos el buscador de profesor
+      if (currentUser.id) {
+        this.profesorSeleccionado.set(currentUser.id);
+        this.loadTeachersTasks(currentUser.id); //cargamos sus tareas directamente
+      } else {
+        alert('Error: No se pudo identificar tu ID de alumno.');
+      }
+    } else {
+      this.mostrarBusquedaProfesor.set(true);
+      this.cargarDatosBase();
+    }
+
   }
 
   buscarTareasProfesor() {
     const idProfesor = this.profesorSeleccionado();
-
     if (!idProfesor) {
       alert('Selecciona un profesor');
       return;
     }
-
     this.loadTeachersTasks(idProfesor);
     this.mostrarBusquedaProfesor.set(false);
   }

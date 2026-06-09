@@ -17,12 +17,14 @@ import { LucideLoader2, LucideDynamicIcon } from '@lucide/angular';
     } @else if (authService.isAuthenticated()) {
       <div class="min-h-screen bg-background">
         
-        <app-sidebar 
-          [collapsed]="sidebarCollapsed" 
-          (toggle)="sidebarCollapsed = !sidebarCollapsed">
-        </app-sidebar>
+        @if(authService.user()?.role !== 'alumno') {
+          <app-sidebar
+            [collapsed]="sidebarCollapsed"
+            (toggle)="sidebarCollapsed = !sidebarCollapsed">
+          </app-sidebar>
+        }
         
-        <main class="transition-all duration-300" [ngClass]="sidebarCollapsed ? 'ml-16' : 'ml-64'">
+        <main class="transition-all duration-300" [ngClass]="authService.user()?.role === 'alumno' ? 'ml-0' : (sidebarCollapsed ? 'ml-16' : 'ml-64')">
           <div class="p-6">
             <router-outlet></router-outlet>
           </div>
@@ -35,6 +37,6 @@ import { LucideLoader2, LucideDynamicIcon } from '@lucide/angular';
 export class DashboardLayout {
   authService = inject(AuthService);
   sidebarCollapsed = false;
-  
+
   loaderIcon = LucideLoader2;
 }

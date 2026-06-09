@@ -1,9 +1,6 @@
-import { Component, inject, computed, signal } from '@angular/core';
+import { Component, inject, computed, signal, effect } from '@angular/core';
 import { AuthService, UserRole } from '../../../core/auth/auth';
 import {
-  LucideClipboardList,
-  LucideUsers,
-  LucideUser,
   LucideSearch,
   LucideShieldAlert,
   LucideTriangleAlert,
@@ -12,6 +9,8 @@ import {
   LucideChevronRight,
   LucideUserCircle,
   LucideDynamicIcon,
+  LucideEye,
+  LucideUserX
 } from '@lucide/angular';
 import { CommonModule } from '@angular/common';
 import {
@@ -20,7 +19,6 @@ import {
   Validators,
   ReactiveFormsModule
 } from '@angular/forms';
-
 import { TableModule } from 'primeng/table';
 import { ReprimandService } from '../../../core/services/reprimands/reprimand';
 import { StudentService } from '../../../core/services/students/student';
@@ -58,16 +56,17 @@ export class Reprimands {
     ChevronRight: LucideChevronRight,
     UserCircle: LucideUserCircle,
     LogOut: LucideLogOut,
-    Search: LucideSearch
+    Search: LucideSearch,
+    Eye: LucideEye,
+    UserX: LucideUserX
   }
 
   private butonItems: Buttons[] = [
     { label: 'Crear amonestacion', icon: LucideTriangleAlert, roles: ['admin', 'directivo', 'profesor'] },
     { label: 'Ver amonestaciones', icon: LucideShieldAlert, roles: ['admin', 'directivo'] },
-    { label: 'Ver amonestaciones del alumno', icon: LucideSearch, roles: ['admin', 'directivo', 'profesor'] },
+    { label: 'Ver amonestaciones del alumno', icon: LucideSearch, roles: ['admin', 'directivo', 'profesor', 'alumno'] },
   ];
 
-  // 2. Filtramos la lista según el rol del usuario (igual que en el sidebar)
   filteredButtons = computed(() => {
     const currentUser = this.user();
     if (!currentUser) return [];
@@ -97,16 +96,51 @@ export class Reprimands {
     tipo: ['', Validators.required]
   });
 
+  constructor() {
+    effect(() => {
+      if (this.authService.isAuthenticated()) {
+        this.cargarDatosBase();
+      }
+    });
+  }
+
+  cargarDatosBase() {
+    this.studentService.getStudents().subscribe({
+      //desplegable alumnos
+      next: (data: any) => {
+        const lista = Array.isArray(data) ? data : [];
+        this.alumnos.set(lista);
+      },
+      error: (err) => console.error('Error cargando alumnos:', err)
+    });
+
+    this.teacherService.getTeachers().subscribe({
+      //desplegable profesor
+      next: (data: any) => {
+        const lista = Array.isArray(data) ? data : [];
+        this.profesores.set(lista);
+      },
+      error: (err) => console.error('Error cargando profesores:', err)
+    });
+  }
+
   toggleCrearAmonestacion() {
     this.mostrarTabla.set(false);
     this.mostrarBusquedaAlumno.set(false);
     this.mostrarFormulario.set(true);
-    this.studentService.getStudents().subscribe({
-      next: (data: any) => this.alumnos.set(data)
-    });
-    this.teacherService.getTeachers().subscribe({
-      next: (data: any) => this.profesores.set(data)
-    });
+    
+    this.cargarDatosBase();
+    const currentUser = this.user();
+    
+    if (currentUser?.role === 'profesor' && currentUser.id) {
+      this.reprimandForm.patchValue({
+        idProfesor: currentUser.id
+      });
+    } else {
+      this.reprimandForm.patchValue({
+        idProfesor: null
+      });
+    }
   }
 
   createReprimand() {
@@ -115,7 +149,7 @@ export class Reprimands {
       return;
     }
     const value = this.reprimandForm.value;
-    //console.log('FORM VALUE', value);
+    //asi lo espera el back
     const body = {
       amonestacion: { nivel: value.nivel },
       actitud: {
@@ -124,18 +158,17 @@ export class Reprimands {
         tipo: value.tipo
       }
     };
-    //console.log('BODY', body);
     this.reprimandService.createReprimand(value.idAlumno, value.idProfesor, body).subscribe({
       next: () => {
         alert('Amonestación creada correctamente');
         this.reprimandForm.reset({
-          fecha: new Date().toISOString().split('T')[0]
+          fecha: new Date().toISOString().split('T')[0],
+          idProfesor: this.user()?.role === 'profesor' ? this.user()?.id : null 
         });
 
       },
       error: (error) => {
         console.error(error);
-        console.log('ERROR BACKEND', error.error);
         alert('Error creando amonestación');
       }
     });
@@ -144,8 +177,6 @@ export class Reprimands {
   loadReprimands() {
     this.reprimandService.getReprimands().subscribe({
       next: (data: any) => {
-        //console.log(data);
-        console.log('AMONESTACIONES ALUMNO', data);
         this.reprimands.set(data);
         this.mostrarFormulario.set(false);
         this.mostrarBusquedaAlumno.set(false);
@@ -156,7 +187,6 @@ export class Reprimands {
 
   loadStudentReprimands(idAlumno: number) {
     this.mostrarFormulario.set(false);
-    
     this.reprimandService.getReprimandByStudent(idAlumno).subscribe({
       next: (data: any) => {
         this.reprimands.set(data);
@@ -164,10 +194,8 @@ export class Reprimands {
       },
       error: (err) => {
         if (err.status === 404) {
-          // Vaciamos la lista y mostramos la tabla
           this.reprimands.set([]);
           this.mostrarTabla.set(true);
-          // ¡Hemos quitado el alert!
         } else {
           console.error(err);
           alert('Error cargando amonestaciones del alumno');
@@ -179,10 +207,21 @@ export class Reprimands {
   showStudentSelector() {
     this.mostrarFormulario.set(false);
     this.mostrarTabla.set(false);
-    this.mostrarBusquedaAlumno.set(true);
-    this.studentService.getStudents().subscribe({
-      next: (data: any) => this.alumnos.set(data)
-    });
+
+    const currentUser = this.user();
+    if (currentUser?.role === 'alumno') {
+      this.mostrarBusquedaAlumno.set(false); 
+      
+      if (currentUser.id) {
+        this.alumnoSeleccionado.set(currentUser.id);
+        this.loadStudentReprimands(currentUser.id); 
+      } else {
+        alert('Error: No se pudo identificar tu ID de alumno.');
+      }
+    } else {
+      this.mostrarBusquedaAlumno.set(true);
+      this.cargarDatosBase();
+    }
   }
 
   buscarAmonestacionesAlumno() {

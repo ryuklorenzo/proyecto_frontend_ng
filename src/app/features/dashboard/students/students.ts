@@ -1,4 +1,4 @@
-import { Component, inject, computed, signal, OnInit } from '@angular/core';
+import { Component, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
@@ -13,7 +13,10 @@ import {
   LucideUserCircle,
   LucideLogOut,
   LucideDynamicIcon,
+  LucideEye,
+  LucideUserX
 } from '@lucide/angular';
+import { ActivatedRoute } from '@angular/router';
 
 interface Buttons {
   label: string;
@@ -38,6 +41,7 @@ export class Students {
   private studentService = inject(StudentService);
   private courseService = inject(CourseService);
   private fb = inject(FormBuilder);
+  private route = inject(ActivatedRoute);
 
   user = this.authService.user;
 
@@ -45,7 +49,9 @@ export class Students {
     ChevronLeft: LucideChevronLeft,
     ChevronRight: LucideChevronRight,
     UserCircle: LucideUserCircle,
-    LogOut: LucideLogOut
+    LogOut: LucideLogOut,
+    Eye: LucideEye,
+    UserX: LucideUserX
   };
 
   private butonItems: Buttons[] = [
@@ -72,9 +78,9 @@ export class Students {
   filteredStudents = computed(() => {
     const term = this.searchTerm().toLowerCase();
     const allStudents = this.students();
-    
+
     if (!term) return allStudents;
-    
+
     return allStudents.filter(student =>
       student.nombre.toLowerCase().includes(term) ||
       student.apellidos.toLowerCase().includes(term) ||
@@ -93,7 +99,7 @@ export class Students {
   toggleCrearAlumno() {
     this.mostrarTabla.set(false);
     this.mostrarFormulario.set(true);
-    
+
     //desplegable de cursos dispo
     this.courseService.getCourses().subscribe({
       next: (data: any) => this.cursos.set(data),
@@ -137,8 +143,7 @@ export class Students {
     };
 
     this.studentService.createStudent(studentData, formValue.idCurso).subscribe({
-      next: (response) => {
-        console.log(response);
+      next: () => {
         //reseteamos el estado
         this.studentForm.reset({ idCurso: 1 });
         alert('Alumno creado correctamente');
@@ -162,7 +167,7 @@ export class Students {
   bajaStudent(student: any) {
     const confirmar = confirm(`¿Dar de baja a ${student.nombre} ${student.apellidos}?`);
     if (!confirmar) return;
-    
+
     this.studentService.bajaStudent(student.id).subscribe({
       next: () => {
         alert('Alumno dado de baja correctamente');
@@ -180,9 +185,16 @@ export class Students {
     this.selectedStudent.set(null);
   }
 
-  // Método auxiliar para la vista HTML para comprobar si un campo tiene error
   hasError(controlName: string, errorName: string = 'required') {
     const control = this.studentForm.get(controlName);
     return control?.hasError(errorName) && control?.touched;
+  }
+
+  constructor() {
+    this.route.queryParams.subscribe(params => {
+      if (params['view'] === 'list') {
+        this.loadStudents();
+      }
+    });
   }
 }

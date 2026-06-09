@@ -9,6 +9,8 @@ import {
   LucideChevronRight,
   LucideUserCircle,
   LucideDynamicIcon,
+  LucideEye,
+  LucideUserX
 } from '@lucide/angular';
 import { CommonModule } from '@angular/common';
 import {
@@ -17,11 +19,8 @@ import {
   Validators,
   ReactiveFormsModule
 } from '@angular/forms';
-
 import { TableModule } from 'primeng/table';
-
-// Asegúrate de que las rutas a tus servicios sean correctas
-import { RecordService } from '../../../core/services/records/record'; 
+import { RecordService } from '../../../core/services/records/record';
 import { StudentService } from '../../../core/services/students/student';
 import { ExecutiveService } from '../../../core/services/executives/executive';
 
@@ -50,14 +49,16 @@ export class Records {
   private recordService = inject(RecordService);
   private studentService = inject(StudentService);
   private executiveService = inject(ExecutiveService);
-  
+
   user = this.authService.user;
 
   icons = {
     ChevronLeft: LucideChevronLeft,
     ChevronRight: LucideChevronRight,
     UserCircle: LucideUserCircle,
-    LogOut: LucideLogOut
+    LogOut: LucideLogOut,
+    Eye: LucideEye,
+    UserX: LucideUserX
   }
 
   private butonItems: Buttons[] = [
@@ -73,14 +74,12 @@ export class Records {
     return this.butonItems.filter((btn) => btn.roles.includes(currentUser.role));
   });
 
-  // Signals de estado visual
   mostrarFormulario = signal(false);
   mostrarTabla = signal(false);
   mostrarDetalle = signal(false);
   mostrarBusquedaAlumno = signal(false);
   mostrarBusquedaDirectivo = signal(false);
 
-  // Signals de datos
   records = signal<any[]>([]);
   selectedRecord = signal<any>(null);
   searchTerm = signal('');
@@ -117,10 +116,21 @@ export class Records {
     this.studentService.getStudents().subscribe({
       next: (data: any) => this.alumnos.set(data)
     });
-    
+
     this.executiveService.getExecutives().subscribe({
       next: (data: any) => this.directivos.set(data)
     });
+
+    const currentUser = this.user();
+    if (currentUser?.role === 'directivo' && currentUser.id) {
+      this.recordForm.patchValue({
+        idDirectivo: currentUser.id
+      });
+    } else {
+      this.recordForm.patchValue({
+        idDirectivo: null
+      });
+    }
   }
 
   createRecord() {
@@ -130,21 +140,16 @@ export class Records {
     }
 
     const formValue = this.recordForm.value;
-
     const record = {
       estado: formValue.estado
     };
 
-    // Suponemos que tu RecordService tiene este método:
-    // createRecord(idDirectivo: number, idAlumno: number, record: any)
     this.recordService.createRecord(
       formValue.idDirectivo,
       formValue.idAlumno,
       record
     ).subscribe({
-      next: (response) => {
-        console.log(response);
-
+      next: () => {
         this.recordForm.reset({
           estado: 'Abierto',
           idDirectivo: null,
@@ -164,7 +169,7 @@ export class Records {
     this.mostrarFormulario.set(false);
     this.mostrarBusquedaAlumno.set(false);
     this.mostrarBusquedaDirectivo.set(false);
-    
+
     this.recordService.getRecords().subscribe({
       next: (data: any) => {
         this.records.set(data);
@@ -247,11 +252,16 @@ export class Records {
     this.mostrarFormulario.set(false);
     this.mostrarTabla.set(false);
     this.mostrarBusquedaAlumno.set(false);
-    this.mostrarBusquedaDirectivo.set(true);
-
-    this.executiveService.getExecutives().subscribe({
-      next: (data: any) => this.directivos.set(data)
-    });
+    const currentUser = this.user();
+    if (currentUser?.role === 'directivo') {
+      this.directivoSeleccionado.set(currentUser.id);
+      this.loadExecutiveRecords(currentUser.id);
+    } else {
+      this.mostrarBusquedaDirectivo.set(true);
+      this.executiveService.getExecutives().subscribe({
+        next: (data: any) => this.directivos.set(data)
+      });
+    }
   }
 
   buscarExpedientesDirectivo() {

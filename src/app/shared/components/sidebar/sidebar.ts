@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, inject, computed } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService, UserRole } from '../../../core/auth/auth';
@@ -28,9 +28,8 @@ export class Sidebar {
 
   authService = inject(AuthService);
   user = this.authService.user; 
-  mostrarLogoutModal = false;
+  mostrarLogoutModal = signal(false);
 
-  // Registro de iconos estáticos para usarlos en el template HTML
   icons = { 
     ChevronLeft: LucideChevronLeft,
     ChevronRight: LucideChevronRight,
@@ -38,7 +37,6 @@ export class Sidebar {
     LogOut: LucideLogOut
   };
 
-  //TODO verificar permisos de cada campo
   private navItems: NavItem[] = [
     { href: '/dashboard', label: 'Inicio', icon: LucideHome, roles: ['admin', 'directivo', 'profesor', 'alumno'] },
     { href: '/dashboard/courses', label: 'Cursos', icon: LucideBookOpen, roles: ['admin'] },
@@ -49,12 +47,12 @@ export class Sidebar {
     { href: '/dashboard/tasks', label: 'Tareas', icon: LucideClipboardList, roles: ['admin', 'directivo', 'profesor', 'alumno'] },
     { href: '/dashboard/records', label: 'Expedientes', icon: LucideFileText, roles: ['admin', 'directivo'] },
     { href: '/dashboard/previ', label: 'Previ', icon: LucideClipboardList, roles: ['admin', 'directivo'] },
-    { href: '/dashboard/attitudes', label: 'Actitudes', icon: LucideTriangleAlert, roles: ['admin', 'directivo', 'profesor'] },
-    { href: '/dashboard/reprimands', label: 'Amonestaciones', icon: LucideTriangleAlert, roles: ['admin', 'directivo', 'profesor'] },
-    { href: '/dashboard/recognitions', label: 'Reconocimientos', icon: LucideClipboardList, roles: ['admin', 'directivo'] },
+    { href: '/dashboard/attitudes', label: 'Actitudes', icon: LucideTriangleAlert, roles: ['admin', 'directivo', 'profesor', 'alumno'] },
+    { href: '/dashboard/reprimands', label: 'Amonestaciones', icon: LucideTriangleAlert, roles: ['admin', 'directivo', 'profesor', 'alumno'] },
+    { href: '/dashboard/recognitions', label: 'Reconocimientos', icon: LucideClipboardList, roles: ['admin', 'directivo', 'profesor' ,'alumno'] },
     { href: '/dashboard/mentions', label: 'Menciones', icon: LucideClipboardList, roles: ['admin', 'directivo'] },
     { href: '/dashboard/probi', label: 'Probi', icon: LucideClipboardList, roles: ['admin', 'directivo'] },
-    { href: '/dashboard/aula-convivencia', label: 'Aula_convivencia', icon: LucideClipboardList, roles: ['admin', 'directivo'] },
+    { href: '/dashboard/classroom_coexistence', label: 'Aula_convivencia', icon: LucideClipboardList, roles: ['admin', 'directivo'] },
   ];
 
   filteredNavItems = computed(() => {
@@ -74,7 +72,7 @@ export class Sidebar {
   }
 
   openLogoutModal() {
-    this.mostrarLogoutModal = true;
+    this.mostrarLogoutModal.set(true);
   }
 
   confirmLogout() {
@@ -82,6 +80,6 @@ export class Sidebar {
   }
 
   closeLogoutModal() {
-    this.mostrarLogoutModal = false;
+    this.mostrarLogoutModal.set(false);
   }
 }

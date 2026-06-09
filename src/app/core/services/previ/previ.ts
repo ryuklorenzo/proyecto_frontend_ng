@@ -9,7 +9,6 @@ export class PreviService {
 
     private http = inject(HttpClient);
     private authService = inject(AuthService);
-    token = this.authService.token();
 
     createPrevi(idDirectivo: number, idExpediente: number, previ: any) {
         return this.http.post(
@@ -17,7 +16,7 @@ export class PreviService {
             previ,
             {
                 headers: new HttpHeaders({
-                    Authorization: `Bearer ${this.token}`
+                    Authorization: `Bearer ${this.authService.token()}`
                 })
             }
         );
@@ -26,17 +25,17 @@ export class PreviService {
     getPrevis() {
         return this.http.get('/api/previ/', {
             headers: {
-                Authorization: `Bearer ${this.token}`
+                Authorization: `Bearer ${this.authService.token()}`
             }
         });
     }
 
     getPrevisByExpediente(idExpediente: number) {
         return this.http.get(
-            `/api/previ/expediente/${idExpediente}`,
+            `/api/previ/expediente/${idExpediente}/`,
             {
                 headers: {
-                    Authorization: `Bearer ${this.token}`
+                    Authorization: `Bearer ${this.authService.token()}`
                 }
             }
         );
@@ -44,10 +43,10 @@ export class PreviService {
 
     getPrevisByDirectivo(idDirectivo: number) {
         return this.http.get(
-            `/api/previ/directivo/${idDirectivo}`,
+            `/api/previ/directivo/${idDirectivo}/`,
             {
                 headers: {
-                    Authorization: `Bearer ${this.token}`
+                    Authorization: `Bearer ${this.authService.token()}`
                 }
             }
         );
@@ -55,11 +54,11 @@ export class PreviService {
 
     updatePrevi(id: number, previ: any) {
         return this.http.put(
-            `/api/previ/${id}`,
+            `/api/previ/${id}/`,
             previ,
             {
                 headers: {
-                    Authorization: `Bearer ${this.token}`
+                    Authorization: `Bearer ${this.authService.token()}`
                 }
             }
         );
@@ -67,10 +66,10 @@ export class PreviService {
 
     deletePrevi(id: number) {
         return this.http.delete(
-            `/api/previ/${id}`,
+            `/api/previ/${id}/`,
             {
                 headers: {
-                    Authorization: `Bearer ${this.token}`
+                    Authorization: `Bearer ${this.authService.token()}`
                 }
             }
         );

@@ -13,29 +13,23 @@ import { Reprimands } from './features/dashboard/reprimands/reprimands';
 import { Recognitions } from './features/dashboard/recognitions/recognitions';
 import { Probi } from './features/dashboard/probi/probi';
 import { Previ } from './features/dashboard/previ/previ';
-import { AulaConvivencia } from './features/dashboard/aula-convivencia/aula-convivencia';
+import { Classroom_coexistence } from './features/dashboard/classroom_coexistence/classroom_coexistence';
 import { Mentions } from './features/dashboard/mentions/mentions';
 import { Attitudes } from './features/dashboard/attitudes/attitudes';
-//import { authGuard } from './core/auth/auth.guard'; // Importante para proteger el dashboard
 
 export const routes: Routes = [
   {
     path: '',
-    //TODO mover a otro archivo.
-    //aqui esta el login, deberiamos de moverlo a otro archivo si
     component: Login
   },
 
-  // 2. RUTAS PROTEGIDAS: Todo lo que cuelga del Dashboard
   {
     path: 'dashboard',
     component: DashboardLayout, //layout actúa de padre
-    //canActivate: [authGuard], // para proteger rutas, si da tiempo a futuro, esta guapo
     children: [
       {
         path: '',
-        // Esta es la vista principal que carga DENTRO del dashboard (el resumen/inicio del panel)
-        component: Home, //si pongo que navegue de home a home hacemos poco
+        component: Home,
         },
       {path: 'students',component: Students,},
       {path: 'teachers',component: Teachers,},
@@ -48,14 +42,12 @@ export const routes: Routes = [
       {path: 'recognitions',component: Recognitions,},
       {path: 'probi',component: Probi,},
       {path: 'previ',component: Previ,},
-      {path: 'aula-convivencia',component: AulaConvivencia,},
+      {path: 'classroom_coexistence',component: Classroom_coexistence,},
       {path: 'mentions',component: Mentions,},
       {path: 'attitudes',component: Attitudes,},
-      // mas paginas futuro
     ],
   },
 
-  //si la URL no existe, lo manda al Login
   {
     path: '**',
     redirectTo: '',

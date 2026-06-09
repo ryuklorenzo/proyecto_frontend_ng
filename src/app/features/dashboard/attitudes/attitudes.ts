@@ -1,8 +1,7 @@
-import { Component, computed, inject, signal, OnInit } from '@angular/core';
+import { Component, computed, inject, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
-
 import { AuthService, UserRole } from '../../../core/auth/auth';
 import { AttitudeService } from '../../../core/services/attitudes/attitude';
 import { StudentService } from '../../../core/services/students/student';
@@ -37,7 +36,7 @@ interface Buttons {
   templateUrl: './attitudes.html',
   styleUrl: './attitudes.css',
 })
-export class Attitudes implements OnInit {
+export class Attitudes {
   authService = inject(AuthService);
   private fb = inject(FormBuilder);
   private attitudeService = inject(AttitudeService);
@@ -56,9 +55,9 @@ export class Attitudes implements OnInit {
   }
 
   private butonItems: Buttons[] = [
-    { label: 'Crear actitud', icon: LucideShieldAlert, roles: ['admin', 'directivo'] },
-    { label: 'Ver actitudes', icon: LucideSearch, roles: ['admin', 'directivo'] },
-    { label: 'Ver por alumno', icon: LucideSearch, roles: ['admin', 'directivo'] },
+    { label: 'Crear actitud', icon: LucideShieldAlert, roles: ['admin', 'directivo', 'profesor'] },
+    { label: 'Ver actitudes', icon: LucideSearch, roles: ['admin', 'directivo', 'profesor'] },
+    { label: 'Ver por alumno', icon: LucideSearch, roles: ['admin', 'directivo', 'profesor', 'alumno'] },
   ];
 
   filteredButtons = computed(() => {
@@ -79,52 +78,63 @@ export class Attitudes implements OnInit {
   alumnoSeleccionado = signal<number | null>(null);
   searchTerm = signal('');
 
-  //cruzar actitudes con el nombre del alumno
+  // cruzar actitudes con el nombre del alumno
   filteredActitudes = computed(() => {
     const term = this.searchTerm().toLowerCase();
     const allAttitudes = this.actitudes();
     const allStudents = this.alumnos();
 
     const enrichedAttitudes = allAttitudes.map(act => {
-      //cruzamos usando id_alumno o id_usuario según lo que devuelva tu backend
-      const idEstudiante = act.id_alumno || act.id_usuario;
+      const idEstudiante = act.id_alumno || act.id_usuario; //busca por id_alumno o por id_usuario
       const student = allStudents.find(s => Number(s.id) === Number(idEstudiante));
       
       return {
         ...act,
         nombre_alumno_completo: student ? `${student.nombre} ${student.apellidos}` : 'Desconocido'
       };
+      // si lo encuentra devuelve nombre y apellidos
     });
 
-    if (!term) return enrichedAttitudes;
-    
+    if (!term) return enrichedAttitudes; 
+    //si no hay busqueda, devuelve solo las enriquecidas
     return enrichedAttitudes.filter((act: any) =>
-      act.tipo?.toLowerCase().includes(term) ||
-      act.descripcion?.toLowerCase().includes(term) ||
-      act.fecha?.includes(term) ||
-      act.nombre_alumno_completo?.toLowerCase().includes(term)
+      act.tipo?.toLowerCase().includes(term) || //tipo actitud
+      act.descripcion?.toLowerCase().includes(term) || //descripcion de actitud
+      act.fecha?.includes(term) || //fecha actitud
+      act.nombre_alumno_completo?.toLowerCase().includes(term) //nombre estudiante completo
     );
   });
 
+  //form
   attitudeForm: FormGroup = this.fb.group({
     tipo: ['', Validators.required],
     descripcion: ['', Validators.required],
-    fecha: ['', Validators.required],
+    fecha: [new Date().toISOString().split('T')[0], Validators.required],
     id_alumno: [null, Validators.required]
   });
 
-  ngOnInit() {
-    this.cargarAlumnos();
+  constructor() {
+    //sin esto da CC y no se ejecuta antes
+    effect(() => {
+      if (this.authService.isAuthenticated()) {
+        this.cargarAlumnos();
+      }
+    });
   }
 
   cargarAlumnos() {
     this.studentService.getStudents().subscribe({
-      next: (data: any) => this.alumnos.set(data),
+      next: (data: any) => {
+        // Aseguramos que data es un array por si acaso
+        const lista = Array.isArray(data) ? data : [];
+        this.alumnos.set(lista);
+      },
       error: (err) => console.error('Error cargando alumnos', err)
     });
   }
 
   ocultarTodo() {
+    //no tiene misterio
     this.mostrarFormulario.set(false);
     this.mostrarBusquedaAlumno.set(false);
     this.mostrarTabla.set(false);
@@ -134,14 +144,49 @@ export class Attitudes implements OnInit {
     this.ocultarTodo();
     this.mostrarFormulario.set(true);
     this.cargarAlumnos();
+    this.attitudeForm.reset({
+      fecha: new Date().toISOString().split('T')[0],
+      id_alumno: null
+    });
   }
 
   showStudentSelector() {
     this.ocultarTodo();
-    this.mostrarBusquedaAlumno.set(true);
-    this.cargarAlumnos();
     this.actitudes.set([]);
     this.isShowingAll.set(false);
+
+    const currentUser = this.user();
+
+    // Comprobamos si el usuario logueado es un alumno
+    if (currentUser?.role === 'alumno') {
+      this.mostrarBusquedaAlumno.set(false);
+      
+      if (currentUser.id) {
+        this.alumnoSeleccionado.set(currentUser.id);
+        
+        this.attitudeService.getAttituddesByStudent(currentUser.id).subscribe({
+          next: (data: any) => {
+            this.actitudes.set(data);
+            this.mostrarTabla.set(true);
+          },
+          error: (err) => {
+            if (err.status === 404) {
+              this.actitudes.set([]);
+              this.mostrarTabla.set(true);
+            } else {
+              console.error(err);
+              alert('Error cargando tus actitudes');
+            }
+          }
+        });
+        
+      } else {
+        alert('Error: No se pudo identificar tu ID de alumno.');
+      }
+    } else {
+      this.mostrarBusquedaAlumno.set(true);
+      this.cargarAlumnos();
+    }
   }
 
   loadAttitudes() {
@@ -169,19 +214,25 @@ export class Attitudes implements OnInit {
   createAttitude() {
     if (this.attitudeForm.invalid) {
       this.attitudeForm.markAllAsTouched();
+      //simplemente recordarle que tiene que rellenarlo entero
       return;
     }
 
     const formValue = this.attitudeForm.value;
+    //datos a enviar
     const dataToSave = {
       tipo: formValue.tipo,
       descripcion: formValue.descripcion,
       fecha: formValue.fecha
     };
 
+    //llamada api
     this.attitudeService.createAttitude(formValue.id_alumno, dataToSave).subscribe({
       next: (response) => {
-        console.log(response);
+        this.attitudeForm.reset({ 
+          fecha: new Date().toISOString().split('T')[0],
+          id_alumno: null 
+        });
         this.attitudeForm.reset({ id_alumno: null });
         alert('Actitud creada correctamente');
       },

@@ -16,6 +16,9 @@ export interface User {
 export interface AuthResponse {
   access_token: string;
   role: string;
+  id: number;
+  nombre: string;
+  apellidos: string;
 }
 
 @Injectable({
@@ -51,7 +54,6 @@ export class AuthService {
   }
 
   private detectUserRole(role: string): UserRole {
-    //TODO cambiar esto de alguna manera saber que es, pero asi no
     const role_lowercase = role.toLowerCase();
     if (role_lowercase.includes('admin')){
       return 'admin';
@@ -76,8 +78,7 @@ export class AuthService {
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
         })
       );
-      // console.log(response)
-
+      
       if (!response.access_token) {
         console.error('La respuesta no contiene access_token');
         return false;
@@ -85,23 +86,12 @@ export class AuthService {
 
       const userRole = this.detectUserRole(response.role);
 
-      // const alumno = this.detectUserRole("alumno");
-      // const profe = this.detectUserRole("profesor");
-      // const directivo = this.detectUserRole("directivo");
-      // const admin = this.detectUserRole("admin");
-
       const userData: User = {
-        id: 1,
-        nombre: username,
-        apellidos: '',
+        id: response.id,
+        nombre: response.nombre,
+        apellidos: response.apellidos,
         activo: true,
-        role: userRole, //asi tendrá que ser
-
-        //TESTEO
-        // role: alumno,
-        // role: profe,
-        // role: directivo,
-        // role: admin,
+        role: userRole, 
       };
 
       this.token.set(response.access_token);
@@ -110,9 +100,6 @@ export class AuthService {
       localStorage.setItem('access_token', response.access_token);
       localStorage.setItem('user', JSON.stringify(userData));
 
-      console.log('Login exitoso');
-      console.log(response.access_token);
-      console.log(response.role);
       return true;
     } catch (error) {
       console.error('Login error:', error);

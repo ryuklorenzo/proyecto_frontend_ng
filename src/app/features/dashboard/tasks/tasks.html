@@ -12,7 +12,7 @@
         </p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+    <div class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-3 gap-8">
 
         @for (btn of filteredButtons(); track btn.label) {
 
@@ -83,6 +83,13 @@
 
             <div>
                 <label class="block mb-2 font-semibold">Profesor</label>
+                
+                @if(user()?.role === 'profesor') {
+                <div class="w-full border border-slate-700 bg-slate-800 text-slate-300 rounded-xl p-4 cursor-not-allowed flex items-center gap-2">
+                    <svg [lucideIcon]="icons.UserCircle" class="w-5 h-5"></svg>
+                    {{ user()?.nombre }} {{ user()?.apellidos }} (Tú)
+                </div>
+                } @else {
                 <select formControlName="idProfesor" class="w-full border border-slate-700 bg-slate-900 text-white rounded-xl p-4">
                     <option [ngValue]="null" disabled selected class="bg-slate-900 text-white">Selecciona un profesor...</option>
                     @for(profesor of profesores(); track profesor.id){
@@ -93,6 +100,7 @@
                 </select>
                 @if(hasError('idProfesor')){
                 <p class="text-red-500 text-sm mt-2">Seleccionar profesor es obligatorio.</p>
+                }
                 }
             </div>
 
@@ -190,7 +198,7 @@
                         <td>
                             <button (click)="viewTask(task)"
                                 class="w-12 h-12 rounded-xl bg-blue-600 text-white flex items-center justify-center">
-                                👁
+                                <svg [lucideIcon]="icons.Eye" class="w-5 h-5 text-white-600"></svg>
                             </button>
                         </td>
                     </tr>

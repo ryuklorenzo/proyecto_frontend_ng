@@ -9,7 +9,6 @@ export class ReprimandService {
 
     private http = inject(HttpClient);
     private authService = inject(AuthService);
-    token = this.authService.token();
 
     createReprimand(idAlumno: number, idProfesor: number, reprimand: any) {
         return this.http.post(
@@ -17,7 +16,7 @@ export class ReprimandService {
             reprimand,
             {
                 headers: new HttpHeaders({
-                    Authorization: `Bearer ${this.token}`
+                    Authorization: `Bearer ${this.authService.token()}`
                 })
             }
         );
@@ -26,7 +25,7 @@ export class ReprimandService {
     getReprimands() {
         return this.http.get('/api/reprimands/', {
             headers: {
-                Authorization: `Bearer ${this.token}`
+                Authorization: `Bearer ${this.authService.token()}`
             }
         });
     }
@@ -36,19 +35,18 @@ export class ReprimandService {
             `/api/reprimands/${id}/`,
             {
                 headers: {
-                    Authorization: `Bearer ${this.token}`
+                    Authorization: `Bearer ${this.authService.token()}`
                 }
             }
         );
     }
 
     getReprimandByStudent(idAlumno: number) {
-        //console.log('TOKEN:', this.token);
         return this.http.get(
-            `/api/reprimands/students/${idAlumno}`,
+            `/api/reprimands/students/${idAlumno}/`,
             {
                 headers: {
-                    Authorization: `Bearer ${this.token}`
+                    Authorization: `Bearer ${this.authService.token()}`
                 }
             }
         );

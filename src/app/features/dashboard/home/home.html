@@ -1,1 +1,704 @@
-<p>HOME</p>
+<div class="space-y-8">
+    <div
+        class="relative overflow-hidden rounded-3xl border border-slate-800 bg-gradient-to-r from-slate-950 via-slate-900 to-blue-950 p-10">
+        <div class="absolute -top-24 -right-24 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl"></div>
+        <div class="relative flex flex-col md:flex-row justify-between items-center gap-8">
+            <div>
+                <h1 class="text-5xl font-bold text-white">
+                    Bienvenido, {{ user()?.nombre }} 👋
+                </h1>
+                <p class="text-xl text-slate-400 mt-3">
+                    {{ user()?.role }}
+                </p>
+                <p class="text-slate-500 mt-2">
+                    Resumen general de la plataforma escolar
+                </p>
+            </div>
+            <button (click)="openProfile()"
+                class="px-8 py-4 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-lg shadow-blue-600/30 transition-all">
+                👤 Mi Perfil
+            </button>
+        </div>
+    </div>
+
+    @if(isAdmin()) {
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+
+        <a [routerLink]="['/dashboard/students']" [queryParams]="{view: 'list'}"
+            class="bg-slate-900 border border-slate-800 rounded-3xl p-6 hover:border-blue-500 hover:-translate-y-1 transition-all cursor-pointer block">
+            <div class="flex justify-between items-center">
+                <div>
+                    <p class="text-slate-400">
+                        Alumnos
+                    </p>
+                    <h2 class="text-5xl font-bold text-white mt-3">
+                        {{ totalAlumnos() }}
+                    </h2>
+                </div>
+                <div
+                    class="w-20 h-20 rounded-3xl bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center shadow-sm">
+                    <svg [lucideIcon]="icons.GraduationCap" class="w-10 h-10 text-blue-600">
+                    </svg>
+                </div>
+            </div>
+        </a>
+
+        <a [routerLink]="['/dashboard/teachers']" [queryParams]="{view: 'list'}"
+            class="bg-slate-900 border border-slate-800 rounded-3xl p-6 hover:border-blue-500 hover:-translate-y-1 transition-all cursor-pointer block">
+            <div class="flex justify-between items-center">
+                <div>
+                    <p class="text-slate-400">
+                        Profesores
+                    </p>
+                    <h2 class="text-5xl font-bold text-white mt-3">
+                        {{ totalProfesores() }}
+                    </h2>
+                </div>
+                <div
+                    class="w-20 h-20 rounded-3xl bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center shadow-sm">
+                    <svg [lucideIcon]="icons.Users" class="w-10 h-10 text-blue-600"></svg>
+                </div>
+            </div>
+        </a>
+
+        <a [routerLink]="['/dashboard/courses']" [queryParams]="{view: 'list'}"
+            class="bg-slate-900 border border-slate-800 rounded-3xl p-6 hover:border-blue-500 hover:-translate-y-1 transition-all cursor-pointer block">
+            <div class="flex justify-between items-center">
+                <div>
+                    <p class="text-slate-400">
+                        Cursos
+                    </p>
+                    <h2 class="text-5xl font-bold text-white mt-3">
+                        {{ totalCursos() }}
+                    </h2>
+                </div>
+                <div
+                    class="w-20 h-20 rounded-3xl bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center shadow-sm">
+                    <svg [lucideIcon]="icons.BookOpen" class="w-10 h-10 text-blue-600">
+                    </svg>
+                </div>
+            </div>
+        </a>
+
+        <a [routerLink]="['/dashboard/schedules']" [queryParams]="{view: 'list'}"
+            class="bg-slate-900 border border-slate-800 rounded-3xl p-6 hover:border-blue-500 hover:-translate-y-1 transition-all cursor-pointer block">
+            <div class="flex justify-between items-center">
+                <div>
+                    <p class="text-slate-400">
+                        Horarios
+                    </p>
+                    <h2 class="text-5xl font-bold text-white mt-3">
+                        {{ totalHorarios() }}
+                    </h2>
+                </div>
+                <div
+                    class="w-20 h-20 rounded-3xl bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center shadow-sm">
+                    <svg [lucideIcon]="icons.Calendar" class="w-10 h-10 text-blue-600">
+                    </svg>
+                </div>
+            </div>
+        </a>
+
+    </div>
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-8">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-2xl font-bold text-white">
+                Últimos alumnos registrados
+            </h3>
+            <span class="text-slate-400 text-sm">
+                {{ ultimosAlumnos().length }} alumnos
+            </span>
+        </div>
+        <div class="space-y-4">
+            @for(alumno of ultimosAlumnos(); track alumno.id){
+            <button (click)="viewAlumno(alumno)"
+                class="w-full text-left flex items-center justify-between p-4 rounded-xl bg-slate-800 border border-slate-700 hover:border-blue-500 hover:bg-slate-700/70 transition-all duration-300 hover:scale-[1.01]">
+                <div>
+                    <p class="text-white font-semibold">
+                        {{ alumno.nombre }} {{ alumno.apellidos }}
+                    </p>
+                    <p class="text-slate-400 text-sm">
+                        ID: {{ alumno.id }}
+                    </p>
+                </div>
+                <div class="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold">
+                    {{ alumno.nombre?.charAt(0) }}
+                </div>
+            </button>
+            }
+        </div>
+    </div>}
+
+    @if(isDirectivo()) {
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+
+        <a [routerLink]="['/dashboard/records']"
+            class="bg-slate-900 border border-slate-800 rounded-3xl p-6 hover:border-blue-500 hover:-translate-y-1 transition-all block cursor-pointer">
+            <div class="flex justify-between items-center">
+                <div>
+                    <p class="text-slate-400">
+                        Expedientes
+                    </p>
+                    <h2 class="text-5xl font-bold text-white mt-3">
+                        {{ totalExpedientes() }}
+                    </h2>
+                </div>
+                <div class="w-20 h-20 rounded-3xl bg-blue-500/10 flex items-center justify-center text-4xl">
+                    📂
+                </div>
+            </div>
+        </a>
+
+        <a [routerLink]="['/dashboard/previ']"
+            class="bg-slate-900 border border-slate-800 rounded-3xl p-6 hover:border-cyan-500 hover:-translate-y-1 transition-all block cursor-pointer">
+            <div class="flex justify-between items-center">
+                <div>
+                    <p class="text-slate-400">
+                        Previs
+                    </p>
+                    <h2 class="text-5xl font-bold text-white mt-3">
+                        {{ totalPrevis() }}
+                    </h2>
+                </div>
+                <div class="w-20 h-20 rounded-3xl bg-cyan-500/10 flex items-center justify-center text-4xl">
+                    🛡️
+                </div>
+            </div>
+        </a>
+
+        <a [routerLink]="['/dashboard/reprimands']"
+            class="bg-slate-900 border border-slate-800 rounded-3xl p-6 hover:border-red-500 hover:-translate-y-1 transition-all block cursor-pointer">
+            <div class="flex justify-between items-center">
+                <div>
+                    <p class="text-slate-400">
+                        Amonestaciones
+                    </p>
+                    <h2 class="text-5xl font-bold text-white mt-3">
+                        {{ totalAmonestaciones() }}
+                    </h2>
+                </div>
+                <div class="w-20 h-20 rounded-3xl bg-red-500/10 flex items-center justify-center text-4xl">
+                    ⚠️
+                </div>
+            </div>
+        </a>
+
+        <a [routerLink]="['/dashboard/recognitions']"
+            class="bg-slate-900 border border-slate-800 rounded-3xl p-6 hover:border-emerald-500 hover:-translate-y-1 transition-all block cursor-pointer">
+            <div class="flex justify-between items-center">
+                <div>
+                    <p class="text-slate-400">
+                        Reconocimientos
+                    </p>
+                    <h2 class="text-5xl font-bold text-white mt-3">
+                        {{ totalReconocimientos() }}
+                    </h2>
+                </div>
+                <div class="w-20 h-20 rounded-3xl bg-emerald-500/10 flex items-center justify-center text-4xl">
+                    🏆
+                </div>
+            </div>
+        </a>
+
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+        <div class="bg-[#08173d] border border-blue-900/40 rounded-3xl p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-3xl font-bold text-white">
+                    📂 Expedientes
+                </h3>
+                <span class="px-4 py-2 rounded-full bg-blue-500/20 text-blue-400 font-bold">
+                    {{ totalExpedientes() }}
+                </span>
+            </div>
+            @for(expediente of ultimosExpedientes(); track expediente.id) {
+            <button (click)="viewExpediente(expediente)"
+                class="w-full text-left mb-3 bg-slate-800 border border-slate-700 rounded-xl p-4 hover:border-blue-500 hover:bg-slate-700/70 transition-all duration-300">
+                <p class="font-semibold text-white">
+                    Expediente #{{ expediente.id }}
+                </p>
+                <p class="text-slate-400 text-sm">
+                    Estado: {{ expediente.estado }}
+                </p>
+            </button>
+            }
+        </div>
+        <div class="bg-[#08173d] border border-blue-900/40 rounded-3xl p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-3xl font-bold text-white">
+                    🛡️ Previs
+                </h3>
+                <span class="px-4 py-2 rounded-full bg-blue-500/20 text-blue-400 font-bold">
+                    {{ totalPrevis() }}
+                </span>
+            </div>
+            @for(previ of ultimasPrevis(); track previ.id) {
+            <button (click)="viewPrevi(previ)"
+                class="w-full text-left mb-3 bg-slate-800 border border-slate-700 rounded-xl p-4 hover:border-cyan-500 hover:bg-slate-700/70 transition-all duration-300">
+                <p class="font-semibold text-white">
+                    Previ #{{ previ.id }}
+                </p>
+                <p class="text-slate-400 text-sm">
+                    {{ previ.fecha }}
+                </p>
+            </button>
+            }
+        </div>
+    </div>
+    }
+
+    @if(isProfesor()) {
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+        <a [routerLink]="['/dashboard/tasks']"
+            class="bg-slate-900 border border-slate-800 rounded-3xl p-6 hover:border-blue-500 hover:-translate-y-1 transition-all block cursor-pointer">
+            <div class="flex justify-between items-center">
+                <div>
+                    <p class="text-slate-400">Tareas creadas</p>
+                    <h2 class="text-5xl font-bold text-white mt-3">{{ totalTareas() }}</h2>
+                </div>
+                <div class="w-20 h-20 rounded-3xl bg-blue-500/10 flex items-center justify-center">
+                    <svg [lucideIcon]="icons.BookOpen" class="w-10 h-10 text-blue-500"></svg>
+                </div>
+            </div>
+        </a>
+        <a [routerLink]="['/dashboard/tasks']"
+            class="bg-slate-900 border border-slate-800 rounded-3xl p-6 hover:border-orange-500 hover:-translate-y-1 transition-all block cursor-pointer">
+            <div class="flex justify-between items-center">
+                <div>
+                    <p class="text-slate-400">Pendientes</p>
+                    <h2 class="text-5xl font-bold text-white mt-3">{{ tareasPendientes() }}</h2>
+                </div>
+                <div class="w-20 h-20 rounded-3xl bg-orange-500/10 flex items-center justify-center">
+                    <svg [lucideIcon]="icons.Calendar" class="w-10 h-10 text-orange-500"></svg>
+                </div>
+            </div>
+        </a>
+        <a [routerLink]="['/dashboard/reprimands']"
+            class="bg-slate-900 border border-slate-800 rounded-3xl p-6 hover:border-red-500 hover:-translate-y-1 transition-all block cursor-pointer">
+            <div class="flex justify-between items-center">
+                <div>
+                    <p class="text-slate-400">Amonestaciones</p>
+                    <h2 class="text-5xl font-bold text-white mt-3">{{ totalAmonestaciones() }}</h2>
+                </div>
+                <div class="w-20 h-20 rounded-3xl bg-red-500/10 flex items-center justify-center text-4xl">⚠️</div>
+            </div>
+        </a>
+        <a [routerLink]="['/dashboard/recognitions']"
+            class="bg-slate-900 border border-slate-800 rounded-3xl p-6 hover:border-emerald-500 hover:-translate-y-1 transition-all block cursor-pointer">
+            <div class="flex justify-between items-center">
+                <div>
+                    <p class="text-slate-400">Reconocimientos</p>
+                    <h2 class="text-5xl font-bold text-white mt-3">{{ totalReconocimientos() }}</h2>
+                </div>
+                <div class="w-20 h-20 rounded-3xl bg-emerald-500/10 flex items-center justify-center text-4xl">🏆</div>
+            </div>
+        </a>
+    </div>
+
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-8 mt-8">
+
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-8">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-2xl font-bold text-white">Últimas tareas</h3>
+                <span class="px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 text-sm">
+                    {{ ultimasTareas().length }}
+                </span>
+            </div>
+            <div class="space-y-4">
+                @for(tarea of ultimasTareas(); track tarea.id){
+                <button (click)="viewTask(tarea)"
+                    class="w-full text-left p-5 rounded-2xl bg-slate-800 border border-slate-700 hover:border-blue-500 hover:bg-slate-700/70 transition-all duration-300 hover:scale-[1.01]">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="font-semibold text-white">
+                                {{ tarea.descripcion }}
+                            </p>
+                        </div>
+                        <span class="px-3 py-1 rounded-full text-xs font-semibold" [class]="tarea.estado === 'COMPLETADA'
+                        ? 'bg-emerald-500/10 text-emerald-400'
+                        : 'bg-orange-500/10 text-orange-400'">
+                            {{ tarea.estado }}
+                        </span>
+                    </div>
+                </button>
+                }
+            </div>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-8">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-2xl font-bold text-white">Últimas amonestaciones</h3>
+                <span class="px-3 py-1 rounded-full bg-red-500/10 text-red-400 text-sm">
+                    {{ ultimasAmonestaciones().length }}
+                </span>
+            </div>
+            <div class="space-y-4">
+                @for(amonestacion of ultimasAmonestaciones(); track amonestacion.id){
+                <button (click)="viewReprimand(amonestacion)"
+                    class="w-full text-left p-5 rounded-2xl bg-slate-800 border border-slate-700 hover:border-red-500 hover:bg-slate-700/70 transition-all duration-300 hover:scale-[1.01]">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <p class="font-semibold text-white">
+                                {{ amonestacion.actitud_descripcion }}
+                            </p>
+                            <p class="text-sm text-slate-400 mt-2">
+                                Nivel {{ amonestacion.nivel }}
+                            </p>
+                        </div>
+                        <span class="px-3 py-1 rounded-full bg-red-500/10 text-red-400 text-xs font-semibold">
+                            {{ amonestacion.nivel }}
+                        </span>
+                    </div>
+                </button>
+                }
+            </div>
+        </div>
+
+    </div>
+    }
+
+    @if(isAlumno()) {
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-8">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-white">
+                    📚 Mis tareas
+                </h3>
+                <span class="px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 text-sm">
+                    {{ ultimasTareas().length }}
+                </span>
+            </div>
+            <div class="space-y-4">
+                @for(tarea of ultimasTareas(); track tarea.id){
+                <button (click)="viewTask(tarea)"
+                    class="w-full text-left p-5 rounded-2xl bg-slate-800 border border-slate-700 hover:border-blue-500 hover:bg-slate-700/70 transition-all duration-300 hover:scale-[1.01]">
+                    <div class="flex justify-between items-center">
+                        <p class="text-white font-semibold">
+                            {{ tarea.descripcion }}
+                        </p>
+                        <span class="px-3 py-1 rounded-full text-xs font-semibold" [class]="tarea.estado === 'COMPLETADA'
+                        ? 'bg-emerald-500/10 text-emerald-400'
+                        : 'bg-orange-500/10 text-orange-400'">
+                            {{ tarea.estado }}
+                        </span>
+                    </div>
+                </button>
+                }
+            </div>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-8">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-white">
+                    ⚠️ Mis amonestaciones
+                </h3>
+                <span class="px-3 py-1 rounded-full bg-red-500/10 text-red-400 text-sm">
+                    {{ ultimasAmonestaciones().length }}
+                </span>
+            </div>
+            <div class="space-y-4">
+                @for(amonestacion of ultimasAmonestaciones(); track amonestacion.id){
+                <button (click)="viewReprimand(amonestacion)"
+                    class="w-full text-left p-5 rounded-2xl bg-slate-800 border border-slate-700 hover:border-red-500 hover:bg-slate-700/70 transition-all duration-300 hover:scale-[1.01]">
+                    <p class="font-semibold text-white">
+                        {{ amonestacion.actitud_descripcion }}
+                    </p>
+                    <p class="text-sm text-slate-400 mt-2">
+                        Nivel {{ amonestacion.nivel }}
+                    </p>
+                </button>
+                }
+            </div>
+        </div>
+    </div>
+    }
+
+    @if(mostrarPerfil()) {
+    <div class="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-6">
+        <div
+            class="w-full max-w-5xl overflow-hidden rounded-[32px] border border-slate-700 bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950 shadow-2xl">
+            <div class="relative p-10 border-b border-slate-700">
+                <div class="absolute top-0 right-0 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl"></div>
+                <div class="flex items-center justify-between relative">
+                    <div class="flex items-center gap-6">
+                        <div
+                            class="w-24 h-24 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-4xl font-bold text-white shadow-lg">
+                            {{ user()?.nombre?.charAt(0) }}
+                        </div>
+                        <div>
+                            <h2 class="text-5xl font-bold text-white">
+                                Mi perfil
+                            </h2>
+                            <p class="text-slate-400 text-xl mt-2">
+                                Información de tu cuenta
+                            </p>
+                        </div>
+                    </div>
+                    <button (click)="closeProfile()"
+                        class="w-14 h-14 rounded-2xl bg-slate-800/60 hover:bg-slate-700 text-white text-2xl transition-all">
+                        ✕
+                    </button>
+                </div>
+            </div>
+            <div class="p-10">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div
+                        class="bg-slate-800/60 border border-slate-700 rounded-3xl p-6 hover:border-blue-500 transition-all">
+                        <p class="text-slate-400 text-sm uppercase tracking-wider">
+                            Nombre
+                        </p>
+                        <p class="text-3xl font-bold text-white mt-3">
+                            {{ user()?.nombre }}
+                        </p>
+                    </div>
+                    <div
+                        class="bg-slate-800/60 border border-slate-700 rounded-3xl p-6 hover:border-blue-500 transition-all">
+                        <p class="text-slate-400 text-sm uppercase tracking-wider">
+                            Apellidos
+                        </p>
+                        <p class="text-3xl font-bold text-white mt-3">
+                            {{ user()?.apellidos }}
+                        </p>
+                    </div>
+                    <div
+                        class="bg-slate-800/60 border border-slate-700 rounded-3xl p-6 hover:border-blue-500 transition-all">
+                        <p class="text-slate-400 text-sm uppercase tracking-wider">
+                            Rol
+                        </p>
+                        <p class="text-3xl font-bold text-blue-400 mt-3">
+                            {{ user()?.role }}
+                        </p>
+                    </div>
+                    <div
+                        class="bg-slate-800/60 border border-slate-700 rounded-3xl p-6 hover:border-blue-500 transition-all">
+                        <p class="text-slate-400 text-sm uppercase tracking-wider">
+                            ID Usuario
+                        </p>
+                        <p class="text-3xl font-bold text-white mt-3">
+                            #{{ user()?.id }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    }
+
+    @if(mostrarDetalle()) {
+    <div class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
+        <div class="w-full max-w-2xl rounded-3xl border border-slate-700 bg-slate-900 p-8 shadow-2xl">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-3xl font-bold text-white">
+                    @if(tipoDetalle() === 'tarea') {
+                    📚 Detalle de tarea
+                    }
+                    @if(tipoDetalle() === 'amonestacion') {
+                    ⚠️ Detalle de amonestación
+                    }
+                    @if(tipoDetalle() === 'alumno') {
+                    🎓 Detalle de alumno
+                    }
+                </h2>
+                <button (click)="closeModal()" class="w-12 h-12 rounded-xl bg-slate-800 hover:bg-slate-700 text-white">
+                    ✕
+                </button>
+            </div>
+
+            <div class="space-y-6">
+
+                @if(tipoDetalle() === 'tarea') {
+                <div class="bg-slate-800 rounded-2xl p-6">
+                    <p class="text-slate-400 mb-2">Descripción</p>
+                    <p class="text-white text-lg">
+                        {{ detalleSeleccionado()?.descripcion }}
+                    </p>
+                </div>
+                <div class="bg-slate-800 rounded-2xl p-6">
+                    <p class="text-slate-400 mb-2">Estado</p>
+                    <p class="text-white">
+                        {{ detalleSeleccionado()?.estado }}
+                    </p>
+                </div>
+                }
+
+                @if(tipoDetalle() === 'amonestacion') {
+                <div class="bg-slate-800 rounded-2xl p-6">
+                    <p class="text-slate-400 mb-2">Nivel</p>
+                    <p class="text-red-400 text-xl font-bold">
+                        {{ detalleSeleccionado()?.nivel }}
+                    </p>
+                </div>
+                <div class="bg-slate-800 rounded-2xl p-6">
+                    <p class="text-slate-400 mb-2">Descripción</p>
+                    <p class="text-white">
+                        {{ detalleSeleccionado()?.actitud_descripcion }}
+                    </p>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-slate-800 rounded-2xl p-6">
+                        <p class="text-slate-400 mb-2">Tipo</p>
+                        <p class="text-white">
+                            {{ detalleSeleccionado()?.actitud_tipo }}
+                        </p>
+                    </div>
+                    <div class="bg-slate-800 rounded-2xl p-6">
+                        <p class="text-slate-400 mb-2">Fecha</p>
+                        <p class="text-white">
+                            {{ detalleSeleccionado()?.actitud_fecha }}
+                        </p>
+                    </div>
+                </div>
+                <div class="bg-slate-800 rounded-2xl p-6">
+                    <p class="text-slate-400 mb-2">Profesor</p>
+                    <p class="text-white font-semibold">
+                        {{ detalleSeleccionado()?.profesor_nombre }}
+                        {{ detalleSeleccionado()?.profesor_apellido }}
+                    </p>
+                </div>
+                }
+                @if(tipoDetalle() === 'alumno') {
+                <div class="bg-slate-800 rounded-2xl p-6">
+                    <p class="text-slate-400 mb-2">Nombre completo</p>
+                    <p class="text-white text-xl font-bold">
+                        {{ detalleSeleccionado()?.nombre }}
+                        {{ detalleSeleccionado()?.apellidos }}
+                    </p>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-slate-800 rounded-2xl p-6">
+                        <p class="text-slate-400 mb-2">ID</p>
+                        <p class="text-blue-400 font-bold">
+                            #{{ detalleSeleccionado()?.id }}
+                        </p>
+                    </div>
+                    <div class="bg-slate-800 rounded-2xl p-6">
+                        <p class="text-slate-400 mb-2">Rol</p>
+                        <p class="text-white">
+                            Alumno
+                        </p>
+                    </div>
+                </div>
+                @if(detalleSeleccionado()?.email) {
+                <div class="bg-slate-800 rounded-2xl p-6">
+                    <p class="text-slate-400 mb-2">Email</p>
+                    <p class="text-white">
+                        {{ detalleSeleccionado()?.email }}
+                    </p>
+                </div>
+                }
+                @if(detalleSeleccionado()?.curso) {
+                <div class="bg-slate-800 rounded-2xl p-6">
+                    <p class="text-slate-400 mb-2">Curso</p>
+                    <p class="text-white">
+                        {{ detalleSeleccionado()?.curso }}
+                    </p>
+                </div>
+                }
+                }
+            </div>
+        </div>
+    </div>
+    }
+
+    @if(isAlumno()) {
+    <div class="fixed bottom-6 left-6 z-50">
+        <button (click)="mostrarLogoutModal.set(true)" class="group flex items-center gap-3
+                    px-4 py-3 rounded-xl
+                    bg-sidebar text-sidebar-foreground
+                    border border-sidebar-accent
+                    hover:bg-red-500
+                    hover:text-white
+                    hover:shadow-lg
+                    hover:shadow-red-500/30
+                    hover:translate-x-1
+                    active:scale-95
+                    transition-all duration-300">
+            <svg [lucideIcon]="icons.LogOut"
+                class="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1">
+            </svg>
+            <span>Cerrar sesión</span>
+        </button>
+    </div>
+    }
+
+    @if(mostrarLogoutModal()) {
+    <div class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+        <div class="bg-slate-900 rounded-3xl shadow-2xl p-8 w-full max-w-md border border-slate-700">
+            <div class="text-center">
+                <div class="w-20 h-20 mx-auto rounded-full bg-red-500/10 flex items-center justify-center mb-6">
+                    <svg [lucideIcon]="icons.LogOut" class="w-10 h-10 text-red-500"></svg>
+                </div>
+                <h3 class="text-2xl font-bold text-white mb-3">
+                    ¿Cerrar sesión?
+                </h3>
+                <p class="text-slate-400 mb-8">
+                    Se cerrará tu sesión actual y volverás al inicio de sesión.
+                </p>
+                <div class="flex gap-4">
+                    <button (click)="closeLogoutModal()"
+                        class="flex-1 py-3 rounded-xl border border-slate-700 hover:bg-slate-800 text-white">
+                        Cancelar
+                    </button>
+                    <button (click)="confirmLogout()"
+                        class="flex-1 py-3 rounded-xl bg-red-600 text-white hover:bg-red-700">
+                        Cerrar sesión
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    }
+
+    @if(mostrarDetalleDirectivo()) {
+    <div class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
+        <div class="w-full max-w-2xl rounded-3xl border border-slate-700 bg-slate-900 p-8 shadow-2xl">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-3xl font-bold text-white">
+                    @if(tipoDetalleDirectivo() === 'expediente') {
+                    📂 Detalle del expediente
+                    }
+                    @if(tipoDetalleDirectivo() === 'previ') {
+                    🛡️ Detalle del previ
+                    }
+                </h2>
+                <button (click)="closeDirectivoModal()"
+                    class="w-12 h-12 rounded-xl bg-slate-800 hover:bg-slate-700 text-white">
+                    ✕
+                </button>
+            </div>
+            @if(tipoDetalleDirectivo() === 'expediente') {
+            <div class="space-y-4">
+                <div class="bg-slate-800 rounded-2xl p-6">
+                    <p class="text-slate-400 mb-2">Estado</p>
+                    <p class="text-blue-400 font-bold text-xl">
+                        {{ detalleDirectivo()?.estado }}
+                    </p>
+                </div>
+                <div class="bg-slate-800 rounded-2xl p-6">
+                    <p class="text-slate-400 mb-2">Alumno</p>
+                    <p class="text-white">
+                        {{ detalleDirectivo()?.nombre_alumno }}
+                        {{ detalleDirectivo()?.apellidos_alumno }}
+                    </p>
+                </div>
+            </div>
+            }
+            @if(tipoDetalleDirectivo() === 'previ') {
+            <div class="space-y-4">
+                <div class="bg-slate-800 rounded-2xl p-6">
+                    <p class="text-slate-400 mb-2">Detalle</p>
+                    <p class="text-white">
+                        {{ detalleDirectivo()?.detalle }}
+                    </p>
+                </div>
+                <div class="bg-slate-800 rounded-2xl p-6">
+                    <p class="text-slate-400 mb-2">Fecha</p>
+                    <p class="text-white">
+                        {{ detalleDirectivo()?.fecha }}
+                    </p>
+                </div>
+            </div>
+            }
+        </div>
+    </div>
+    }

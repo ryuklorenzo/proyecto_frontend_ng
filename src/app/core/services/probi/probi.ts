@@ -9,7 +9,6 @@ export class ProbiService {
 
     private http = inject(HttpClient);
     private authService = inject(AuthService);
-    token = this.authService.token();
 
     createProbi(idMencion: number, probi: any) {
         return this.http.post(
@@ -17,7 +16,7 @@ export class ProbiService {
             probi,
             {
                 headers: new HttpHeaders({
-                    Authorization: `Bearer ${this.token}`
+                    Authorization: `Bearer ${this.authService.token()}`
                 })
             }
         );
@@ -26,17 +25,17 @@ export class ProbiService {
     getProbis() {
         return this.http.get('/api/probis/', {
             headers: {
-                Authorization: `Bearer ${this.token}`
+                Authorization: `Bearer ${this.authService.token()}`
             }
         });
     }
 
     getProbiById(id: number) {
         return this.http.get(
-            `/api/probis/${id}`,
+            `/api/probis/${id}/`,
             {
                 headers: {
-                    Authorization: `Bearer ${this.token}`
+                    Authorization: `Bearer ${this.authService.token()}`
                 }
             }
         );
@@ -44,11 +43,11 @@ export class ProbiService {
 
     updateProbi(id: number, id_mencion: number, probi: any) {
         return this.http.put(
-            `/api/probis/${id}?id_mencion=${id_mencion}`,
+            `/api/probis/${id}/?id_mencion=${id_mencion}`,
             probi,
             {
                 headers: {
-                    Authorization: `Bearer ${this.token}`
+                    Authorization: `Bearer ${this.authService.token()}`
                 }
             }
         );
@@ -56,10 +55,10 @@ export class ProbiService {
 
     deleteProbi(id: number) {
         return this.http.delete(
-            `/api/probis/${id}`,
+            `/api/probis/${id}/`,
             {
                 headers: {
-                    Authorization: `Bearer ${this.token}`
+                    Authorization: `Bearer ${this.authService.token()}`
                 }
             }
         );

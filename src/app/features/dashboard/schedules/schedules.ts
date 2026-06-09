@@ -11,7 +11,6 @@ import {
   LucideUserCircle,
   LucideDynamicIcon,
 } from '@lucide/angular';
-
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -20,9 +19,9 @@ import {
   ReactiveFormsModule,
   FormsModule
 } from '@angular/forms';
-
 import { TableModule } from 'primeng/table';
 import { ScheduleService } from '../../../core/services/schedules/schedule';
+import { ActivatedRoute } from '@angular/router';
 
 interface Buttons {
   label: string;
@@ -47,6 +46,7 @@ export class Schedules {
   authService = inject(AuthService);
   private scheduleService = inject(ScheduleService);
   private fb = inject(FormBuilder);
+  private route = inject(ActivatedRoute);
 
   user = this.authService.user;
 
@@ -64,7 +64,6 @@ export class Schedules {
     { label: 'Ver horarios', icon: LucideClock3, roles: ['admin', 'directivo', 'profesor'] },
   ];
 
-  // 2. Filtramos la lista según el rol del usuario (igual que en el sidebar)
   filteredButtons = computed(() => {
     const currentUser = this.user();
     if (!currentUser) return [];
@@ -129,7 +128,6 @@ export class Schedules {
   }
 
   loadSchedules() {
-    // Pedimos los datos y, cuando lleguen, mostramos la tabla
     this.scheduleService.getSchedules().subscribe({
       next: (data: any) => {
         this.schedules.set(data);
@@ -205,6 +203,14 @@ export class Schedules {
   updateSearchTerm(event: Event) {
     const target = event.target as HTMLInputElement;
     this.searchTerm.set(target.value);
+  }
+
+  constructor() {
+    this.route.queryParams.subscribe(params => {
+      if (params['view'] === 'list') {
+        this.loadSchedules();
+      }
+    });
   }
 
 }

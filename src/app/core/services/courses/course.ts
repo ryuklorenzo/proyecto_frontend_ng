@@ -9,18 +9,14 @@ export class CourseService {
 
     private http = inject(HttpClient);
     private authService = inject(AuthService);
-    token = this.authService.token();
 
     createCourse(idHorario: number, course: any) {
-
-        const token = this.authService.token();
-
         return this.http.post(
             `/api/courses/?id_horario=${idHorario}`,
             course,
             {
                 headers: new HttpHeaders({
-                    Authorization: `Bearer ${this.token}`
+                    Authorization: `Bearer ${this.authService.token()}`
                 })
             }
         );
@@ -29,7 +25,7 @@ export class CourseService {
     getCourses() {
         return this.http.get('/api/courses/', {
             headers: {
-                Authorization: `Bearer ${this.token}`
+                Authorization: `Bearer ${this.authService.token()}`
             }
         });
     }
@@ -39,7 +35,7 @@ export class CourseService {
             `/api/courses/${id}/`,
             {
                 headers: {
-                    Authorization: `Bearer ${this.token}`
+                    Authorization: `Bearer ${this.authService.token()}`
                 }
             }
         );
@@ -51,7 +47,7 @@ export class CourseService {
             course,
             {
                 headers: {
-                    Authorization: `Bearer ${this.token}`
+                    Authorization: `Bearer ${this.authService.token()}`
                 }
             }
         );
@@ -62,7 +58,7 @@ export class CourseService {
             `/api/courses/${id}/`,
             {
                 headers: {
-                    Authorization: `Bearer ${this.token}`
+                    Authorization: `Bearer ${this.authService.token()}`
                 }
             }
         );

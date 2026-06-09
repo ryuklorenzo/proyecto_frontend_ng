@@ -99,7 +99,7 @@ export class Mentions {
 
   constructor() {
     this.mentionForm = this.fb.group({
-      fecha: ['', Validators.required],
+      fecha: [new Date().toISOString().split('T')[0], Validators.required],
       id_reconocimiento: [null, Validators.required]
     });
 
@@ -108,36 +108,46 @@ export class Mentions {
     });
   }
 
+  private loadCrossedData() {
+    return forkJoin({
+      menciones: this.mentionService.getMentions(),
+      reconocimientos: this.recognitionService.getRecognitions(),
+      actitudes: this.attitudeService.getAttitudes(),
+      alumnos: this.studentService.getStudents()
+    });
+  }
+
   toggleCrearMencion() {
     this.mostrarFormulario.set(true);
     this.mostrarTabla.set(false);
     this.mostrarPorReconocimiento.set(false);
-    this.mentionForm.reset();
+    this.mentionForm.reset({
+      //fecha actual
+      fecha: new Date().toISOString().split('T')[0],
+      id_reconocimiento: null
+    });
 
-    forkJoin({
-      reconocimientos: this.recognitionService.getRecognitions(), 
-      actitudes: this.attitudeService.getAttitudes(), 
-      alumnos: this.studentService.getStudents()
-    }).subscribe({
+    this.loadCrossedData().subscribe({
       next: (data: any) => {
-        
+        //mapeamos reconocmimientos para cruzar datos
         const reconocimientosCompletos = data.reconocimientos.map((rec: any) => {
-          const actitudVinculada = data.actitudes.find((act: any) => act.id == rec.id_actitud);
+          const actitudVinculada = data.actitudes.find((act: any) => act.id == rec.id_actitud); 
+          //busca por actitud id asociada
 
           let alumnoVinculado = null;
           if (actitudVinculada) {
             const idAlumno = actitudVinculada.id_usuario; 
             alumnoVinculado = data.alumnos.find((a: any) => a.id == idAlumno);
-          }
+          } //busca por el id alumno si hay actitud
           return {
             ...rec,
             nombre_completo_alumno: alumnoVinculado 
               ? `${alumnoVinculado.nombre} ${alumnoVinculado.apellidos}` 
               : 'Alumno no encontrado'
-          };
+          };//lo devuelve con los datos vinculados
         });
 
-        this.reconocimientos.set(reconocimientosCompletos);
+        this.reconocimientos.set(reconocimientosCompletos); //save
       },
       error: (err: any) => console.error('Error cruzando datos', err)
     });
@@ -149,41 +159,31 @@ export class Mentions {
     this.mostrarPorReconocimiento.set(false);
     
     // Cruzamos los datos
-    forkJoin({
-      menciones: this.mentionService.getMentions(),
-      reconocimientos: this.recognitionService.getRecognitions(), 
-      actitudes: this.attitudeService.getAttitudes(), 
-      alumnos: this.studentService.getStudents()
-    }).subscribe({
+    this.loadCrossedData().subscribe({
       next: (data: any) => {
         
         const mencionesCompletas = data.menciones.map((mention: any) => {
           let nombre_completo_alumno = 'Alumno no encontrado';
 
-          // Reconocimiento de la mención
+          //reconocimiento de la mención
           const rec = data.reconocimientos.find((r: any) => r.id == mention.id_reconocimiento);
-          
           if (rec) {
-            // Actitud del reconocimiento
+            //actitud del reconocimiento
             const act = data.actitudes.find((a: any) => a.id == rec.id_actitud);
-            
             if (act) {
-              // Alumno de la actitud
+              //alumno de la actitud
               const idAlumno = act.id_usuario; 
               const alumno = data.alumnos.find((al: any) => al.id == idAlumno);
-              
               if (alumno) {
                 nombre_completo_alumno = `${alumno.nombre} ${alumno.apellidos}`;
               }
             }
           }
-
           return {
             ...mention,
             nombre_completo_alumno
-          };
+          };//datos cruzados
         });
-
         this.mentions.set(mencionesCompletas);
       },
       error: (err: any) => console.error('Error cargando menciones completas', err)
@@ -195,14 +195,9 @@ export class Mentions {
     this.mostrarFormulario.set(false);
     this.mostrarTabla.set(false);
 
-    forkJoin({
-      menciones: this.mentionService.getMentions(),
-      reconocimientos: this.recognitionService.getRecognitions(), 
-      actitudes: this.attitudeService.getAttitudes(), 
-      alumnos: this.studentService.getStudents()
-    }).subscribe({
+    this.loadCrossedData().subscribe({
       next: (data: any) => {
-        
+        //lo mismo
         const mencionesCruzadas = data.menciones.map((mention: any) => {
           let nombre_completo_alumno = 'Alumno no encontrado';
           let id_alumno = 'Desconocido';
@@ -219,15 +214,13 @@ export class Mentions {
               }
             }
           }
-
           return {
             ...mention,
             nombre_completo_alumno,
             id_alumno
           };
         });
-
-        // Guardamos los cruces hechos
+        //guardamos los cruces hechos
         this.mentionsWithStudents.set(mencionesCruzadas);
       },
       error: (err: any) => console.error('Error cruzando datos para el desplegable', err)
@@ -242,7 +235,10 @@ export class Mentions {
       this.mentionService.createMention(idReconocimiento, formValue).subscribe({
         next: (res: any) => {
           alert('¡Mención creada correctamente!');
-          this.mentionForm.reset();
+          this.mentionForm.reset({
+            fecha: new Date().toISOString().split('T')[0],
+            id_reconocimiento: null
+          });
         },
         error: (err: any) => {
           console.error('Error al crear mención', err);

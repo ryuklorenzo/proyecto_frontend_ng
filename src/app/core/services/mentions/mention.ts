@@ -9,7 +9,6 @@ export class MentionService {
 
     private http = inject(HttpClient);
     private authService = inject(AuthService);
-    token = this.authService.token();
 
     createMention(idReconocimiento: number, mention: any) {
         return this.http.post(
@@ -17,7 +16,7 @@ export class MentionService {
             mention,
             {
                 headers: new HttpHeaders({
-                    Authorization: `Bearer ${this.token}`
+                    Authorization: `Bearer ${this.authService.token()}`
                 })
             }
         );
@@ -26,17 +25,17 @@ export class MentionService {
     getMentions() {
         return this.http.get('/api/mentions/', {
             headers: {
-                Authorization: `Bearer ${this.token}`
+                Authorization: `Bearer ${this.authService.token()}`
             }
         });
     }
 
     getMentionById(id: number) {
         return this.http.get(
-            `/api/mentions/${id}`,
+            `/api/mentions/${id}/`,
             {
                 headers: {
-                    Authorization: `Bearer ${this.token}`
+                    Authorization: `Bearer ${this.authService.token()}`
                 }
             }
         );
@@ -44,10 +43,10 @@ export class MentionService {
 
     getMentionsByRecognition(idReconocimiento: number) {
         return this.http.get(
-            `/api/mentions/recognitions/${idReconocimiento}`,
+            `/api/mentions/recognitions/${idReconocimiento}/`,
             {
                 headers: {
-                    Authorization: `Bearer ${this.token}`
+                    Authorization: `Bearer ${this.authService.token()}`
                 }
             }
         );
@@ -55,11 +54,11 @@ export class MentionService {
 
     updateMention(id: number, id_reconocimiento: number, mention: any) {
         return this.http.put(
-            `/api/mentions/${id}?id_reconocimiento=${id_reconocimiento}`,
+            `/api/mentions/${id}/?id_reconocimiento=${id_reconocimiento}`,
             mention,
             {
                 headers: {
-                    Authorization: `Bearer ${this.token}`
+                    Authorization: `Bearer ${this.authService.token()}`
                 }
             }
         );
@@ -67,10 +66,10 @@ export class MentionService {
 
     deleteMention(id: number) {
         return this.http.delete(
-            `/api/mentions/${id}`,
+            `/api/mentions/${id}/`,
             {
                 headers: {
-                    Authorization: `Bearer ${this.token}`
+                    Authorization: `Bearer ${this.authService.token()}`
                 }
             }
         );
