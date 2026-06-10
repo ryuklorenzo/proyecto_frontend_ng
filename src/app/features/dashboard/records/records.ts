@@ -248,6 +248,7 @@ export class Records {
     this.mostrarBusquedaAlumno.set(false);
   }
 
+  //Para que muestre el directivo logueado
   showExecutiveSelector() {
     this.mostrarFormulario.set(false);
     this.mostrarTabla.set(false);
